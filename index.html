@@ -51,8 +51,15 @@ body{font-family:'Barlow Condensed',sans-serif;background:#000;color:#fff;overfl
 .t:hover{transform:scale(1.1) rotate(2deg);z-index:10;box-shadow:0 8px 0 rgba(0,0,0,.5),0 12px 35px rgba(255,140,0,.7);border-color:rgba(255,140,0,.5)}
 .t.sel{transform:scale(1.15) rotate(-2deg);box-shadow:0 0 0 4px #ffd700,0 10px 0 rgba(0,0,0,.5),0 14px 40px rgba(255,215,0,1);animation:sp2 .4s ease infinite;z-index:11;border-color:#ffd700}
 @keyframes sp2{0%,100%{transform:scale(1.15) rotate(-2deg)}50%{transform:scale(1.2) rotate(-2deg)}}
-.t.hint{animation:hg 1.5s ease-in-out infinite}
-@keyframes hg{0%,100%{box-shadow:0 0 0 4px rgba(255,215,0,.6),0 8px 25px rgba(255,215,0,.5);transform:scale(1)}50%{box-shadow:0 0 0 6px rgba(255,215,0,1),0 10px 35px rgba(255,215,0,1);transform:scale(1.12)}}
+
+
+/* ===== CLEAR HINT SYSTEM: arrow + highlight ===== */
+.t.hint-from{box-shadow:0 0 0 4px #ffd700,0 0 25px rgba(255,215,0,.8)!important;z-index:15;animation:hintBounce 1s ease-in-out infinite;border-color:#ffd700!important}
+.t.hint-to{box-shadow:0 0 0 4px #ff8c00,0 0 20px rgba(255,140,0,.6)!important;z-index:14;animation:hintBounce 1s ease-in-out infinite .15s;border-color:#ff8c00!important}
+@keyframes hintBounce{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.hint-arrow{position:fixed;font-size:2rem;z-index:20;pointer-events:none;color:#ffd700;filter:drop-shadow(0 2px 8px rgba(0,0,0,.8)) drop-shadow(0 0 10px rgba(255,215,0,.6));animation:hintArrowPulse 1s ease-in-out infinite}
+@keyframes hintArrowPulse{0%,100%{opacity:1;transform:translate(-50%,-50%) scale(1)}50%{opacity:.7;transform:translate(-50%,-50%) scale(1.2)}}
+
 .t.mtch{animation:mp .3s ease forwards}
 @keyframes mp{0%{transform:scale(1);opacity:1}40%{transform:scale(1.3) rotate(120deg);opacity:1}100%{transform:scale(0) rotate(360deg);opacity:0}}
 .t.fall{animation:tf .35s cubic-bezier(.34,1.56,.64,1)}
@@ -67,7 +74,7 @@ body{font-family:'Barlow Condensed',sans-serif;background:#000;color:#fff;overfl
 .t.xr .ts{font-size:1.2rem;font-weight:900;color:#fff;text-shadow:0 0 15px #000,0 0 30px rgba(255,215,0,1)}
 .t.or{background:linear-gradient(145deg,#5c3a1e,#3a2210)!important;border:3px solid #8B4513!important;cursor:default}
 .t.oc{background:linear-gradient(145deg,#1a2a1a,#0a1a0a)!important;border:3px solid #2d5a2d!important;cursor:default}
-.ohp{position:absolute;bottom:2px;right:4px;font-size:.7rem;font-weight:900;text-shadow:0 1px 3px #000;font-family:'Archivo Black',sans-serif}
+.ohp{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:.7rem;font-weight:900;text-shadow:0 1px 3px #000,0 0 8px rgba(0,0,0,.8);font-family:'Archivo Black',sans-serif;background:rgba(0,0,0,.6);padding:1px 6px;border-radius:4px}
 .t.or .ohp{color:#ffd700}.t.oc .ohp{color:#55ff55}
 .t.ock{animation:oc .4s ease}
 @keyframes oc{0%{transform:scale(1)}50%{transform:scale(1.1) rotate(5deg)}100%{transform:scale(1)}}
@@ -95,7 +102,41 @@ body{font-family:'Barlow Condensed',sans-serif;background:#000;color:#fff;overfl
 .at{position:fixed;top:12px;right:12px;z-index:100;background:rgba(0,0,0,.7);border:2px solid rgba(255,215,0,.5);border-radius:50%;width:44px;height:44px;font-size:1.3rem;cursor:pointer;color:#ffd700;display:flex;align-items:center;justify-content:center;transition:all .2s;backdrop-filter:blur(10px)}
 .at:hover{border-color:#ffd700;transform:scale(1.1)}.at.mu{opacity:.5}
 .ob{background:rgba(0,0,0,.5);border-radius:10px;padding:8px 15px;margin:8px auto;max-width:500px;display:flex;gap:15px;justify-content:center;flex-wrap:wrap;border:1px solid rgba(255,69,0,.3);font-size:.85rem}
-@media(max-width:768px){.hud{justify-content:center}.hi{min-width:70px;padding:8px 10px}.hv{font-size:1.2rem}.lg{grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:10px}.dc{flex-direction:column;text-align:center}#gb{gap:5px;padding:10px}}
+@media(max-width:768px){
+.hud{justify-content:center;gap:5px;margin-bottom:6px}
+.hi{min-width:60px;padding:6px 8px}.hv{font-size:1.1rem}
+.hl{font-size:.6rem;letter-spacing:1px}
+.lg{grid-template-columns:repeat(auto-fill,minmax(55px,1fr));gap:8px}
+.dc{flex-direction:row;text-align:left;padding:8px 12px;margin:6px auto;gap:8px}
+.cp{width:36px;height:36px;font-size:1.3rem}
+.dcn{font-size:.8rem}.dct{font-size:.8rem}
+#gb{gap:4px;padding:8px;border-radius:14px;margin:6px auto;border-width:2px;box-shadow:0 0 0 3px rgba(255,69,0,.4),0 10px 30px rgba(0,0,0,.6)}
+.t{border-radius:8px;border-width:1.5px}
+.pc{padding:8px;margin-bottom:6px;border-radius:10px}
+.pl{font-size:.85rem;margin-bottom:4px}
+.pbg{height:22px}
+.pb{font-size:.75rem}
+.ob{padding:5px 10px;font-size:.75rem;margin:4px auto;gap:8px}
+.ingame-links{padding:6px;gap:5px;margin:5px auto}
+.ingame-links a{font-size:.75rem;padding:6px 10px;min-height:36px}
+.combo-meter{margin:3px auto}
+.tile-legend{padding:4px 8px;gap:6px;margin:4px auto;font-size:.6rem}
+.tile-legend-dot{width:11px;height:11px;font-size:.5rem}
+.bg{margin:8px 0}
+.bs{padding:8px 16px;font-size:.8rem}
+.ntf{padding:20px 30px;font-size:1.1rem;max-width:85vw}
+.gt{font-size:clamp(1.6rem,7vw,3rem)}
+#gc{padding:8px;padding-bottom:60px}
+.sh{padding:12px;margin:8px 0}
+.sht{font-size:1.3rem}
+}
+@media(max-width:400px){
+#gb{gap:3px;padding:6px}
+.t{border-radius:6px}
+.hud{gap:3px}.hi{min-width:50px;padding:4px 6px}.hv{font-size:1rem}
+.ingame-links a{font-size:.65rem;padding:5px 7px;min-height:32px}
+.tile-legend{font-size:.55rem}
+}
 
 /* ===== NEW: Gallery/Backstage Screen ===== */
 .gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;margin:15px 0}
@@ -257,6 +298,146 @@ body{font-family:'Barlow Condensed',sans-serif;background:#000;color:#fff;overfl
 .tile-pop{animation:tilePop .2s ease}
 @keyframes tilePop{0%{transform:scale(.8)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
 
+
+/* ===== Touch swipe feedback ===== */
+.t.drag-over{box-shadow:0 0 0 3px #ffd700,0 8px 20px rgba(255,215,0,.5)!important;transform:scale(1.05)}
+/* ===== Objective banner (clearer what to do) ===== */
+.obj-banner{background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(255,69,0,.1));border:2px solid rgba(255,215,0,.3);border-radius:10px;padding:10px 14px;margin:6px auto;max-width:520px;text-align:center;font-size:.85rem;color:#ffd700;line-height:1.3}
+.obj-banner b{color:#fff}
+.obj-banner .obj-icon{font-size:1.2rem;margin-right:4px}
+/* ===== First-time helper arrows ===== */
+.first-play-hint{position:absolute;top:-30px;left:50%;transform:translateX(-50%);font-size:.7rem;color:#ffd700;white-space:nowrap;animation:bounce 1.5s infinite;pointer-events:none;text-shadow:0 1px 5px rgba(0,0,0,.8);z-index:20}
+@media(max-width:768px){.obj-banner{font-size:.75rem;padding:6px 10px;margin:4px auto}}
+
+
+/* ===== Rock Star Life Shop ===== */
+.shop-status{background:linear-gradient(135deg,rgba(26,10,10,.95),rgba(42,26,58,.95));border-radius:16px;padding:18px;border:3px solid rgba(255,215,0,.4);margin:12px 0;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+.shop-coins{font-family:'Archivo Black',sans-serif;font-size:1.8rem;color:#ffd700;text-shadow:0 0 15px rgba(255,215,0,.6)}
+.shop-fame{font-size:.9rem;color:#ff8c00;margin-top:4px}
+.fame-bar{background:rgba(0,0,0,.5);height:10px;border-radius:5px;margin:6px auto;max-width:300px;overflow:hidden;border:1px solid rgba(255,215,0,.3)}
+.fame-fill{height:100%;background:linear-gradient(90deg,#dc143c,#ffd700);border-radius:5px;transition:width .5s}
+.fame-label{font-size:.75rem;color:#aaa;margin-top:2px}
+.shop-cat-bar{display:flex;gap:6px;justify-content:center;margin:12px 0;flex-wrap:wrap}
+.shop-cat{background:rgba(255,69,0,.15);border:2px solid rgba(255,69,0,.3);color:#ff8c00;padding:8px 14px;border-radius:8px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:700;transition:all .2s}
+.shop-cat.active{background:linear-gradient(135deg,#dc143c,#8b0000);border-color:#ffd700;color:#fff;box-shadow:0 4px 15px rgba(220,20,60,.5)}
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin:12px 0}
+.shop-item{background:linear-gradient(135deg,rgba(26,10,10,.9),rgba(42,26,58,.9));border-radius:14px;padding:16px;text-align:center;border:3px solid rgba(255,69,0,.3);transition:all .3s;position:relative;cursor:pointer}
+.shop-item:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(255,215,0,.3);border-color:rgba(255,215,0,.5)}
+.shop-item.owned{border-color:#ffd700;background:linear-gradient(135deg,rgba(50,30,10,.9),rgba(60,30,70,.9))}
+.shop-item.owned::after{content:'\2705';position:absolute;top:8px;right:8px;font-size:1rem}
+.shop-item.equipped{border-color:#00ff88;box-shadow:0 0 20px rgba(0,255,136,.3)}
+.shop-item.equipped::after{content:'\1F451';position:absolute;top:8px;right:8px;font-size:1rem}
+.shop-item.locked{opacity:.5}
+.shop-icon{font-size:2.8rem;margin-bottom:8px;display:block}
+.shop-name{font-family:'Archivo Black',sans-serif;font-size:.8rem;color:#ffd700;margin-bottom:3px}
+.shop-desc{font-size:.7rem;color:#aaa;margin-bottom:6px;line-height:1.2}
+.shop-price{font-family:'Archivo Black',sans-serif;font-size:.85rem;color:#ffd700;display:flex;align-items:center;justify-content:center;gap:4px}
+.shop-price.owned-price{color:#55ff55}
+/* ===== Band Preview ===== */
+.band-preview{background:linear-gradient(135deg,rgba(0,0,0,.8),rgba(30,10,40,.8));border-radius:16px;padding:18px;margin:12px 0;border:2px solid rgba(255,69,0,.3);text-align:center}
+.band-preview-title{font-family:'Archivo Black',sans-serif;font-size:1rem;color:#ffd700;margin-bottom:10px}
+.band-scene{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;font-size:2rem;margin:8px 0}
+.band-scene-item{display:flex;flex-direction:column;align-items:center;gap:2px}
+.band-scene-label{font-size:.6rem;color:#ff8c00}
+.fame-level{display:inline-block;background:linear-gradient(135deg,#dc143c,#8b0000);color:#fff;padding:3px 10px;border-radius:6px;font-size:.7rem;font-weight:700;border:1px solid rgba(255,215,0,.5);margin-top:6px}
+@media(max-width:768px){.shop-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}.shop-item{padding:12px}.shop-icon{font-size:2.2rem}.shop-name{font-size:.7rem}.shop-desc{font-size:.6rem}}
+
+
+/* ===== Goal Tracker (in-game HUD) ===== */
+.goal-tracker{background:linear-gradient(135deg,rgba(0,0,0,.7),rgba(30,10,40,.7));border:2px solid rgba(255,215,0,.3);border-radius:10px;padding:8px 12px;margin:6px auto;max-width:520px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .2s;backdrop-filter:blur(5px)}
+.goal-tracker:hover{border-color:#ffd700;box-shadow:0 4px 15px rgba(255,215,0,.3)}
+.goal-icon{font-size:1.6rem;flex-shrink:0}
+.goal-info{flex:1;min-width:0}
+.goal-name{font-family:'Archivo Black',sans-serif;font-size:.75rem;color:#ffd700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.goal-progress{display:flex;align-items:center;gap:6px;margin-top:3px}
+.goal-bar{flex:1;background:rgba(255,255,255,.1);height:8px;border-radius:4px;overflow:hidden}
+.goal-fill{height:100%;background:linear-gradient(90deg,#dc143c,#ffd700);border-radius:4px;transition:width .5s}
+.goal-pct{font-size:.65rem;color:#ff8c00;white-space:nowrap}
+.goal-ready{animation:goalReady 1s ease-in-out infinite}
+@keyframes goalReady{0%,100%{border-color:#ffd700;box-shadow:0 0 10px rgba(255,215,0,.3)}50%{border-color:#00ff88;box-shadow:0 0 25px rgba(0,255,136,.5)}}
+/* ===== Afford Alert Toast ===== */
+.afford-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;padding:14px 24px;border-radius:14px;font-family:'Archivo Black',sans-serif;font-size:.9rem;z-index:10001;animation:affordIn .5s cubic-bezier(.68,-.55,.265,1.55);box-shadow:0 8px 30px rgba(255,215,0,.6);text-align:center;cursor:pointer;max-width:90vw}
+@keyframes affordIn{from{transform:translateX(-50%) translateY(50px) scale(.8);opacity:0}to{transform:translateX(-50%) translateY(0) scale(1);opacity:1}}
+/* ===== Shop item progress bar ===== */
+.shop-item-progress{background:rgba(255,255,255,.1);height:6px;border-radius:3px;margin-top:6px;overflow:hidden}
+.shop-item-fill{height:100%;background:linear-gradient(90deg,#dc143c,#ffd700);border-radius:3px;transition:width .3s}
+.shop-item.affordable{border-color:#00ff88!important;box-shadow:0 0 20px rgba(0,255,136,.3)!important;animation:canBuy 1.5s ease-in-out infinite}
+@keyframes canBuy{0%,100%{box-shadow:0 0 15px rgba(0,255,136,.3)}50%{box-shadow:0 0 30px rgba(0,255,136,.6)}}
+.shop-item.affordable .shop-price{color:#00ff88!important}
+/* ===== Post-level reward breakdown ===== */
+.reward-breakdown{background:rgba(0,0,0,.4);border-radius:10px;padding:10px;margin:8px 0;border:1px solid rgba(255,215,0,.2)}
+.reward-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:.8rem}
+.reward-row .label{color:#aaa}.reward-row .value{color:#ffd700;font-weight:700}
+.reward-row.total{border-top:1px solid rgba(255,215,0,.3);margin-top:4px;padding-top:6px;font-size:.9rem}
+.reward-row.total .label{color:#fff}.reward-row.total .value{color:#00ff88}
+/* ===== Next purchase teaser ===== */
+.next-buy{background:linear-gradient(135deg,rgba(255,215,0,.08),rgba(255,69,0,.05));border:1px dashed rgba(255,215,0,.3);border-radius:8px;padding:8px;margin-top:8px;font-size:.8rem;color:#ff8c00;text-align:center;cursor:pointer}
+.next-buy:hover{border-color:#ffd700;background:rgba(255,215,0,.15)}
+.next-buy b{color:#ffd700}
+@media(max-width:768px){.goal-tracker{padding:6px 10px;gap:8px}.goal-icon{font-size:1.3rem}.goal-name{font-size:.65rem}.goal-pct{font-size:.6rem}.afford-toast{font-size:.8rem;padding:10px 18px;bottom:60px}}
+
+
+/* ===== Upgrade Bonus HUD ===== */
+.bonus-bar{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:4px auto;max-width:520px}
+.bonus-pill{background:rgba(0,0,0,.5);border:1px solid rgba(255,215,0,.25);border-radius:20px;padding:3px 10px;font-size:.65rem;color:#ffd700;display:flex;align-items:center;gap:3px;backdrop-filter:blur(5px)}
+.bonus-pill .bp-icon{font-size:.8rem}
+.bonus-pill.active{border-color:rgba(0,255,136,.4);color:#00ff88;background:rgba(0,255,136,.08)}
+/* ===== Power Chord Tile ===== */
+.t.pchord{background:linear-gradient(135deg,#8b00ff,#4400aa,#8b00ff)!important;background-size:200% 200%!important;box-shadow:0 0 0 3px #8b00ff,0 8px 0 rgba(0,0,0,.5),0 0 30px rgba(139,0,255,.6);border-color:#8b00ff!important}
+.t.pchord::after{content:'\1F3B5';position:absolute;top:-8px;right:-8px;font-size:1.1rem;z-index:10}
+/* ===== Crowd Surf Tile ===== */
+.t.csurf{background:linear-gradient(135deg,#ff1493,#ff69b4,#ff1493)!important;box-shadow:0 0 0 3px #ff1493,0 8px 0 rgba(0,0,0,.5),0 0 30px rgba(255,20,147,.6);border-color:#ff1493!important}
+.t.csurf::after{content:'\1F3C4';position:absolute;top:-8px;right:-8px;font-size:1.1rem;z-index:10}
+/* ===== Encore Tile ===== */
+.t.encore{background:linear-gradient(135deg,#00cc88,#00ff88,#00cc88)!important;box-shadow:0 0 0 3px #00ff88,0 8px 0 rgba(0,0,0,.5),0 0 30px rgba(0,255,136,.6);border-color:#00ff88!important}
+.t.encore::after{content:'\1F504';position:absolute;top:-8px;right:-8px;font-size:1.1rem;z-index:10}
+/* ===== Smooth pulse for special tiles (no strobe!) ===== */
+.t.pchord,.t.csurf,.t.encore{animation:specialGlow 3s ease-in-out infinite}
+@keyframes specialGlow{0%,100%{filter:brightness(1.1)}50%{filter:brightness(1.35)}}
+/* ===== Bonus popup on level start ===== */
+.bonus-splash{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9994;display:flex;align-items:center;justify-content:center}
+.bonus-splash-box{background:linear-gradient(135deg,rgba(20,5,30,.98),rgba(40,15,10,.98));border:4px solid #ffd700;border-radius:20px;padding:28px;max-width:380px;width:90%;text-align:center;animation:nb .5s cubic-bezier(.68,-.55,.265,1.55);box-shadow:0 0 0 10px rgba(255,215,0,.15),0 30px 60px rgba(0,0,0,.9)}
+.bonus-splash-title{font-family:'Archivo Black',sans-serif;font-size:1.2rem;color:#ffd700;margin-bottom:12px}
+.bonus-item{display:flex;align-items:center;gap:10px;padding:8px;margin:6px 0;background:rgba(255,215,0,.06);border-radius:10px;border:1px solid rgba(255,215,0,.15);text-align:left}
+.bonus-item-icon{font-size:1.6rem;flex-shrink:0}
+.bonus-item-text{flex:1}
+.bonus-item-name{font-family:'Archivo Black',sans-serif;font-size:.75rem;color:#ffd700}
+.bonus-item-effect{font-size:.7rem;color:#00ff88;margin-top:2px}
+.bonus-splash .btn{margin-top:14px}
+/* ===== Shop: bonus descriptions ===== */
+.shop-bonus{font-size:.65rem;color:#00ff88;margin-top:3px;font-weight:700}
+/* ===== Tile legend additions ===== */
+.tl-pchord{background:linear-gradient(135deg,#8b00ff,#4400aa);border:1px solid #8b00ff}
+.tl-csurf{background:linear-gradient(135deg,#ff1493,#ff69b4);border:1px solid #ff1493}
+.tl-encore{background:linear-gradient(135deg,#00cc88,#00ff88);border:1px solid #00ff88}
+@media(max-width:768px){.bonus-bar{gap:4px}.bonus-pill{font-size:.58rem;padding:2px 7px}.bonus-splash-box{padding:20px}.bonus-item{padding:6px;gap:8px}.bonus-item-icon{font-size:1.3rem}}
+
+
+/* ===== Menu visual upgrades ===== */
+.sub::after{content:'\2605 A Match-3 Rock Adventure \2605';display:block;font-size:.8rem;color:#ff8c00;margin-top:4px;letter-spacing:1px;opacity:.8}
+/* ===== Better dialogue box ===== */
+.dc{background:linear-gradient(135deg,rgba(26,10,10,.92),rgba(42,26,58,.92));backdrop-filter:blur(12px);border:2px solid rgba(255,69,0,.4);border-radius:14px;padding:10px 14px;margin:8px auto;max-width:520px;display:flex;gap:12px;align-items:center;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+.cp{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#dc143c,#8b0000);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;border:2px solid rgba(255,215,0,.5);box-shadow:0 3px 10px rgba(0,0,0,.4)}
+.dcn{font-family:'Archivo Black',sans-serif;font-size:.8rem;color:#ffd700}
+.dct{font-size:.85rem;color:#e0e0e0;font-style:italic;line-height:1.3;margin-top:2px}
+/* ===== Score popup upgrade ===== */
+.scp{position:fixed;font-family:'Archivo Black',sans-serif;font-size:1.4rem;z-index:9998;pointer-events:none;text-shadow:0 2px 8px rgba(0,0,0,.8),0 0 15px rgba(255,215,0,.6);animation:scpAnim 1.2s ease-out forwards}
+@keyframes scpAnim{0%{opacity:1;transform:translateY(0) scale(.8)}20%{opacity:1;transform:translateY(-15px) scale(1.1)}100%{opacity:0;transform:translateY(-80px) scale(.7)}}
+/* ===== Level select visual upgrade ===== */
+.lb{position:relative;overflow:hidden}
+.lb::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,215,0,.15),transparent);transition:left .6s}
+.lb:hover::before{left:100%}
+.lb.cur{box-shadow:0 0 0 3px #ffd700,0 0 20px rgba(255,215,0,.4)}
+/* ===== Win overlay upgrade ===== */
+.win-box{position:relative;overflow:hidden}
+.win-box::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg,transparent,rgba(255,215,0,.05),transparent,rgba(255,215,0,.05));animation:winShimmer 8s linear infinite;pointer-events:none}
+@keyframes winShimmer{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+/* ===== Particle trails on matches ===== */
+.ptc{position:fixed;font-size:1.2rem;z-index:9997;pointer-events:none;animation:ptcAnim .8s ease-out forwards}
+@keyframes ptcAnim{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0)}}
+/* ===== Smooth tile transitions ===== */
+.t{transition:all .15s cubic-bezier(.34,1.56,.64,1),box-shadow .2s ease}
+
 </style>
 </head>
 <body>
@@ -276,14 +457,17 @@ body{font-family:'Barlow Condensed',sans-serif;background:#000;color:#fff;overfl
 <a href="https://www.redbubble.com/shop/ap/172252421" target="_blank" class="bla">&#128085; Merch</a>
 </div>
 <div class="dc"><div class="cp">&#127928;</div><div class="dco"><div class="dcn">Jake</div><div class="dct">"Ready to go from basement to stadiums? Let's match some instruments and ROCK!"</div></div></div>
-<div class="bg"><button class="btn btn-play" onclick="showLS()">&#127925; LET'S ROCK!</button><br><button class="btn btn2 bs" onclick="showDaily()">&#128293; Daily Challenge</button> <button class="btn btn2 bs" onclick="showBK()">&#127911; Backstage</button><br><button class="btn btn2 bs" onclick="showSets()">&#9881;&#65039; Settings</button> <button class="btn btn2 bs" onclick="tut()">&#128214; How to Play</button></div>
+<div class="bg"><button class="btn btn-play" onclick="showLS()">&#127925; LET'S ROCK!</button><br><button class="btn btn2 bs" onclick="showDaily()">&#128293; Daily Challenge</button> <button class="btn" onclick="showRSL()" style="background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;box-shadow:0 8px 0 #b8860b,0 10px 25px rgba(0,0,0,.6)">&#127775; ROCK STAR LIFE</button> <button class="btn btn2 bs" onclick="showBK()">&#127911; Backstage</button><br><button class="btn btn2 bs" onclick="showSets()">&#9881;&#65039; Settings</button> <button class="btn btn2 bs" onclick="tut()">&#128214; How to Play</button></div>
 </div>
 <!-- LEVEL SELECT -->
 <div id="ls" class="screen">
 <h2 class="gt" style="font-size:2.2rem">Select Level</h2>
 <div class="sh"><div class="sht" id="stt">&#127968; Stage 1: Basement Dreamers</div><div class="shd" id="std">"We're gonna be HUGE... someday."</div></div>
 <div class="lg" id="lgr"></div>
-<div class="bg"><button class="btn btn2 bs" onclick="showM()">&#127968; Back to Menu</button></div>
+<div class="bg" style="margin-top:20px">
+<button class="btn" onclick="returnFromShop()" style="font-size:1.1rem;padding:14px 36px" id="rsl-back-bottom">&#127926; BACK TO GAME</button>
+<button class="btn btn2" onclick="showM()" style="padding:12px 28px">&#127968; Back to Menu</button>
+</div>
 </div>
 
 <!-- BACKSTAGE / GALLERY SCREEN -->
@@ -301,7 +485,10 @@ body{font-family:'Barlow Condensed',sans-serif;background:#000;color:#fff;overfl
 <div id="tab-merch" class="tab-content"><div class="gal-grid" id="merch-grid"></div></div>
 <div id="tab-achs" class="tab-content"><div class="ach-grid" id="ach-grid"></div></div>
 <div id="tab-scores" class="tab-content"><ul class="hs-list" id="hs-list"></ul></div>
-<div class="bg"><button class="btn btn2 bs" onclick="showM()">&#127968; Back to Menu</button></div>
+<div class="bg" style="margin-top:20px">
+<button class="btn" onclick="returnFromShop()" style="font-size:1.1rem;padding:14px 36px" id="rsl-back-bottom">&#127926; BACK TO GAME</button>
+<button class="btn btn2" onclick="showM()" style="padding:12px 28px">&#127968; Back to Menu</button>
+</div>
 </div>
 <!-- SETTINGS SCREEN -->
 <div id="sets" class="screen">
@@ -311,7 +498,10 @@ body{font-family:'Barlow Condensed',sans-serif;background:#000;color:#fff;overfl
 <div class="setting-row"><span class="setting-label">&#128161; Hints</span><div class="setting-toggle on" id="stg-hints" onclick="tgHints()"></div></div>
 <div class="setting-row"><span class="setting-label">&#128163; Reset All Progress</span><button class="btn bs" style="padding:8px 16px;font-size:.8rem;margin:0" onclick="resetAll()">RESET</button></div>
 </div>
-<div class="bg"><button class="btn btn2 bs" onclick="showM()">&#127968; Back to Menu</button></div>
+<div class="bg" style="margin-top:20px">
+<button class="btn" onclick="returnFromShop()" style="font-size:1.1rem;padding:14px 36px" id="rsl-back-bottom">&#127926; BACK TO GAME</button>
+<button class="btn btn2" onclick="showM()" style="padding:12px 28px">&#127968; Back to Menu</button>
+</div>
 </div>
 <!-- DAILY CHALLENGE SCREEN -->
 <div id="dcs" class="screen">
@@ -322,7 +512,33 @@ body{font-family:'Barlow Condensed',sans-serif;background:#000;color:#fff;overfl
 <button class="btn" id="dc-btn" onclick="startDaily()">&#127925; PLAY CHALLENGE</button>
 <div class="daily-timer" id="dc-timer"></div>
 </div>
-<div class="bg"><button class="btn btn2 bs" onclick="showM()">&#127968; Back to Menu</button></div>
+<div class="bg" style="margin-top:20px">
+<button class="btn" onclick="returnFromShop()" style="font-size:1.1rem;padding:14px 36px" id="rsl-back-bottom">&#127926; BACK TO GAME</button>
+<button class="btn btn2" onclick="showM()" style="padding:12px 28px">&#127968; Back to Menu</button>
+</div>
+</div>
+
+
+<!-- ROCK STAR LIFE SHOP -->
+<div id="rsl" class="screen">
+<h2 class="gt" style="font-size:1.8rem">&#127775; Rock Star Life</h2>
+<div style="display:flex;gap:8px;justify-content:center;margin-bottom:10px;flex-wrap:wrap">
+<button class="btn bs" onclick="returnFromShop()" style="flex:1;max-width:220px" id="rsl-back-top">&#127926; BACK TO GAME</button>
+<button class="btn btn2 bs" onclick="showM()" style="flex:1;max-width:200px">&#127968; MENU</button>
+</div>
+<div class="shop-status">
+<div class="shop-coins" id="rsl-coins">&#11088; 0 Stars</div>
+<div class="shop-fame">Fame Level: <span id="rsl-fame-name">Basement Nobody</span></div>
+<div class="fame-bar"><div class="fame-fill" id="rsl-fame-bar" style="width:0%"></div></div>
+<div class="fame-label" id="rsl-fame-next">Next: Garage Rocker (5 items)</div>
+</div>
+<div class="band-preview" id="band-preview"></div>
+<div class="shop-cat-bar" id="shop-cats"></div>
+<div class="shop-grid" id="shop-grid"></div>
+<div class="bg" style="margin-top:20px">
+<button class="btn" onclick="returnFromShop()" style="font-size:1.1rem;padding:14px 36px" id="rsl-back-bottom">&#127926; BACK TO GAME</button>
+<button class="btn btn2" onclick="showM()" style="padding:12px 28px">&#127968; Back to Menu</button>
+</div>
 </div>
 
 <!-- GAME -->
@@ -343,14 +559,17 @@ body{font-family:'Barlow Condensed',sans-serif;background:#000;color:#fff;overfl
 <a href="https://www.facebook.com/XRayStarband" target="_blank">&#128218; FB</a>
 <a href="https://www.redbubble.com/shop/ap/172252421" target="_blank">&#128085; Merch</a>
 </div>
+<div class="goal-tracker" id="goal-tracker" onclick="showRSL()" style="display:none"></div>
+<div class="bonus-bar" id="bonus-bar"></div>
 <div class="combo-meter"><div class="combo-fill" id="combo-fill" style="width:0%"></div></div>
+<div class="obj-banner" id="obj-banner"></div>
 <div class="tile-legend">
-<div class="tile-legend-item"><div class="tile-legend-dot tl-gem">&#9889;</div>Gem=2x pts</div>
-<div class="tile-legend-item"><div class="tile-legend-dot tl-amp">&#128266;</div>Amp=clears cross</div>
-<div class="tile-legend-item"><div class="tile-legend-dot tl-xr">&#9733;</div>XRay=row+col</div>
-<div class="tile-legend-item"><div class="tile-legend-dot tl-rs">&#11088;</div>Star=clears type</div>
-<div class="tile-legend-item"><div class="tile-legend-dot tl-road">&#128230;</div>Crate:2 hits</div>
-<div class="tile-legend-item"><div class="tile-legend-dot tl-cable">&#128268;</div>Cable:3 hits</div>
+<div class="tile-legend-item"><div class="tile-legend-dot tl-gem">&#9889;</div>Gem=bonus pts</div>
+<div class="tile-legend-item"><div class="tile-legend-dot tl-amp">&#128266;</div>Amp: SWAP it to clear row+col!</div>
+<div class="tile-legend-item"><div class="tile-legend-dot tl-xr">&#9733;</div>XRay: SWAP to blast row+col!</div>
+<div class="tile-legend-item"><div class="tile-legend-dot tl-rs">&#11088;</div>Star: SWAP to clear all of a type!</div>
+<div class="tile-legend-item"><div class="tile-legend-dot tl-road">&#128230;</div>Crate: match next to it!</div>
+<div class="tile-legend-item"><div class="tile-legend-dot tl-cable">&#128268;</div>Cable: match next to it!</div>
 </div>
 <div id="gb"></div>
 <div class="bg"><button class="btn btn2 bs" onclick="showLS()">&#127968; Quit Level</button></div>
@@ -379,13 +598,309 @@ default:g.gain.setValueAtTime(0,t);o.start(t);o.stop(t+.01)}}catch(e){}}
 
 // ===================== BGM ENGINE =====================
 var bgmPlaying=false,bgmIntensity=0,bgmTimer,bgmVisTimer;
-function startBGM(){if(bgmPlaying||!AO)return;iA();if(!AC)return;bgmPlaying=true;var bpm=120,bl=60/bpm;function loop(){if(!bgmPlaying||!AO)return;var t=AC.currentTime;playDrm(t,60,.12,.2);playDrm(t+bl*2,60,.12,.2);playSnr(t+bl,.06,.15);playSnr(t+bl*3,.06,.15);for(var i=0;i<4;i++){playHH(t+bl*i,.025,.05);playHH(t+bl*i+bl/2,.015,.03)}var bn=bgmIntensity>2?[82.4,98,110,98]:[82.4,82.4,110,98];bn.forEach(function(f,i){playBs(t+bl*i,f,.05+bgmIntensity*.008,.4)});if(bgmIntensity>=2){[330,392,440,392].forEach(function(f,i){playGt(t+bl*i+bl/2,f,.015+bgmIntensity*.004,.15)})}if(bgmIntensity>=4){playGt(t,164.8,.025,.8);playGt(t,246.9,.02,.8)}bgmTimer=setTimeout(loop,(bl*4)*1000-50)}loop();var bar=document.getElementById('bgm-bar');bar.innerHTML='';for(var i=0;i<30;i++){bar.appendChild(document.createElement('div'))}bgmVisTimer=setInterval(function(){document.querySelectorAll('.bgm-bar div').forEach(function(b){b.style.height=Math.random()*(2+bgmIntensity*2)+'px'});document.getElementById('bgm-bar').classList.toggle('intense',bgmIntensity>=3)},100)}
+// (old rock BGM removed - replaced by Neon Horizon below)
 function stopBGM(){bgmPlaying=false;clearTimeout(bgmTimer);clearInterval(bgmVisTimer);document.getElementById('bgm-bar').innerHTML=''}
-function playDrm(t,f,v,d){try{var o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(AC.destination);o.type='sine';o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(30,t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.start(t);o.stop(t+d)}catch(e){}}
-function playSnr(t,v,d){try{var buf=AC.createBuffer(1,AC.sampleRate*d|0,AC.sampleRate);var da=buf.getChannelData(0);for(var i=0;i<da.length;i++)da[i]=(Math.random()*2-1)*Math.exp(-i/(AC.sampleRate*.05));var s=AC.createBufferSource(),g=AC.createGain();s.buffer=buf;s.connect(g);g.connect(AC.destination);g.gain.setValueAtTime(v,t);s.start(t)}catch(e){}}
-function playHH(t,v,d){try{var buf=AC.createBuffer(1,AC.sampleRate*d|0,AC.sampleRate);var da=buf.getChannelData(0);for(var i=0;i<da.length;i++)da[i]=(Math.random()*2-1)*Math.exp(-i/(AC.sampleRate*.01));var s=AC.createBufferSource(),g=AC.createGain(),f=AC.createBiquadFilter();s.buffer=buf;f.type='highpass';f.frequency.value=8000;s.connect(f);f.connect(g);g.connect(AC.destination);g.gain.setValueAtTime(v,t);s.start(t)}catch(e){}}
-function playBs(t,f,v,d){try{var o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(AC.destination);o.type='triangle';o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(v,t);g.gain.setValueAtTime(v,t+d*.8);g.gain.exponentialRampToValueAtTime(.001,t+d);o.start(t);o.stop(t+d)}catch(e){}}
-function playGt(t,f,v,d){try{var o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(AC.destination);o.type='sawtooth';o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.start(t);o.stop(t+d)}catch(e){}}
+
+// ===================== "NEON HORIZON" — SYNTHWAVE BGM ENGINE =====================
+// Key: Am | Tempo: 108 BPM | Style: Gary Numan × Depeche Mode × Cosmic Darkwave
+// Chord progression: Am → F → C → G (i → VI → III → VII)
+
+// --- Frequency table (A minor scale) ---
+var NT={
+    A2:110, B2:123.5, C3:130.8, D3:146.8, E3:164.8, F3:174.6, G3:196,
+    A3:220, B3:246.9, C4:261.6, D4:293.7, E4:329.6, F4:349.2, G4:392,
+    A4:440, B4:493.9, C5:523.3, D5:587.3, E5:659.3, F5:698.5, G5:784,
+    A5:880
+};
+
+// Chord voicings (root, third, fifth, seventh)
+var CHORDS=[
+    [NT.A2, NT.A3, NT.C4, NT.E4],  // Am
+    [NT.F3, NT.A3, NT.C4, NT.F4],  // F
+    [NT.C3, NT.G3, NT.C4, NT.E4],  // C
+    [NT.G3, NT.B3, NT.D4, NT.G4]   // G
+];
+
+// The signature hook: descending motif E5→D5→C5→B4→A4
+var HOOK=[NT.E5, NT.D5, NT.C5, NT.B4, NT.A4];
+
+// Arp patterns per chord (16th note sequences)
+var ARP_PATTERNS=[
+    [NT.A4, NT.C5, NT.E5, NT.C5, NT.A4, NT.E4, NT.C5, NT.E5],  // Am
+    [NT.F4, NT.A4, NT.C5, NT.A4, NT.F4, NT.C4, NT.A4, NT.C5],  // F
+    [NT.C4, NT.E4, NT.G4, NT.E4, NT.C5, NT.G4, NT.E4, NT.G4],  // C
+    [NT.G4, NT.B4, NT.D5, NT.B4, NT.G4, NT.D4, NT.B4, NT.D5]   // G
+];
+
+// Bass patterns (root movement with octave jumps)
+var BASS_PATTERNS=[
+    [NT.A2, 0, NT.A3, 0, NT.A2, NT.A2, NT.A3, 0],       // Am - pulsing
+    [NT.F3, 0, NT.F3*2, 0, NT.F3, NT.F3, NT.F3*2, 0],   // F
+    [NT.C3, 0, NT.C3*2, 0, NT.C3, NT.C3, NT.C3*2, 0],   // C
+    [NT.G3, 0, NT.G3*2, 0, NT.G3, NT.G3, NT.G3*2, 0]    // G
+];
+
+// --- Synth voice functions ---
+
+function neonPad(t, freq, vol, dur) {
+    // Dual detuned sawtooth through lowpass — warm analog pad
+    if(!AC||!AO)return;try{
+    var o1=AC.createOscillator(),o2=AC.createOscillator(),o3=AC.createOscillator();
+    var g=AC.createGain(),f=AC.createBiquadFilter();
+    o1.type='sawtooth'; o2.type='sawtooth'; o3.type='triangle';
+    o1.frequency.setValueAtTime(freq,t);
+    o2.frequency.setValueAtTime(freq*1.003,t);     // Detune for width
+    o3.frequency.setValueAtTime(freq*0.998,t);     // Sub layer
+    f.type='lowpass';
+    // Filter opens with intensity
+    f.frequency.setValueAtTime(600+bgmIntensity*150,t);
+    f.Q.setValueAtTime(1.5,t);
+    o1.connect(f);o2.connect(f);o3.connect(f);f.connect(g);g.connect(AC.destination);
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(vol,t+0.08);
+    g.gain.setValueAtTime(vol*0.85,t+dur*0.3);
+    g.gain.linearRampToValueAtTime(0.001,t+dur);
+    o1.start(t);o1.stop(t+dur);o2.start(t);o2.stop(t+dur);o3.start(t);o3.stop(t+dur);
+    }catch(e){}
+}
+
+function dmBass(t, freq, vol, dur) {
+    // Depeche Mode bass: square+saw through resonant LP with envelope
+    if(!AC||!AO||!freq)return;try{
+    var o1=AC.createOscillator(),o2=AC.createOscillator();
+    var g=AC.createGain(),f=AC.createBiquadFilter();
+    o1.type='square'; o2.type='sawtooth';
+    o1.frequency.setValueAtTime(freq,t);
+    o2.frequency.setValueAtTime(freq*1.001,t);
+    f.type='lowpass';
+    f.frequency.setValueAtTime(600,t);
+    f.frequency.exponentialRampToValueAtTime(120,t+dur*0.8);
+    f.Q.setValueAtTime(6,t); // Resonant sweep
+    o1.connect(f);o2.connect(f);f.connect(g);g.connect(AC.destination);
+    g.gain.setValueAtTime(vol,t);
+    g.gain.setValueAtTime(vol*0.9,t+dur*0.3);
+    g.gain.exponentialRampToValueAtTime(0.001,t+dur);
+    o1.start(t);o1.stop(t+dur);o2.start(t);o2.stop(t+dur);
+    }catch(e){}
+}
+
+function crystalArp(t, freq, vol, dur) {
+    // Bright crystalline arp — triangle through bandpass with fast decay
+    if(!AC||!AO)return;try{
+    var o=AC.createOscillator(),g=AC.createGain(),f=AC.createBiquadFilter();
+    o.type='triangle';
+    o.frequency.setValueAtTime(freq,t);
+    f.type='bandpass';f.frequency.setValueAtTime(freq*2,t);f.Q.setValueAtTime(2,t);
+    o.connect(f);f.connect(g);g.connect(AC.destination);
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(vol,t+0.005);
+    g.gain.exponentialRampToValueAtTime(0.001,t+dur);
+    o.start(t);o.stop(t+dur);
+    }catch(e){}
+}
+
+function numanLead(t, freq, vol, dur) {
+    // Gary Numan lead: sawtooth with portamento, vibrato, resonant filter
+    if(!AC||!AO)return;try{
+    var o=AC.createOscillator(),g=AC.createGain(),f=AC.createBiquadFilter();
+    var lfo=AC.createOscillator(),lfoG=AC.createGain();
+    o.type='sawtooth';
+    o.frequency.setValueAtTime(freq*0.98,t); // Start slightly flat
+    o.frequency.linearRampToValueAtTime(freq,t+0.06); // Portamento glide up
+    lfo.frequency.setValueAtTime(5.5,t);
+    lfoG.gain.setValueAtTime(freq*0.008,t); // Subtle vibrato
+    lfo.connect(lfoG);lfoG.connect(o.frequency);
+    f.type='lowpass';
+    f.frequency.setValueAtTime(1800+bgmIntensity*400,t);
+    f.Q.setValueAtTime(4,t);
+    o.connect(f);f.connect(g);g.connect(AC.destination);
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(vol,t+0.015);
+    g.gain.setValueAtTime(vol*0.7,t+dur*0.6);
+    g.gain.exponentialRampToValueAtTime(0.001,t+dur);
+    o.start(t);o.stop(t+dur);lfo.start(t);lfo.stop(t+dur);
+    }catch(e){}
+}
+
+function gateSnare(t, vol) {
+    // 80s gated reverb snare — the signature sound
+    if(!AC||!AO)return;try{
+    var len=0.18;
+    var buf=AC.createBuffer(1,AC.sampleRate*len,AC.sampleRate);
+    var d=buf.getChannelData(0);
+    for(var i=0;i<d.length;i++){
+        var env=Math.exp(-i/(AC.sampleRate*0.06));
+        var gate=i<AC.sampleRate*len*0.75?1:Math.max(0,1-(i-AC.sampleRate*len*0.75)/(AC.sampleRate*0.01));
+        d[i]=(Math.random()*2-1)*env*gate;
+    }
+    var s=AC.createBufferSource(),g=AC.createGain(),f=AC.createBiquadFilter();
+    s.buffer=buf;
+    f.type='bandpass';f.frequency.setValueAtTime(1500,t);f.Q.setValueAtTime(0.8,t);
+    s.connect(f);f.connect(g);g.connect(AC.destination);
+    g.gain.setValueAtTime(vol,t);s.start(t);
+    // Add tonal body
+    var o=AC.createOscillator(),g2=AC.createGain();
+    o.type='triangle';o.frequency.setValueAtTime(180,t);o.frequency.exponentialRampToValueAtTime(80,t+0.05);
+    o.connect(g2);g2.connect(AC.destination);g2.gain.setValueAtTime(vol*0.4,t);g2.gain.exponentialRampToValueAtTime(0.001,t+0.06);
+    o.start(t);o.stop(t+0.1);
+    }catch(e){}
+}
+
+function kick808(t, vol) {
+    if(!AC||!AO)return;try{
+    var o=AC.createOscillator(),g=AC.createGain();
+    o.type='sine';
+    o.frequency.setValueAtTime(160,t);
+    o.frequency.exponentialRampToValueAtTime(35,t+0.15);
+    o.connect(g);g.connect(AC.destination);
+    g.gain.setValueAtTime(vol,t);
+    g.gain.exponentialRampToValueAtTime(0.001,t+0.35);
+    o.start(t);o.stop(t+0.35);
+    // Click transient
+    var o2=AC.createOscillator(),g2=AC.createGain();
+    o2.type='square';o2.frequency.setValueAtTime(1200,t);
+    o2.connect(g2);g2.connect(AC.destination);
+    g2.gain.setValueAtTime(vol*0.3,t);g2.gain.exponentialRampToValueAtTime(0.001,t+0.01);
+    o2.start(t);o2.stop(t+0.02);
+    }catch(e){}
+}
+
+function hat(t, vol, open) {
+    if(!AC||!AO)return;try{
+    var len=open?0.12:0.03;
+    var buf=AC.createBuffer(1,AC.sampleRate*len,AC.sampleRate);
+    var d=buf.getChannelData(0);
+    for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.exp(-i/(AC.sampleRate*(open?0.04:0.008)));
+    var s=AC.createBufferSource(),g=AC.createGain(),f=AC.createBiquadFilter();
+    s.buffer=buf;f.type='highpass';f.frequency.setValueAtTime(9000,t);
+    s.connect(f);f.connect(g);g.connect(AC.destination);g.gain.setValueAtTime(vol,t);s.start(t);
+    }catch(e){}
+}
+
+// Old function aliases for compatibility
+function playDrm(t,f,v,d){kick808(t,v)}
+function playSnr(t,v,d){gateSnare(t,v)}
+function playHH(t,v,d){hat(t,v,false)}
+function playBs(t,f,v,d){dmBass(t,f,v,d)}
+function playGt(t,f,v,d){crystalArp(t,f,v,d)}
+
+// ===================== BGM MAIN LOOP: "NEON HORIZON" =====================
+var bgmChordIdx=0; // Tracks which chord we're on in the progression
+
+function startBGM(){
+    if(bgmPlaying||!AO)return;iA();if(!AC)return;bgmPlaying=true;
+    bgmChordIdx=0;
+    function loop(){
+        if(!bgmPlaying||!AO)return;
+        try{
+        var stage=G.cl<=5?1:G.cl<=10?2:G.cl<=15?3:G.cl<=20?4:G.cl<=25?5:6;
+        var mood=Math.min(7,bgmIntensity);
+        var I=Math.max(stage,mood); // Intensity 0-7
+        var bpm=108; // Fixed tempo for groove consistency
+        var bl=60/bpm; var t=AC.currentTime;
+        var ci=bgmChordIdx%4; // Current chord index
+        var chord=CHORDS[ci];
+        var bass=BASS_PATTERNS[ci];
+        var arp=ARP_PATTERNS[ci];
+        var V=0.55+I*0.06; // Master volume
+
+        // ========== LAYER 1: DRUMS (always present) ==========
+
+        // Kick: four-on-the-floor
+        kick808(t, .10*V);
+        kick808(t+bl*1, .05*V); // Ghost kick
+        kick808(t+bl*2, .10*V);
+        kick808(t+bl*3, .04*V);
+        // Extra syncopation at high intensity
+        if(I>=5) kick808(t+bl*1.5, .06*V);
+        if(I>=7) kick808(t+bl*3.5, .05*V);
+
+        // Gated snare on 2 and 4
+        gateSnare(t+bl*1, .06*V);
+        gateSnare(t+bl*3, .06*V);
+        if(I>=4) gateSnare(t+bl*2.75, .025*V); // Ghost
+
+        // Hi-hats: 8ths at base, 16ths when intense
+        for(var i=0;i<4;i++){
+            hat(t+bl*i, .018*V, false);
+            hat(t+bl*i+bl/2, .012*V, false);
+            if(I>=3) hat(t+bl*i+bl/4, .006*V, false);
+            if(I>=6) hat(t+bl*i+bl*3/4, .004*V, false);
+        }
+        // Open hat on the "and" of 4
+        if(I>=2) hat(t+bl*3+bl/2, .02*V, true);
+
+        // ========== LAYER 2: BASS (always present) ==========
+        for(var i=0;i<8;i++){
+            if(bass[i]) dmBass(t+bl*i/2, bass[i], .035*V, bl/2*0.85);
+        }
+
+        // ========== LAYER 3: PAD (intensity 1+) ==========
+        if(I>=1){
+            var pv=.006+I*.0015;
+            neonPad(t, chord[0], pv*V, bl*4); // Root
+            neonPad(t, chord[2], pv*V*.7, bl*4); // Fifth
+            if(I>=3) neonPad(t, chord[3], pv*V*.5, bl*4); // Seventh
+        }
+
+        // ========== LAYER 4: ARPEGGIATOR (intensity 2+) ==========
+        if(I>=2){
+            var av=.010+I*.003;
+            for(var i=0;i<8;i++){
+                var noteTime=t+bl*i/2;
+                crystalArp(noteTime, arp[i], av*V, bl/2*0.6);
+                // Double at higher octave when intense
+                if(I>=5) crystalArp(noteTime, arp[i]*2, av*V*.3, bl/2*0.4);
+            }
+        }
+
+        // ========== LAYER 5: SIGNATURE HOOK (intensity 4+) ==========
+        // The descending motif: E5→D5→C5→B4→A4
+        if(I>=4 && ci===0){ // Play on the Am chord (every 4 bars)
+            var hv=.007+(I-4)*.003;
+            for(var i=0;i<HOOK.length;i++){
+                numanLead(t+bl*i*0.7, HOOK[i], hv*V, bl*0.65);
+            }
+        }
+        // Counter melody on other chords
+        if(I>=5 && ci===2){ // On the C chord
+            numanLead(t, NT.G5, .006*V, bl*1.5);
+            numanLead(t+bl*2, NT.E5, .006*V, bl*1.5);
+        }
+
+        // ========== LAYER 6: SUB BASS (intensity 5+) ==========
+        if(I>=5){
+            dmBass(t, chord[0]/2, .02*V, bl*2);
+            dmBass(t+bl*2, chord[0]/2, .02*V, bl*2);
+        }
+
+        // ========== LAYER 7: ANTHEM MODE (intensity 7) ==========
+        if(I>=7){
+            // Full chord stabs
+            neonPad(t, chord[1]*2, .008*V, bl*2);
+            neonPad(t+bl*2, chord[3]*2, .008*V, bl*2);
+            // High arp doubled
+            for(var i=0;i<4;i++){
+                crystalArp(t+bl*i, arp[i%arp.length]*4, .004*V, bl*.3);
+            }
+            // Lead answer phrase (ascending)
+            numanLead(t+bl*.5, NT.A4, .005*V, bl*.6);
+            numanLead(t+bl*1.5, NT.C5, .005*V, bl*.6);
+            numanLead(t+bl*2.5, NT.E5, .005*V, bl*.6);
+            numanLead(t+bl*3.5, NT.A5, .006*V, bl*1);
+        }
+
+        bgmChordIdx++; // Advance chord progression
+        }catch(e){}
+        bgmTimer=setTimeout(loop,bl*4*1000-50);
+    }
+    loop();
+    // Visualizer
+    var bar=document.getElementById('bgm-bar');bar.innerHTML='';
+    for(var i=0;i<30;i++){bar.appendChild(document.createElement('div'))}
+    bgmVisTimer=setInterval(function(){try{var mood=Math.min(7,bgmIntensity);document.querySelectorAll('.bgm-bar div').forEach(function(b){b.style.height=Math.random()*(2+mood*1.5)+'px'});document.getElementById('bgm-bar').classList.toggle('intense',mood>=4)}catch(e){}},100);
+}
+function stopBGM(){bgmPlaying=false;clearTimeout(bgmTimer);clearInterval(bgmVisTimer);document.getElementById('bgm-bar').innerHTML=''}
 
 var SV={
 lespaul:'<svg class="ts" viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="22" ry="28" fill="url(#sb)" stroke="#654321" stroke-width="1.5"/><defs><radialGradient id="sb"><stop offset="0%" stop-color="#8B4513"/><stop offset="50%" stop-color="#D2691E"/><stop offset="100%" stop-color="#654321"/></radialGradient></defs><rect x="46" y="15" width="8" height="35" fill="#654321" rx="2"/><path d="M46,12L46,15L54,15L54,12Q50,10,46,12Z" fill="#654321"/><circle cx="48" cy="13" r="1.5" fill="#C0C0C0"/><circle cx="52" cy="13" r="1.5" fill="#C0C0C0"/><rect x="42" y="65" width="16" height="3" fill="#C0C0C0" rx="1"/><rect x="44" y="55" width="12" height="4" fill="#2C1810" stroke="#000" stroke-width=".5"/><line x1="48" y1="15" x2="48" y2="68" stroke="#C8C8C8" stroke-width=".3"/><line x1="50" y1="15" x2="50" y2="68" stroke="#C8C8C8" stroke-width=".3"/><line x1="52" y1="15" x2="52" y2="68" stroke="#C8C8C8" stroke-width=".3"/></svg>',
@@ -643,7 +1158,7 @@ return{ty:TY[Math.floor(Math.random()*TY.length)],sp:null}}
 function rT(el,d){
     if(!d){el.innerHTML='';el.className='t';el.dataset.type='';return}
     el.className='t';el.dataset.type=d.ty;
-    if(d.ty==='obstacle'){el.innerHTML=OS[d.ob];el.classList.add(d.ob==='roadie'?'or':'oc');var hp=document.createElement('div');hp.className='ohp';hp.textContent=d.hp;el.appendChild(hp);return}
+    if(d.ty==='obstacle'){el.innerHTML=OS[d.ob];el.classList.add(d.ob==='roadie'?'or':'oc');var hp=document.createElement('div');hp.className='ohp';hp.innerHTML='\u2764\uFE0F'+d.hp;el.appendChild(hp);return}
     el.innerHTML=SV[d.ty]||'';
     if(d.sp==='gem')el.classList.add('gem');
     if(d.sp==='amp'){el.classList.add('amp');var ar=document.createElement('div');ar.className='amp-arrow h';ar.textContent='\u2194';el.appendChild(ar)}
@@ -659,7 +1174,7 @@ function mkB(lv){
     var tot=(lv.r||0)+(lv.cb||0);
     if(tot>0){var c=[];for(var i=0;i<36;i++)c.push(i);for(var i=c.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=c[i];c[i]=c[j];c[j]=tmp}
     var ri=0,ci=0;for(var i=0;i<c.length&&(ri+ci)<tot;i++){if(ri<(lv.r||0)){G.bd[c[i]]={ty:'obstacle',ob:'roadie',hp:2};ri++}else if(ci<(lv.cb||0)){G.bd[c[i]]={ty:'obstacle',ob:'cable',hp:3};ci++}}}
-    for(var i=0;i<36;i++){var el=document.createElement('div');el.className='t';el.dataset.index=i;rT(el,G.bd[i]);(function(idx){el.onclick=function(){ck(idx)}})(i);b.appendChild(el)}
+    for(var i=0;i<36;i++){var el=document.createElement('div');el.className='t';el.dataset.index=i;rT(el,G.bd[i]);(function(idx){el.onclick=function(){if(_lastTouchTime&&Date.now()-_lastTouchTime<500)return;ck(idx)}})(i);b.appendChild(el)}
     cI();uOC();
 }
 function cI(){var m=fM(),it=0;while(m.length>0&&it<100){var fl=[];m.forEach(function(a){a.forEach(function(x){fl.push(x)})});fl.forEach(function(i){if(G.bd[i]&&G.bd[i].ty!=='obstacle'){G.bd[i]=mT();uT(i)}});m=fM();it++}}
@@ -758,7 +1273,8 @@ function proc(matches){
     // Streak popup
     if(G.co>=3&&G.co<=10){var msg=streakMsgs[G.co]||'EPIC!';var sp=document.createElement('div');sp.className='streak-pop';sp.textContent=msg;document.body.appendChild(sp);setTimeout(function(){sp.remove()},1500)}
     // BGM intensity
-    bgmIntensity=Math.min(5,G.co);document.getElementById('combo-fill').style.width=Math.min(100,G.co*20)+'%';
+    // Let mood system handle bgmIntensity - just set combo floor
+var _comboFloor=Math.min(5,G.co);if(_comboFloor>bgmIntensity)bgmIntensity=_comboFloor;
 
     allM.forEach(function(i){G.bd[i]=null});
     setTimeout(function(){grav();setTimeout(function(){refill();
@@ -811,7 +1327,7 @@ function refill(){var tiles=document.querySelectorAll('.t');for(var i=0;i<36;i++
 // ===================== CHECK CONTINUE (consolidated: win/lose, surprises) =====================
 function chk(){
     var m=fM();if(m.length>0){proc(m);return}
-    G.co=0;G.pr=false;uH();bgmIntensity=0;document.getElementById('combo-fill').style.width='0%';
+    G.co=0;G.pr=false;uH();document.getElementById('combo-fill').style.width='0%';
     var lv=LV[G.cl-1]||{r:0,cb:0},ho=G.isDaily||((lv.r||0)+(lv.cb||0)>0),oc=aOC();
     if(ho){if(G.sc>=G.tg&&oc)wn();else if(G.mv<=0)ls();else{if(G.mv<=5&&(G.sc<G.tg*.7||!oc))dlg('ml');else if(G.sc>=G.tg*.5)dlg('mg');if(hintsOn)sH()}}
     else{if(G.sc>=G.tg)wn();else if(G.mv<=0)ls();else{if(G.mv<=5&&G.sc<G.tg*.7)dlg('ml');else if(G.sc>=G.tg*.5)dlg('mg');if(hintsOn)sH()}}
@@ -833,7 +1349,7 @@ function shuf(){var no=[],op=[];for(var i=0;i<36;i++){if(G.bd[i]&&G.bd[i].ty==='
 
 // ===================== HINTS =====================
 function sH(){cH();G.ht=setTimeout(function(){if(!G.pr)shH()},3000)}
-function cH(){document.querySelectorAll('.t.hint').forEach(function(t){t.classList.remove('hint')});if(G.ht){clearTimeout(G.ht);G.ht=null}}
+function cH(){document.querySelectorAll('.t.hint,.t.hint-from,.t.hint-to').forEach(function(t){t.classList.remove('hint','hint-from','hint-to')});document.querySelectorAll('.hint-arrow').forEach(function(a){a.remove()});if(G.ht){clearTimeout(G.ht);G.ht=null}}
 function shH(){var h=fPM();if(h){var tiles=document.querySelectorAll('.t');h.forEach(function(idx){tiles[idx].classList.add('hint')})}}
 function fPM(){for(var i=0;i<36;i++){if(!G.bd[i]||G.bd[i].ty==='obstacle')continue;for(var j=i+1;j<36;j++){if(!G.bd[j]||G.bd[j].ty==='obstacle')continue;if(isA(i,j)){// Check if either tile is a special (amp/rockstar/xray) - always a valid move
 var iSp=G.bd[i]&&(G.bd[i].sp==='amp'||G.bd[i].sp==='rstar'||G.bd[i].ty==='xray');
@@ -860,16 +1376,61 @@ function wn(){
 function showWinOv(title,score,stars,extra,unlocks){
     var ov=document.createElement('div');ov.className='win-overlay';
     var sh='\u2B50'.repeat(stars)+'\u2606'.repeat(3-stars);
-    ov.innerHTML='<div class="win-box"><div style="font-family:Archivo Black,sans-serif;font-size:1.4rem;color:#ffd700">\u{1F389} '+title+'</div><div class="win-stars">'+sh+'</div><div class="win-score">'+score.toLocaleString()+' pts</div>'+(extra?'<div class="win-msg" style="color:#ffd700">'+extra+'</div>':'')+(unlocks?'<div class="win-unlock">\u{1F513} UNLOCKED:<br>'+unlocks.replace(/\n/g,'<br>')+'</div>':'')+'<div class="win-btns"><button class="btn bs" onclick="this.closest(\'.win-overlay\').remove();showLS()">Continue</button><button class="btn btn2 bs" onclick="this.closest(\'.win-overlay\').remove();showBK()">Backstage</button></div></div>';
+    var nextLvl=G.cl; // G.cl already incremented by wn()
+    var hasNext=nextLvl<=LV.length;
+    var isDaily=title.indexOf('Daily')>=0;
+    
+    var btns='';
+    if(isDaily){
+        btns='<button class="btn bs" onclick="this.closest(\'.win-overlay\').remove();showM()">\u{1F3E0} Menu</button>';
+        btns+='<button class="btn btn2 bs" onclick="this.closest(\'.win-overlay\').remove();showBK()">\u{1F3A4} Backstage</button>';
+    } else if(hasNext){
+        btns='<button class="btn bs" style="font-size:1.1rem;padding:14px 36px" onclick="this.closest(\'.win-overlay\').remove();strt('+nextLvl+')">\u{27A1}\uFE0F NEXT LEVEL</button>';
+        btns+='<br><button class="btn btn2 bs" onclick="this.closest(\'.win-overlay\').remove();strt('+(nextLvl-1)+')">\u{1F504} Play Again</button>';
+        btns+=' <button class="btn btn2 bs" onclick="this.closest(\'.win-overlay\').remove();showLS()">\u{1F4CB} Levels</button>';
+        btns+=' <button class="btn btn2 bs" onclick="this.closest(\'.win-overlay\').remove();showBK()">\u{1F3A4} Backstage</button>';
+    } else {
+        btns='<button class="btn bs" onclick="this.closest(\'.win-overlay\').remove();showBK()">\u{1F3A4} Backstage</button>';
+        btns+=' <button class="btn btn2 bs" onclick="this.closest(\'.win-overlay\').remove();showLS()">\u{1F4CB} Levels</button>';
+    }
+    
+    ov.innerHTML='<div class="win-box">'
+        +'<div style="font-family:Archivo Black,sans-serif;font-size:1.4rem;color:#ffd700">\u{1F389} '+title+'</div>'
+        +'<div class="win-stars">'+sh+'</div>'
+        +'<div class="win-score">'+score.toLocaleString()+' pts</div>'
+        +(extra?'<div class="win-msg" style="color:#ffd700">'+extra+'</div>':'')
+        +(unlocks?'<div class="win-unlock">\u{1F513} UNLOCKED:<br>'+unlocks.replace(/\n/g,'<br>')+'</div>':'')
+        +'<div class="win-btns" style="flex-direction:column;gap:8px">'+btns+'</div>'
+        +'</div>';
     document.body.appendChild(ov);
 }
 
 // ===================== LOSE (consolidated) =====================
-function ls(){stopBGM();cH();P('L');dlg('lose');setTimeout(function(){
-    var ov=document.createElement('div');ov.className='win-overlay';
-    ov.innerHTML='<div class="win-box"><div style="font-family:Archivo Black,sans-serif;font-size:1.4rem;color:#ff4500">\u{1F605} Out of Moves!</div><div class="win-score" style="color:#fff">'+G.sc.toLocaleString()+' / '+G.tg.toLocaleString()+'</div><div class="win-msg">So close! Give it another shot.</div><div class="win-btns"><button class="btn bs" onclick="this.closest(\'.win-overlay\').remove();strt('+(G.isDaily?0:G.cl)+')">Retry</button><button class="btn btn2 bs" onclick="this.closest(\'.win-overlay\').remove();showLS()">Levels</button></div></div>';
-    document.body.appendChild(ov);
-},800)}
+function ls(){
+    stopBGM();cH();P('L');dlg('lose');
+    var curLvl=G.isDaily?0:G.cl;
+    setTimeout(function(){
+        var ov=document.createElement('div');ov.className='win-overlay';
+        ov.innerHTML='<div class="win-box">'
+            +'<div style="font-family:Archivo Black,sans-serif;font-size:1.4rem;color:#ff4500">\u{1F605} Out of Moves!</div>'
+            +'<div class="win-score" style="color:#fff">'+G.sc.toLocaleString()+' / '+G.tg.toLocaleString()+'</div>'
+            +'<div class="win-msg">'+getEncouragement()+'</div>'
+            +'<div class="win-btns" style="flex-direction:column;gap:8px">'
+            +'<button class="btn bs" style="font-size:1.1rem;padding:14px 36px" onclick="this.closest(\'.win-overlay\').remove();strt('+curLvl+')">\u{1F504} TRY AGAIN</button>'
+            +'<br><button class="btn btn2 bs" onclick="this.closest(\'.win-overlay\').remove();showLS()">\u{1F4CB} Levels</button>'
+            +' <button class="btn btn2 bs" onclick="this.closest(\'.win-overlay\').remove();showM()">\u{1F3E0} Menu</button>'
+            +'</div></div>';
+        document.body.appendChild(ov);
+    },800);
+}
+
+function getEncouragement(){
+    var pct=G.tg>0?G.sc/G.tg:0;
+    if(pct>=0.9)return "SO CLOSE! You were at "+Math.round(pct*100)+"%! One more try!";
+    if(pct>=0.7)return "Almost there! Try building bigger combos.";
+    if(pct>=0.5)return "Good progress! Focus on matching near the obstacles.";
+    return "Look for chain reactions \u2014 match at the bottom for cascading combos!";
+}
 
 // ===================== HUD =====================
 function uH(){document.getElementById('hsc').textContent=G.sc.toLocaleString();document.getElementById('hmv').textContent=G.mv;document.getElementById('htg').textContent=G.tg.toLocaleString();document.getElementById('hco').textContent=G.co;var p=Math.min(100,(G.sc/G.tg)*100);var pb=document.getElementById('prb');pb.style.width=p+'%';pb.textContent=Math.round(p)+'%'}
@@ -901,7 +1462,7 @@ function strt(n){
             showS('gs');
             var ho=(lv.r||0)+(lv.cb||0)>0;
             document.getElementById('obar').style.display=ho?'flex':'none';
-            document.getElementById('obj').textContent=ho?'Score '+lv.t.toLocaleString()+' + Clear obstacles!':'Reach '+lv.t.toLocaleString()+' points!';
+            document.getElementById('obj').textContent=ho?'Score '+lv.t.toLocaleString()+' + Clear all crates & cables! (Match NEXT TO them to destroy!)':'Reach '+lv.t.toLocaleString()+' points!';
             uH();mkB(lv);var dk='s'+lv.s;if(DL[dk])dlg(dk);else dlg('start');if(hintsOn)sH();
             bgmIntensity=0;iA();if(AO)startBGM();startIdleQuips();
         },500);
@@ -1018,6 +1579,1114 @@ proc = function(matches) {
         }
     });
 };
+
+
+// ===================== SWIPE/DRAG TOUCH CONTROLS =====================
+// ===================== TOUCH/SWIPE SYSTEM (production) =====================
+// All touch handling is scoped to the board element to prevent conflicts.
+// touchmove uses passive:false so we can preventDefault (stop page scroll).
+// A swipe threshold of 15px distinguishes swipe from tap.
+// Tap-tap mode and swipe mode are mutually exclusive per gesture.
+var _touchIdx=null,_touchX=0,_touchY=0,_swiped=false,_lastTouchTime=0;
+(function(){
+    var board=document.getElementById('gb');
+    if(!board)return;
+    
+    board.addEventListener('touchstart',function(e){
+        var tile=e.target.closest('.t');
+        if(!tile||G.pr)return;
+        var idx=parseInt(tile.dataset.index);
+        if(isNaN(idx))return;
+        if(G.bd[idx]&&G.bd[idx].ty==='obstacle')return;
+        _touchIdx=idx;
+        _touchX=e.touches[0].clientX;
+        _touchY=e.touches[0].clientY;
+        _swiped=false;
+        iA();
+    },{passive:true});
+    
+    board.addEventListener('touchmove',function(e){
+        if(_touchIdx===null||_swiped||G.pr)return;
+        var dx=e.touches[0].clientX-_touchX;
+        var dy=e.touches[0].clientY-_touchY;
+        var dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist>15){
+            e.preventDefault(); // CRITICAL: stop page scroll during swipe
+            _swiped=true;
+            var row=Math.floor(_touchIdx/6),col=_touchIdx%6;
+            var targetIdx;
+            if(Math.abs(dx)>Math.abs(dy)){
+                targetIdx=dx>0?(col<5?row*6+col+1:-1):(col>0?row*6+col-1:-1);
+            }else{
+                targetIdx=dy>0?(row<5?(row+1)*6+col:-1):(row>0?(row-1)*6+col:-1);
+            }
+            if(targetIdx>=0&&targetIdx<36&&!(G.bd[targetIdx]&&G.bd[targetIdx].ty==='obstacle')){
+                var tiles=document.querySelectorAll('.t');
+                if(G.sl!==null){tiles[G.sl].classList.remove('sel');G.sl=null}
+                cH();if(hintsOn)sH();clearTimeout(idleTimer);startIdleQuips();
+                sw(_touchIdx,targetIdx);
+            }
+            _touchIdx=null;
+        }
+    },{passive:false}); // passive:false required for preventDefault
+    
+    board.addEventListener('touchend',function(e){
+        if(_touchIdx!==null&&!_swiped&&!G.pr){
+            // This was a tap, not a swipe - use tap-tap system
+            ck(_touchIdx);
+        }
+        _touchIdx=null;
+        _swiped=false;
+        _lastTouchTime=Date.now();
+    },{passive:true});
+})();
+
+// ===================== BETTER OBJECTIVE GUIDANCE =====================
+function updateObjBanner() {
+    var banner = document.getElementById('obj-banner');
+    if (!banner) return;
+    var lv = G.isDaily ? null : LV[G.cl - 1];
+    var hasObs = G.isDaily || (lv && ((lv.r || 0) + (lv.cb || 0) > 0));
+    var pct = G.tg > 0 ? G.sc / G.tg : 0;
+    var obsLeft = 0;
+    G.bd.forEach(function(t) { if (t && t.ty === 'obstacle') obsLeft++ });
+
+    if (pct >= 1 && (!hasObs || obsLeft === 0)) {
+        banner.innerHTML = '<span class="obj-icon">\u2705</span> <b>TARGET REACHED!</b> One more match to win!';
+    } else if (pct >= 1 && obsLeft > 0) {
+        banner.innerHTML = '<span class="obj-icon">\u{1F4A5}</span> Score done! <b>Clear ' + obsLeft + ' obstacle' + (obsLeft > 1 ? 's' : '') + '</b> to win!';
+    } else if (hasObs && obsLeft > 0 && pct < 0.5) {
+        banner.innerHTML = '<span class="obj-icon">\u{1F3AF}</span> Match tiles to score <b>' + G.tg.toLocaleString() + ' pts</b> and break all <b>' + obsLeft + ' obstacles</b>';
+    } else if (hasObs && obsLeft > 0) {
+        banner.innerHTML = '<span class="obj-icon">\u{1F525}</span> <b>' + Math.round(pct * 100) + '% score</b> \u2014 still ' + obsLeft + ' obstacle' + (obsLeft > 1 ? 's' : '') + ' left!';
+    } else if (pct < 0.3) {
+        banner.innerHTML = '<span class="obj-icon">\u{1F3AF}</span> <b>Match 3+ instruments</b> to score ' + G.tg.toLocaleString() + ' points! Swipe or tap to swap tiles.';
+    } else if (pct < 0.7) {
+        var needed = G.tg - G.sc;
+        banner.innerHTML = '<span class="obj-icon">\u{1F525}</span> <b>' + needed.toLocaleString() + ' more pts</b> needed \u2014 build combos for big multipliers!';
+    } else {
+        banner.innerHTML = '<span class="obj-icon">\u26A1</span> <b>Almost there!</b> Just ' + (G.tg - G.sc).toLocaleString() + ' more points!';
+    }
+}
+
+// Hook into HUD updates
+var _origUH2 = uH;
+uH = function() {
+    _origUH2();
+    updateObjBanner();
+};
+
+// ===================== LEVEL PACING: Make mid-levels more generous =====================
+// Boost moves for levels 5-15 by 2-3 to ease the difficulty curve
+// (old pacing overrides removed - see consolidated pacing above)
+
+
+// ===================== FIX: REDUCE TILE TYPES PER LEVEL =====================
+// Use 6 random types per level instead of all 8 - makes matches much more common
+var levelTypes = null;
+function pickLevelTypes() {
+    // Shuffle all 8 and pick 6
+    var all = TY.slice();
+    for (var i = all.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = all[i]; all[i] = all[j]; all[j] = tmp;
+    }
+    levelTypes = all.slice(0, 6);
+}
+
+// Override tile creation to use level-specific types + stronger bias
+var _origMT2 = mT;
+mT = function() {
+    if (!levelTypes) pickLevelTypes();
+    var r = Math.random();
+    if (r < .04) return {ty: 'xray', sp: 'xray'};
+    if (r < .12) return {ty: levelTypes[Math.floor(Math.random() * levelTypes.length)], sp: 'gem'};
+    // 40% chance to bias toward board-common types (was 20%)
+    if (r < .52) {
+        var counts = {};
+        G.bd.forEach(function(t) {
+            if (t && t.ty && t.ty !== 'obstacle' && t.ty !== 'xray')
+                counts[t.ty] = (counts[t.ty] || 0) + 1;
+        });
+        var types = Object.keys(counts).filter(function(t) { return levelTypes.indexOf(t) >= 0 });
+        if (types.length > 0) {
+            types.sort(function(a, b) { return counts[b] - counts[a] });
+            return {ty: types[Math.floor(Math.random() * Math.min(3, types.length))], sp: null};
+        }
+    }
+    return {ty: levelTypes[Math.floor(Math.random() * levelTypes.length)], sp: null};
+};
+
+// Pick new types when starting a level
+var _origStrt2 = strt;
+strt = function(n) {
+    pickLevelTypes();
+    _origStrt2(n);
+};
+var _origStartDaily2 = startDaily;
+startDaily = function() {
+    pickLevelTypes();
+    _origStartDaily2();
+};
+
+// ===================== FIX: CLEAR ARROW HINTS =====================
+// Replace the old hint display with arrow-based hints
+function cH() {
+    document.querySelectorAll('.t.hint-from,.t.hint-to,.t.hint').forEach(function(t) {
+        t.classList.remove('hint-from', 'hint-to', 'hint');
+    });
+    document.querySelectorAll('.hint-arrow').forEach(function(a) { a.remove() });
+    if (G.ht) { clearTimeout(G.ht); G.ht = null }
+}
+
+function shH() {
+    var h = fPM();
+    if (!h) return;
+    var tiles = document.querySelectorAll('.t');
+    var fromIdx = h[0], toIdx = h[1];
+    
+    // Highlight both tiles
+    tiles[fromIdx].classList.add('hint-from');
+    tiles[toIdx].classList.add('hint-to');
+    
+    // Draw arrow between them
+    var fromRect = tiles[fromIdx].getBoundingClientRect();
+    var toRect = tiles[toIdx].getBoundingClientRect();
+    var fromCX = fromRect.left + fromRect.width / 2;
+    var fromCY = fromRect.top + fromRect.height / 2;
+    var toCX = toRect.left + toRect.width / 2;
+    var toCY = toRect.top + toRect.height / 2;
+    var midX = (fromCX + toCX) / 2;
+    var midY = (fromCY + toCY) / 2;
+    
+    // Determine arrow direction
+    var arrow = document.createElement('div');
+    arrow.className = 'hint-arrow';
+    var dx = toCX - fromCX, dy = toCY - fromCY;
+    if (Math.abs(dx) > Math.abs(dy)) {
+        arrow.textContent = dx > 0 ? '\u{27A1}' : '\u{2B05}';
+    } else {
+        arrow.textContent = dy > 0 ? '\u{2B07}' : '\u{2B06}';
+    }
+    arrow.style.left = midX + 'px';
+    arrow.style.top = midY + 'px';
+    document.body.appendChild(arrow);
+}
+
+// ===================== FIX: SMARTER HINT FINDING =====================
+// Prefer bigger matches over smaller ones
+function fPM() {
+    var best = null, bestScore = 0;
+    for (var i = 0; i < 36; i++) {
+        if (!G.bd[i] || G.bd[i].ty === 'obstacle') continue;
+        for (var j = i + 1; j < 36; j++) {
+            if (!G.bd[j] || G.bd[j].ty === 'obstacle') continue;
+            if (!isA(i, j)) continue;
+            
+            // Check specials
+            var iSp = G.bd[i] && (G.bd[i].sp === 'amp' || G.bd[i].sp === 'rstar' || G.bd[i].ty === 'xray');
+            var jSp = G.bd[j] && (G.bd[j].sp === 'amp' || G.bd[j].sp === 'rstar' || G.bd[j].ty === 'xray');
+            if (iSp || jSp) {
+                var spScore = 100; // Specials are high priority
+                if (!best || spScore > bestScore) { best = [i, j]; bestScore = spScore; }
+                continue;
+            }
+            
+            // Try swap and score the match
+            var tmp = G.bd[i]; G.bd[i] = G.bd[j]; G.bd[j] = tmp;
+            var m = fM();
+            tmp = G.bd[i]; G.bd[i] = G.bd[j]; G.bd[j] = tmp;
+            
+            if (m.length > 0) {
+                var score = 0;
+                m.forEach(function(mt) { score += mt.length * mt.length; }); // Prefer longer matches
+                // Bonus for gem matches
+                if (G.bd[i] && G.bd[i].sp === 'gem') score += 10;
+                if (G.bd[j] && G.bd[j].sp === 'gem') score += 10;
+                if (!best || score > bestScore) { best = [i, j]; bestScore = score; }
+            }
+        }
+    }
+    return best;
+}
+
+// ===================== FIX: MORE GENEROUS LEVEL PACING =====================
+// Give more moves across all levels for better flow
+// Level pacing: challenging but fair
+LV.forEach(function(l) {
+    if (l.n <= 3) l.m = Math.max(l.m, 22);       // Tutorial: enough to learn, not a cakewalk
+    else if (l.n <= 8) l.m = Math.max(l.m, 23);   // Early: comfortable but engaged
+    else if (l.n <= 15) l.m = Math.max(l.m, 22);  // Mid S1: real challenge starts
+    else if (l.n <= 22) l.m = Math.max(l.m, 22);  // Early S2: tough but fair
+    else l.m = Math.max(l.m, 21);                  // Late game: expert mode
+});
+// Also raise early targets slightly so boards don't clear instantly
+if(LV[0])LV[0].t=1500;  // Level 1: was 1000
+if(LV[1])LV[1].t=2000;  // Level 2: was 1500
+if(LV[2])LV[2].t=2800;  // Level 3: was 2000
+
+// ===================== FIX: AUTO-HELP WHEN STUCK =====================
+// If player makes 3 moves without scoring, offer stronger hint
+var movesWithoutScore = 0, lastScore = 0;
+var _origSw2 = sw;
+sw = function(a, b) {
+    lastScore = G.sc;
+    _origSw2(a, b);
+    // After swap, check if score changed
+    setTimeout(function() {
+        if (G.sc === lastScore) {
+            movesWithoutScore++;
+            if (movesWithoutScore >= 3) {
+                movesWithoutScore = 0;
+                // Force show hint immediately
+                cH();
+                shH();
+                dlgC('Rick', '\u{1F527}', 'Psst! Check the glowing tiles \u2014 swap the GOLD one toward the ORANGE one!');
+            }
+        } else {
+            movesWithoutScore = 0;
+        }
+    }, 800);
+};
+
+// ===================== POLISH: First-level welcome hint =====================
+var _origMkB2 = mkB;
+mkB = function(lv) {
+    _origMkB2(lv);
+    // On first level, show hint immediately
+    if (G.cl === 1 && !G.dn[1]) {
+        setTimeout(function() {
+            shH();
+            dlgC('Jake', '\u{1F3B8}', 'See the gold and orange tiles? Swipe or tap them to swap! Match 3 of the same instrument!');
+        }, 1500);
+    }
+};
+
+
+// ===================== STAGE TRANSITION =====================
+var _origStrtX = strt;
+strt = function(n) {
+    // Check if entering a new stage
+    if (n === 16 && !G.dn[16]) {
+        // Entering Stage 2 for first time!
+        showStageTransition(2, function() { _origStrtX(n) });
+    } else {
+        _origStrtX(n);
+    }
+};
+
+function showStageTransition(stageNum, callback) {
+    var names = {2: 'Coffee Shop Circuit'};
+    var descs = {2: 'Word has spread. Twelve people in a coffee shop are about to have their minds blown.'};
+    var ov = document.createElement('div');
+    ov.className = 'win-overlay';
+    ov.innerHTML = '<div class="win-box">'
+        + '<div style="font-size:3rem;margin-bottom:10px">\u2615</div>'
+        + '<div style="font-family:Archivo Black,sans-serif;font-size:1.6rem;color:#ffd700;margin-bottom:8px">STAGE ' + stageNum + '</div>'
+        + '<div style="font-family:Archivo Black,sans-serif;font-size:1.2rem;color:#fff;margin-bottom:10px">' + (names[stageNum] || '') + '</div>'
+        + '<div style="font-size:.95rem;color:#ff8c00;margin-bottom:20px;font-style:italic">' + (descs[stageNum] || '') + '</div>'
+        + '<div style="font-size:.85rem;color:#aaa;margin-bottom:15px">\u{1F3B5} New music \u2022 Harder obstacles \u2022 More unlocks</div>'
+        + '<button class="btn" onclick="this.closest(\'.win-overlay\').remove();void(0)" id="stage-go-btn">\u{1F918} LET\'S GO!</button>'
+        + '</div>';
+    document.body.appendChild(ov);
+    document.getElementById('stage-go-btn').onclick = function() {
+        ov.remove();
+        callback();
+    };
+    spawnConfetti();
+}
+
+
+// ===================== ROCK STAR LIFE: SHOP SYSTEM =====================
+var SHOP_CATS=[
+    {id:'guitars',name:'\u{1F3B8} Guitars',items:[
+        {id:'g1',name:'Pawn Shop Special',desc:'It was $40. One string is missing.',icon:'\u{1F3B8}',price:0,tier:0},
+        {id:'g2',name:'Fender Squire',desc:'Real brand! The guys at Guitar Center nodded.',icon:'\u{1F3B8}',price:3,tier:1},
+        {id:'g3',name:'Epiphone Les Paul',desc:'Sunburst finish. Neighbors can feel it.',icon:'\u{1F3B8}',price:8,tier:2},
+        {id:'g4',name:'Gibson SG',desc:'Now we\'re talking. Angus would approve.',icon:'\u{1F3B8}',price:15,tier:3},
+        {id:'g5',name:'PRS Custom 24',desc:'Worth more than the van. By a lot.',icon:'\u{1F3B8}',price:25,tier:4},
+        {id:'g6',name:'1959 Les Paul',desc:'Insured for more than our bassist.',icon:'\u{1F3B8}',price:40,tier:5},
+        {id:'g7',name:'Custom Shop Masterpiece',desc:'Hand-built by monks who shred.',icon:'\u{1F3B8}',price:60,tier:6}
+    ]},
+    {id:'fashion',name:'\u{1F576} Fashion',items:[
+        {id:'f1',name:'Band T-Shirt',desc:'Our own merch. We are our own biggest fans.',icon:'\u{1F455}',price:0,tier:0},
+        {id:'f2',name:'Vintage Leather Jacket',desc:'Found at a thrift shop. Smells like someone else\'s dreams.',icon:'\u{1F9E5}',price:4,tier:1},
+        {id:'f3',name:'Signature Shades',desc:'Rose-tinted. The world looks better and so do we.',icon:'\u{1F576}',price:8,tier:2},
+        {id:'f4',name:'Custom Stage Boots',desc:'Platform heels that double as weapons. Stylish AND practical.',icon:'\u{1F462}',price:14,tier:3},
+        {id:'f5',name:'Hand-Painted Denim',desc:'Every patch tells a story. Mostly stories about being broke.',icon:'\u{1F455}',price:22,tier:4},
+        {id:'f6',name:'Designer Tour Wardrobe',desc:'Vivienne Westwood meets garage sale. Iconic.',icon:'\u{1F457}',price:35,tier:5},
+        {id:'f7',name:'Rock Royalty Collection',desc:'Custom couture. The red carpet called and we answered.',icon:'\u{1F48E}',price:55,tier:6}
+    ]},
+    {id:'rides',name:'\u{1F697} Rides',items:[
+        {id:'r1',name:'City Bus Pass',desc:'Glamorous. The driver knows our faces.',icon:'\u{1F68C}',price:0,tier:0},
+        {id:'r2',name:'Used Bicycle',desc:'Two wheels. Zero respect. Total freedom.',icon:'\u{1F6B2}',price:5,tier:1},
+        {id:'r3',name:'1987 Van',desc:'The classic band van. AC works sometimes.',icon:'\u{1F690}',price:12,tier:2},
+        {id:'r4',name:'Touring Bus',desc:'It has BUNKS. We\'re basically famous.',icon:'\u{1F68C}',price:20,tier:3},
+        {id:'r5',name:'Muscle Car',desc:'1969 Charger. Gas costs more than food.',icon:'\u{1F3CE}',price:30,tier:4},
+        {id:'r6',name:'Luxury SUV',desc:'Heated seats. We made it, technically.',icon:'\u{1F699}',price:45,tier:5},
+        {id:'r7',name:'Tour Helicopter',desc:'The neighbors can\'t complain from up here.',icon:'\u{1F681}',price:65,tier:6}
+    ]},
+    {id:'cribs',name:'\u{1F3E0} Cribs',items:[
+        {id:'h1',name:'Mom\'s Basement',desc:'Free rent. Infinite pizza rolls. No shame.',icon:'\u{1F3DA}',price:0,tier:0},
+        {id:'h2',name:'Studio Apartment',desc:'Bedroom, kitchen, and stage are the same room.',icon:'\u{1F3E2}',price:5,tier:1},
+        {id:'h3',name:'Shared Loft',desc:'Three bedrooms, four band members. Math.',icon:'\u{1F3E0}',price:12,tier:2},
+        {id:'h4',name:'Downtown Condo',desc:'Has a doorman. He\'s heard our demos. He\'s fine.',icon:'\u{1F3E2}',price:20,tier:3},
+        {id:'h5',name:'House with Garage',desc:'A REAL practice space. Soundproofed. By blankets.',icon:'\u{1F3E1}',price:32,tier:4},
+        {id:'h6',name:'Beach House',desc:'Write songs by the ocean. Pretend we surf.',icon:'\u{1F3D6}',price:50,tier:5},
+        {id:'h7',name:'Rock Star Mansion',desc:'Pool shaped like a guitar. Gold toilet. We earned this.',icon:'\u{1F3F0}',price:70,tier:6}
+    ]},
+    {id:'gear',name:'\u{1F3A4} Gear',items:[
+        {id:'e1',name:'Phone Speaker',desc:'Plays backing tracks. Poorly.',icon:'\u{1F4F1}',price:0,tier:0},
+        {id:'e2',name:'Practice Amp',desc:'5 watts of fury. Fury is relative.',icon:'\u{1F50A}',price:3,tier:1},
+        {id:'e3',name:'PA System',desc:'Now the vocals are louder than the drums. Dave is upset.',icon:'\u{1F399}',price:10,tier:2},
+        {id:'e4',name:'Recording Rig',desc:'GarageBand, a microphone, and a dream.',icon:'\u{1F3A7}',price:18,tier:3},
+        {id:'e5',name:'Pro Studio Time',desc:'24 tracks. Real engineer. He sighs a lot.',icon:'\u{1F3AC}',price:28,tier:4},
+        {id:'e6',name:'Concert Light Rig',desc:'Lasers! Strobes! The fire marshal is watching.',icon:'\u{1F4A1}',price:42,tier:5},
+        {id:'e7',name:'Festival Main Stage',desc:'100,000 watts. 50,000 fans. 1 dream realized.',icon:'\u{1F3A4}',price:75,tier:6}
+    ]}
+];
+
+var FAME_LEVELS=[
+    {name:'Basement Nobody',need:0},
+    {name:'Garage Rocker',need:5},
+    {name:'Open Mic Regular',need:10},
+    {name:'Local Favorite',need:18},
+    {name:'Regional Act',need:28},
+    {name:'Touring Band',need:40},
+    {name:'Gold Record Artist',need:55},
+    {name:'Rock Legend',need:70},
+    {name:'Hall of Famer',need:90}
+];
+
+function getStarCoins(){
+    var total=0;for(var k in G.st)total+=G.st[k];
+    return total-(G.spent||0);
+}
+function getTotalStars(){var total=0;for(var k in G.st)total+=G.st[k];return total}
+function getOwnedCount(){if(!G.owned)G.owned={};return Object.keys(G.owned).length}
+function getFameLevel(){
+    var count=getOwnedCount();
+    var lvl=FAME_LEVELS[0];
+    for(var i=FAME_LEVELS.length-1;i>=0;i--){
+        if(count>=FAME_LEVELS[i].need){lvl=FAME_LEVELS[i];break}
+    }
+    return lvl;
+}
+
+function showRSL(){
+    if(!G.owned)G.owned={};
+    if(!G.spent)G.spent=0;
+    // Give starter items for free
+    SHOP_CATS.forEach(function(cat){
+        if(cat.items[0]&&cat.items[0].price===0&&!G.owned[cat.items[0].id]){
+            G.owned[cat.items[0].id]=true;
+        }
+    });
+    renderShop('guitars');
+    showS('rsl');
+}
+
+function renderShop(catId){
+    var coins=getStarCoins();
+    var total=getTotalStars();
+    var count=getOwnedCount();
+    var fame=getFameLevel();
+    
+    // Update status
+    document.getElementById('rsl-coins').innerHTML='\u2B50 '+coins+' Stars Available <span style="font-size:.7rem;color:#ff8c00">('+total+' earned)</span>';
+    document.getElementById('rsl-fame-name').textContent=fame.name;
+    
+    // Fame bar
+    var nextFame=null;
+    for(var i=0;i<FAME_LEVELS.length;i++){if(count<FAME_LEVELS[i].need){nextFame=FAME_LEVELS[i];break}}
+    var pct=nextFame?Math.min(100,(count/nextFame.need)*100):100;
+    document.getElementById('rsl-fame-bar').style.width=pct+'%';
+    document.getElementById('rsl-fame-next').textContent=nextFame?'Next: '+nextFame.name+' ('+nextFame.need+' items)':'MAX FAME REACHED! \u{1F451}';
+    
+    // Band preview
+    var bp=document.getElementById('band-preview');
+    var bestItems={};
+    SHOP_CATS.forEach(function(cat){
+        var best=null;
+        cat.items.forEach(function(item){if(G.owned[item.id])best=item});
+        if(best)bestItems[cat.id]=best;
+    });
+    bp.innerHTML='<div class="band-preview-title">\u{1F3A4} Your Band\'s Current Vibe</div>'
+        +'<div class="band-scene">'
+        +'<div class="band-scene-item"><span>'+(bestItems.guitars?bestItems.guitars.icon:'\u{1F3B8}')+'</span><span class="band-scene-label">'+(bestItems.guitars?bestItems.guitars.name:'???')+'</span></div>'
+        +'<div class="band-scene-item"><span>'+(bestItems.fashion?bestItems.fashion.icon:'\u{1F455}')+'</span><span class="band-scene-label">'+(bestItems.fashion?bestItems.fashion.name:'???')+'</span></div>'
+        +'<div class="band-scene-item"><span>'+(bestItems.rides?bestItems.rides.icon:'\u{1F6B6}')+'</span><span class="band-scene-label">'+(bestItems.rides?bestItems.rides.name:'???')+'</span></div>'
+        +'<div class="band-scene-item"><span>'+(bestItems.cribs?bestItems.cribs.icon:'\u{1F3DA}')+'</span><span class="band-scene-label">'+(bestItems.cribs?bestItems.cribs.name:'???')+'</span></div>'
+        +'<div class="band-scene-item"><span>'+(bestItems.gear?bestItems.gear.icon:'\u{1F4F1}')+'</span><span class="band-scene-label">'+(bestItems.gear?bestItems.gear.name:'???')+'</span></div>'
+        +'</div>'
+        +'<div class="fame-level">\u{1F451} '+fame.name+'</div>';
+    
+    // Category tabs
+    var cats=document.getElementById('shop-cats');cats.innerHTML='';
+    SHOP_CATS.forEach(function(cat){
+        var b=document.createElement('button');b.className='shop-cat'+(cat.id===catId?' active':'');
+        b.textContent=cat.name;b.onclick=function(){renderShop(cat.id)};
+        cats.appendChild(b);
+    });
+    
+    // Items grid
+    var grid=document.getElementById('shop-grid');grid.innerHTML='';
+    var activeCat=SHOP_CATS.find(function(c){return c.id===catId});
+    if(!activeCat)return;
+    
+    activeCat.items.forEach(function(item){
+        var owned=G.owned[item.id];
+        var canAfford=coins>=item.price;
+        var prevOwned=item.tier===0||activeCat.items.some(function(it){return it.tier===item.tier-1&&G.owned[it.id]});
+        
+        var d=document.createElement('div');
+        d.className='shop-item'+(owned?' owned':'')+((!owned&&!canAfford)||(!owned&&!prevOwned)?' locked':'');
+        
+        var priceText=owned?'\u2705 Owned':'<span>\u2B50</span> '+item.price;
+        if(!owned&&!prevOwned)priceText='\u{1F512} Buy previous first';
+        
+        d.innerHTML='<span class="shop-icon">'+item.icon+'</span>'
+            +'<div class="shop-name">'+item.name+'</div>'
+            +'<div class="shop-desc">'+item.desc+'</div>'
+            +'<div class="shop-price'+(owned?' owned-price':'')+'">'+priceText+'</div>';
+        
+        if(!owned&&canAfford&&prevOwned){
+            d.onclick=function(){buyItem(item,catId)};
+        }
+        grid.appendChild(d);
+    });
+}
+
+function buyItem(item,catId){
+    if(!G.owned)G.owned={};
+    var coins=getStarCoins();
+    if(coins<item.price)return;
+    G.spent=(G.spent||0)+item.price;
+    G.owned[item.id]=true;
+    sv();
+    showToast('\u{1F6D2} Bought: '+item.name+'!');
+    P('g');flashScreen();
+    // Check fame level up
+    var oldFame=getFameLevel();
+    var count=getOwnedCount();
+    var newFame=getFameLevel();
+    if(newFame.name!==oldFame.name){
+        setTimeout(function(){
+            showToast('\u{1F451} FAME UP: '+newFame.name+'!');
+            spawnConfetti();
+        },800);
+    }
+    renderShop(catId);
+}
+
+// ===================== SAVE/LOAD: Add shop data =====================
+var _origSv3=sv;
+sv=function(){try{localStorage.setItem('xrs5',JSON.stringify({a:G.cl,b:G.dn,c:G.st,d:G.stats,e:G.achEarned,f:G.owned,g:G.spent}))}catch(e){}};
+var _origLd3=ld;
+ld=function(){_origLd3();try{var d=JSON.parse(localStorage.getItem('xrs5'));if(d){G.owned=d.f||{};G.spent=d.g||0}}catch(e){}};
+
+// ===================== SHOW STAR ECONOMY IN WIN SCREEN =====================
+var _origShowWinOvX=showWinOv;
+showWinOv=function(title,score,stars,extra,unlocks){
+    _origShowWinOvX(title,score,stars,extra,unlocks);
+    // Add star earning info to the win box
+    var wb=document.querySelector('.win-overlay .win-box');
+    if(wb&&stars>0&&title.indexOf('Daily')<0){
+        var shopHint=document.createElement('div');
+        shopHint.style.cssText='font-size:.8rem;color:#ff8c00;margin-top:6px';
+        shopHint.innerHTML='\u2B50 +'+stars+' stars earned! ('+getStarCoins()+' available) <span style="cursor:pointer;text-decoration:underline" onclick="document.querySelector(\'.win-overlay\').remove();showRSL()">\u{1F6D2} Shop</span>';
+        var btns=wb.querySelector('.win-btns');
+        if(btns)wb.insertBefore(shopHint,btns);
+    }
+};
+
+
+// ===================== GOAL TRACKING SYSTEM =====================
+
+// Find the next unowned item the player is closest to affording
+function getNextGoal() {
+    if (!G.owned) G.owned = {};
+    var coins = getStarCoins();
+    var candidates = [];
+
+    SHOP_CATS.forEach(function(cat) {
+        cat.items.forEach(function(item, idx) {
+            if (G.owned[item.id]) return;
+            // Check if previous tier is owned (or it's tier 0)
+            var prevOwned = item.tier === 0 || cat.items.some(function(it) { return it.tier === item.tier - 1 && G.owned[it.id] });
+            if (!prevOwned) return;
+            candidates.push({
+                item: item,
+                cat: cat,
+                pct: Math.min(100, (coins / Math.max(1, item.price)) * 100),
+                remaining: Math.max(0, item.price - coins)
+            });
+        });
+    });
+
+    if (candidates.length === 0) return null;
+
+    // Sort: items you CAN afford first, then by closest to affording
+    candidates.sort(function(a, b) {
+        if (a.remaining === 0 && b.remaining > 0) return -1;
+        if (b.remaining === 0 && a.remaining > 0) return 1;
+        return a.remaining - b.remaining;
+    });
+
+    return candidates[0];
+}
+
+// Get all affordable items player hasn't bought yet
+function getAffordableItems() {
+    if (!G.owned) G.owned = {};
+    var coins = getStarCoins();
+    var affordable = [];
+    SHOP_CATS.forEach(function(cat) {
+        cat.items.forEach(function(item) {
+            if (G.owned[item.id]) return;
+            if (item.price > coins) return;
+            var prevOwned = item.tier === 0 || cat.items.some(function(it) { return it.tier === item.tier - 1 && G.owned[it.id] });
+            if (!prevOwned) return;
+            affordable.push({item: item, cat: cat});
+        });
+    });
+    return affordable;
+}
+
+// ===================== IN-GAME GOAL TRACKER =====================
+function updateGoalTracker() {
+    var el = document.getElementById('goal-tracker');
+    if (!el) return;
+
+    var goal = getNextGoal();
+    if (!goal) { el.style.display = 'none'; return; }
+
+    el.style.display = 'flex';
+    var coins = getStarCoins();
+    var isReady = coins >= goal.item.price;
+
+    el.className = 'goal-tracker' + (isReady ? ' goal-ready' : '');
+    el.innerHTML = '<span class="goal-icon">' + goal.item.icon + '</span>'
+        + '<div class="goal-info">'
+        + '<div class="goal-name">' + (isReady ? '\u2705 CAN BUY: ' : '\u{1F3AF} Saving for: ') + goal.item.name + '</div>'
+        + '<div class="goal-progress">'
+        + '<div class="goal-bar"><div class="goal-fill" style="width:' + goal.pct + '%"></div></div>'
+        + '<span class="goal-pct">' + (isReady ? 'TAP TO BUY!' : '\u2B50 ' + coins + '/' + goal.item.price) + '</span>'
+        + '</div></div>';
+}
+
+// ===================== AFFORD ALERTS (after winning a level) =====================
+var prevAffordable = [];
+function checkNewAffordable() {
+    var nowAffordable = getAffordableItems();
+    var newOnes = nowAffordable.filter(function(a) {
+        return !prevAffordable.some(function(p) { return p.item.id === a.item.id });
+    });
+    prevAffordable = nowAffordable;
+
+    newOnes.forEach(function(a, i) {
+        setTimeout(function() {
+            showAffordToast(a.item);
+        }, 1500 + i * 2500);
+    });
+}
+
+function showAffordToast(item) {
+    var t = document.createElement('div');
+    t.className = 'afford-toast';
+    t.innerHTML = '\u{1F389} You can now afford: <b>' + item.icon + ' ' + item.name + '</b>! Tap to shop!';
+    t.onclick = function() { t.remove(); document.querySelectorAll('.win-overlay').forEach(function(o){o.remove()}); showRSL() };
+    document.body.appendChild(t);
+    setTimeout(function() { if (t.parentNode) { t.style.transition = 'all .5s'; t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(30px)'; setTimeout(function(){t.remove()},500) } }, 5000);
+}
+
+// ===================== SHOP: ADD PROGRESS BARS TO ITEMS =====================
+// (removed: old progress bar override - now in merged override)
+
+// ===================== WIN SCREEN: REWARD BREAKDOWN + NEXT PURCHASE =====================
+var _origShowWinOvY = showWinOv;
+showWinOv = function(title, score, stars, extra, unlocks) {
+    _origShowWinOvY(title, score, stars, extra, unlocks);
+
+    var wb = document.querySelector('.win-overlay .win-box');
+    if (!wb || title.indexOf('Daily') >= 0) return;
+
+    // Build reward breakdown
+    var coins = getStarCoins();
+    var totalStars = getTotalStars();
+    var goal = getNextGoal();
+
+    var breakdown = document.createElement('div');
+    breakdown.className = 'reward-breakdown';
+    breakdown.innerHTML = '<div class="reward-row"><span class="label">Stars this level</span><span class="value">+' + stars + ' \u2B50</span></div>'
+        + '<div class="reward-row"><span class="label">Total earned</span><span class="value">' + totalStars + ' \u2B50</span></div>'
+        + '<div class="reward-row"><span class="label">Spent in shop</span><span class="value">' + (G.spent || 0) + ' \u2B50</span></div>'
+        + '<div class="reward-row total"><span class="label">Available to spend</span><span class="value">' + coins + ' \u2B50</span></div>';
+
+    // Next purchase teaser
+    if (goal) {
+        var nextDiv = document.createElement('div');
+        nextDiv.className = 'next-buy';
+        if (coins >= goal.item.price) {
+            nextDiv.innerHTML = '\u{1F389} You can buy <b>' + goal.item.icon + ' ' + goal.item.name + '</b> now! Tap to shop!';
+        } else {
+            var starsNeeded = goal.item.price - coins;
+            var levelsNeeded = Math.ceil(starsNeeded / 2); // ~2 stars average per level
+            nextDiv.innerHTML = goal.item.icon + ' <b>' + goal.item.name + '</b>: ' + coins + '/' + goal.item.price + ' \u2B50 \u2014 ~' + levelsNeeded + ' more level' + (levelsNeeded > 1 ? 's' : '') + '!';
+        }
+        nextDiv.onclick = function() { document.querySelector('.win-overlay').remove(); showRSL() };
+        breakdown.appendChild(nextDiv);
+    }
+
+    // Insert before buttons
+    var btns = wb.querySelector('.win-btns');
+    if (btns) wb.insertBefore(breakdown, btns);
+
+    // Check for new affordable items
+    checkNewAffordable();
+};
+
+// ===================== LOSE SCREEN: SHOW WHAT YOU'RE WORKING TOWARD =====================
+var _origLsY = ls;
+ls = function() {
+    _origLsY();
+    setTimeout(function() {
+        var wb = document.querySelector('.win-overlay .win-box');
+        if (!wb) return;
+        var goal = getNextGoal();
+        if (goal && getStarCoins() < goal.item.price) {
+            var teaser = document.createElement('div');
+            teaser.className = 'next-buy';
+            teaser.style.marginTop = '10px';
+            var needed = goal.item.price - getStarCoins();
+            teaser.innerHTML = '\u{1F3AF} Win to earn stars toward <b>' + goal.item.icon + ' ' + goal.item.name + '</b> (' + needed + ' more \u2B50 needed)';
+            var btns = wb.querySelector('.win-btns');
+            if (btns) wb.insertBefore(teaser, btns);
+        }
+    }, 900);
+};
+
+// ===================== HOOK GOAL TRACKER INTO GAME =====================
+var _origUH3 = uH;
+uH = function() {
+    _origUH3();
+    updateGoalTracker();
+};
+
+// Initialize previous affordable list on load
+prevAffordable = getAffordableItems();
+
+// ===================== MENU: Show current fame + next goal =====================
+var _origShowM2 = showM;
+showM = function() {
+    _origShowM2();
+    // Could add fame display to menu in future
+};
+
+
+// ===================== UPGRADE BONUS SYSTEM =====================
+// Each category gives bonuses based on highest tier owned
+
+var BONUS_DEFS = {
+    guitars: [
+        {tier:0,desc:'No bonus'},
+        {tier:1,desc:'+5% Gem spawn rate',gemBonus:0.02},
+        {tier:2,desc:'+10% Gem spawn rate',gemBonus:0.04},
+        {tier:3,desc:'+15% Gem spawn + Gems give 4x pts',gemBonus:0.06,gemMulti:4},
+        {tier:4,desc:'+20% Gem spawn + Gems give 5x pts',gemBonus:0.08,gemMulti:5},
+        {tier:5,desc:'+25% Gem spawn + Gems give 5x pts',gemBonus:0.10,gemMulti:5},
+        {tier:6,desc:'+30% Gem spawn + Gems give 6x pts',gemBonus:0.12,gemMulti:6}
+    ],
+    fashion: [
+        {tier:0,desc:'No bonus'},
+        {tier:1,desc:'Combo multiplier +0.5x',comboBonus:0.5},
+        {tier:2,desc:'Combo multiplier +1x',comboBonus:1},
+        {tier:3,desc:'Combo multiplier +1.5x',comboBonus:1.5},
+        {tier:4,desc:'Combo multiplier +2x',comboBonus:2},
+        {tier:5,desc:'Combo multiplier +2.5x',comboBonus:2.5},
+        {tier:6,desc:'Combo multiplier +3x',comboBonus:3}
+    ],
+    rides: [
+        {tier:0,desc:'No bonus'},
+        {tier:1,desc:'+1 starting move',moveBonus:1},
+        {tier:2,desc:'+2 starting moves',moveBonus:2},
+        {tier:3,desc:'+3 starting moves',moveBonus:3},
+        {tier:4,desc:'+4 starting moves',moveBonus:4},
+        {tier:5,desc:'+5 starting moves',moveBonus:5},
+        {tier:6,desc:'+6 starting moves',moveBonus:6}
+    ],
+    cribs: [
+        {tier:0,desc:'No bonus'},
+        {tier:1,desc:'+5% score bonus',scoreMulti:1.05},
+        {tier:2,desc:'+10% score bonus',scoreMulti:1.10},
+        {tier:3,desc:'+15% score bonus',scoreMulti:1.15},
+        {tier:4,desc:'+20% score bonus',scoreMulti:1.20},
+        {tier:5,desc:'+25% score bonus',scoreMulti:1.25},
+        {tier:6,desc:'+30% score bonus',scoreMulti:1.30}
+    ],
+    gear: [
+        {tier:0,desc:'No special tiles'},
+        {tier:1,desc:'Basic gear'},
+        {tier:2,desc:'Unlocks Power Chord tile',unlockTile:'pchord'},
+        {tier:3,desc:'Power Chord + higher spawn'},
+        {tier:4,desc:'Unlocks Crowd Surf tile',unlockTile:'csurf'},
+        {tier:5,desc:'All specials + higher spawn'},
+        {tier:6,desc:'Unlocks Encore tile',unlockTile:'encore'}
+    ]
+};
+
+function getUpgradeBonus(catId) {
+    if (!G.owned) G.owned = {};
+    var cat = SHOP_CATS.find(function(c) { return c.id === catId });
+    if (!cat) return BONUS_DEFS[catId] ? BONUS_DEFS[catId][0] : {tier:0};
+    var maxTier = 0;
+    cat.items.forEach(function(item) {
+        if (G.owned[item.id] && item.tier > maxTier) maxTier = item.tier;
+    });
+    var defs = BONUS_DEFS[catId];
+    return defs ? (defs[maxTier] || defs[0]) : {tier:0};
+}
+
+function getAllBonuses() {
+    return {
+        guitars: getUpgradeBonus('guitars'),
+        fashion: getUpgradeBonus('fashion'),
+        rides: getUpgradeBonus('rides'),
+        cribs: getUpgradeBonus('cribs'),
+        gear: getUpgradeBonus('gear')
+    };
+}
+
+// ===================== APPLY BONUSES TO GAMEPLAY =====================
+
+// Override tile creation to apply gem bonus + new special tiles
+var _origMT3 = mT;
+mT = function() {
+    if (!levelTypes) pickLevelTypes();
+    var bonuses = getAllBonuses();
+    var r = Math.random();
+
+    // X-Ray star
+    if (r < .04) return {ty: 'xray', sp: 'xray'};
+
+    // Gear unlocked specials
+    var gearTier = bonuses.gear.tier || 0;
+    var specialChance = 0.04 + gearTier * 0.005;
+    if (r < .04 + specialChance) {
+        var available = [];
+        if (gearTier >= 2) available.push('pchord');
+        if (gearTier >= 4) available.push('csurf');
+        if (gearTier >= 6) available.push('encore');
+        if (available.length > 0) {
+            var pick = available[Math.floor(Math.random() * available.length)];
+            return {ty: levelTypes[Math.floor(Math.random() * levelTypes.length)], sp: pick};
+        }
+    }
+
+    // Gems (boosted by guitar upgrades)
+    var gemRate = 0.10 + (bonuses.guitars.gemBonus || 0);
+    if (r < .04 + specialChance + gemRate) {
+        return {ty: levelTypes[Math.floor(Math.random() * levelTypes.length)], sp: 'gem'};
+    }
+
+    // Bias toward board types
+    if (r < .52 + specialChance + gemRate) {
+        var counts = {};
+        G.bd.forEach(function(t) {
+            if (t && t.ty && t.ty !== 'obstacle' && t.ty !== 'xray')
+                counts[t.ty] = (counts[t.ty] || 0) + 1;
+        });
+        var types = Object.keys(counts).filter(function(t) { return levelTypes.indexOf(t) >= 0 });
+        if (types.length > 0) {
+            types.sort(function(a, b) { return counts[b] - counts[a] });
+            return {ty: types[Math.floor(Math.random() * Math.min(3, types.length))], sp: null};
+        }
+    }
+
+    return {ty: levelTypes[Math.floor(Math.random() * levelTypes.length)], sp: null};
+};
+
+// Override renderTile to handle new specials
+var _origRT3 = rT;
+rT = function(el, d) {
+    _origRT3(el, d);
+    if (!d) return;
+    if (d.sp === 'pchord') el.classList.add('pchord');
+    if (d.sp === 'csurf') el.classList.add('csurf');
+    if (d.sp === 'encore') el.classList.add('encore');
+};
+
+// Override swap to handle new special activations
+var _origSw3 = sw;
+sw = function(a, b) {
+    var tA = G.bd[a], tB = G.bd[b];
+    var newSpecials = ['pchord', 'csurf', 'encore'];
+    var aNew = tA && newSpecials.indexOf(tA.sp) >= 0;
+    var bNew = tB && newSpecials.indexOf(tB.sp) >= 0;
+
+    if (aNew || bNew) {
+        var tmp = G.bd[a]; G.bd[a] = G.bd[b]; G.bd[b] = tmp; uT(a); uT(b);
+        G.mv--; G.pr = true; P('w'); uH();
+        var spIdx = aNew ? a : b;
+        var spType = G.bd[spIdx] ? G.bd[spIdx].sp : (aNew ? tA.sp : tB.sp);
+        // Get the sp before it gets cleared
+        if (aNew) spType = tA.sp;
+        if (bNew && !aNew) spType = tB.sp;
+        setTimeout(function() { activateNewSpecial(spIdx, spType) }, 150);
+        return;
+    }
+    _origSw3(a, b);
+};
+
+function activateNewSpecial(idx, type) {
+    P('x');
+    var tiles = document.querySelectorAll('.t');
+    var rc = tiles[idx].getBoundingClientRect();
+
+    if (type === 'pchord') {
+        // Power Chord: clear 3x3 area
+        dlgC('Jake', '\u{1F3B8}', 'POWER CHORD! The walls are shaking!');
+        var row = Math.floor(idx / 6), col = idx % 6;
+        var toDestroy = [];
+        for (var r = row - 1; r <= row + 1; r++) {
+            for (var c = col - 1; c <= col + 1; c++) {
+                if (r >= 0 && r < 6 && c >= 0 && c < 6) toDestroy.push(r * 6 + c);
+            }
+        }
+        var sc = toDestroy.length * 200;
+        G.sc += Math.round(sc * (getAllBonuses().cribs.scoreMulti || 1));
+        scp(rc.left + rc.width / 2, rc.top + rc.height / 2, sc);
+        ptc(rc.left + rc.width / 2, rc.top + rc.height / 2, '\u{1F3B5}', 8);
+        document.getElementById('gb').classList.add('shake'); setTimeout(function() { document.getElementById('gb').classList.remove('shake') }, 400);
+        toDestroy.forEach(function(j) {
+            if (G.bd[j] && G.bd[j].ty === 'obstacle') { G.bd[j].hp--; if (G.bd[j].hp <= 0) { G.bd[j] = null; G.sc += 500 } else uT(j) }
+            else if (G.bd[j]) { tiles[j].classList.add('mtch'); G.bd[j] = null }
+        });
+        uH(); uOC();
+        setTimeout(function() { grav(); setTimeout(function() { refill(); setTimeout(chk, 180) }, 180) }, 220);
+
+    } else if (type === 'csurf') {
+        // Crowd Surf: shuffle board + turn 5 random tiles into gems
+        dlgC('Maya', '\u{1F3B5}', 'CROWD SURF! The audience is carrying us!');
+        // First clear the csurf tile itself
+        G.bd[idx] = null;
+        scp(rc.left + rc.width / 2, rc.top + rc.height / 2, 1000);
+        G.sc += Math.round(1000 * (getAllBonuses().cribs.scoreMulti || 1));
+        ptc(rc.left + rc.width / 2, rc.top + rc.height / 2, '\u{1F3C4}', 10);
+        // Refill the empty spot
+        G.bd[idx] = mT(); uT(idx);
+        // Shuffle non-obstacle tiles
+        var normals = [], obsIdx = [];
+        for (var i = 0; i < 36; i++) {
+            if (G.bd[i] && G.bd[i].ty === 'obstacle') obsIdx.push(i);
+            else if (G.bd[i]) normals.push(G.bd[i]);
+        }
+        for (var i = normals.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = normals[i]; normals[i] = normals[j]; normals[j] = tmp;
+        }
+        var ni = 0;
+        for (var i = 0; i < 36; i++) {
+            if (obsIdx.indexOf(i) === -1) { G.bd[i] = normals[ni++] || mT(); uT(i) }
+        }
+        // Turn 5 random tiles into gems
+        var gemCandidates = [];
+        for (var i = 0; i < 36; i++) {
+            if (G.bd[i] && !G.bd[i].sp && G.bd[i].ty !== 'obstacle' && G.bd[i].ty !== 'xray') gemCandidates.push(i);
+        }
+        for (var g = 0; g < Math.min(5, gemCandidates.length); g++) {
+            var ri = Math.floor(Math.random() * gemCandidates.length);
+            var gi = gemCandidates.splice(ri, 1)[0];
+            G.bd[gi].sp = 'gem'; uT(gi);
+        }
+        flashScreen();
+        uH(); uOC();
+        G.pr = false;
+        if (hintsOn) sH();
+
+    } else if (type === 'encore') {
+        // Encore: +5 moves + score bonus
+        dlgC('Dave', '\u{1F941}', 'ENCORE! ENCORE! The crowd wants MORE!');
+        G.bd[idx] = null; tiles[idx].classList.add('mtch');
+        G.mv += 5;
+        var bonus = 1500;
+        G.sc += Math.round(bonus * (getAllBonuses().cribs.scoreMulti || 1));
+        scp(rc.left + rc.width / 2, rc.top + rc.height / 2, bonus);
+        ptc(rc.left + rc.width / 2, rc.top + rc.height / 2, '\u{1F504}', 8);
+        showToast('\u{1F3B5} ENCORE! +5 moves!');
+        document.getElementById('gb').classList.add('shake-big'); setTimeout(function() { document.getElementById('gb').classList.remove('shake-big') }, 600);
+        uH(); uOC();
+        setTimeout(function() { grav(); setTimeout(function() { refill(); setTimeout(chk, 180) }, 180) }, 220);
+    }
+}
+
+// ===================== APPLY SCORE MULTIPLIER (CRIBS BONUS) =====================
+var _origProc6 = proc;
+proc = function(matches) {
+    var bonuses = getAllBonuses();
+    // Temporarily boost combo scoring via fashion bonus
+    var origCo = G.co;
+    var fashionBonus = bonuses.fashion.comboBonus || 0;
+    // We add the fashion bonus to the combo count for scoring
+    G.co = origCo + fashionBonus;
+    _origProc6(matches);
+    G.co = G.co - fashionBonus; // Remove the float bonus after scoring
+};
+
+// ===================== APPLY MOVE BONUS (RIDES) =====================
+var _origStrt5 = strt;
+strt = function(n) {
+    _origStrt5(n);
+    // Add bonus moves from rides (after level loads)
+    setTimeout(function() {
+        var bonuses = getAllBonuses();
+        var moveBonus = bonuses.rides.moveBonus || 0;
+        if (moveBonus > 0 && !G.isDaily) {
+            G.mv += moveBonus;
+            uH();
+        }
+    }, 2000);
+};
+
+// ===================== BONUS HUD DISPLAY =====================
+function updateBonusBar() {
+    var bar = document.getElementById('bonus-bar');
+    if (!bar) return;
+    var b = getAllBonuses();
+    var pills = '';
+    if (b.guitars.tier > 0) pills += '<div class="bonus-pill active"><span class="bp-icon">\u{1F3B8}</span>Gems+' + Math.round((b.guitars.gemBonus || 0) * 100) + '%</div>';
+    if (b.fashion.tier > 0) pills += '<div class="bonus-pill active"><span class="bp-icon">\u{1F576}</span>Combo+' + (b.fashion.comboBonus || 0) + 'x</div>';
+    if (b.rides.tier > 0) pills += '<div class="bonus-pill active"><span class="bp-icon">\u{1F697}</span>+' + (b.rides.moveBonus || 0) + ' moves</div>';
+    if (b.cribs.tier > 0) pills += '<div class="bonus-pill active"><span class="bp-icon">\u{1F3E0}</span>Score+' + Math.round(((b.cribs.scoreMulti || 1) - 1) * 100) + '%</div>';
+    if (b.gear.tier >= 2) pills += '<div class="bonus-pill active"><span class="bp-icon">\u{1F3A4}</span>Special tiles</div>';
+    if (pills === '') pills = '<div class="bonus-pill"><span class="bp-icon">\u{1F6D2}</span>Shop upgrades for bonuses!</div>';
+    bar.innerHTML = pills;
+}
+
+// Hook into HUD
+var _origUH4 = uH;
+uH = function() { _origUH4(); updateBonusBar() };
+
+// ===================== BONUS SPLASH AT LEVEL START =====================
+var _origStrt6 = strt;
+strt = function(n) {
+    _origStrt6(n);
+    // Show bonus splash if player has any bonuses
+    setTimeout(function() {
+        var b = getAllBonuses();
+        var hasBonuses = b.guitars.tier > 0 || b.fashion.tier > 0 || b.rides.tier > 0 || b.cribs.tier > 0 || b.gear.tier >= 2;
+        if (!hasBonuses) return;
+
+        var items = '';
+        if (b.guitars.tier > 0) items += '<div class="bonus-item"><span class="bonus-item-icon">\u{1F3B8}</span><div class="bonus-item-text"><div class="bonus-item-name">' + getOwnedName('guitars') + '</div><div class="bonus-item-effect">' + b.guitars.desc + '</div></div></div>';
+        if (b.fashion.tier > 0) items += '<div class="bonus-item"><span class="bonus-item-icon">\u{1F576}</span><div class="bonus-item-text"><div class="bonus-item-name">' + getOwnedName('fashion') + '</div><div class="bonus-item-effect">' + b.fashion.desc + '</div></div></div>';
+        if (b.rides.tier > 0) items += '<div class="bonus-item"><span class="bonus-item-icon">\u{1F697}</span><div class="bonus-item-text"><div class="bonus-item-name">' + getOwnedName('rides') + '</div><div class="bonus-item-effect">' + b.rides.desc + '</div></div></div>';
+        if (b.cribs.tier > 0) items += '<div class="bonus-item"><span class="bonus-item-icon">\u{1F3E0}</span><div class="bonus-item-text"><div class="bonus-item-name">' + getOwnedName('cribs') + '</div><div class="bonus-item-effect">' + b.cribs.desc + '</div></div></div>';
+        if (b.gear.tier >= 2) items += '<div class="bonus-item"><span class="bonus-item-icon">\u{1F3A4}</span><div class="bonus-item-text"><div class="bonus-item-name">' + getOwnedName('gear') + '</div><div class="bonus-item-effect">' + b.gear.desc + '</div></div></div>';
+
+        var splash = document.createElement('div');
+        splash.className = 'bonus-splash';
+        splash.innerHTML = '<div class="bonus-splash-box"><div class="bonus-splash-title">\u{1F3B8} Your Gear Bonuses</div>' + items + '<button class="btn bs" onclick="this.closest(\'.bonus-splash\').remove()">ROCK ON! \u{1F918}</button></div>';
+        document.body.appendChild(splash);
+        // Auto-dismiss after 4s
+        setTimeout(function() { if (splash.parentNode) splash.remove() }, 4000);
+    }, 2200);
+};
+
+function getOwnedName(catId) {
+    var cat = SHOP_CATS.find(function(c) { return c.id === catId });
+    if (!cat) return '???';
+    var best = null;
+    cat.items.forEach(function(item) { if (G.owned && G.owned[item.id]) best = item });
+    return best ? best.name : '???';
+}
+
+// (removed: old broken split override and old dynamic music - clean versions at end of file)
+
+// ===================== UPDATE TILE LEGEND WITH NEW SPECIALS =====================
+function updateTileLegend() {
+    var legend = document.querySelector('.tile-legend');
+    if (!legend) return;
+    var b = getAllBonuses();
+    // Remove old dynamic entries
+    legend.querySelectorAll('.tl-dynamic').forEach(function(e) { e.remove() });
+    if (b.gear.tier >= 2) {
+        var d = document.createElement('div'); d.className = 'tile-legend-item tl-dynamic';
+        d.innerHTML = '<div class="tile-legend-dot tl-pchord">\u{1F3B5}</div>Chord=3x3';
+        legend.appendChild(d);
+    }
+    if (b.gear.tier >= 4) {
+        var d = document.createElement('div'); d.className = 'tile-legend-item tl-dynamic';
+        d.innerHTML = '<div class="tile-legend-dot tl-csurf">\u{1F3C4}</div>Surf=shuffle+gems';
+        legend.appendChild(d);
+    }
+    if (b.gear.tier >= 6) {
+        var d = document.createElement('div'); d.className = 'tile-legend-item tl-dynamic';
+        d.innerHTML = '<div class="tile-legend-dot tl-encore">\u{1F504}</div>Encore=+5 moves';
+        legend.appendChild(d);
+    }
+}
+
+// Hook legend update into level start
+var _origStrt7 = strt;
+strt = function(n) { _origStrt7(n); setTimeout(updateTileLegend, 2300) };
+
+// Also update fPM to recognize new specials as valid moves
+var _origFPM = fPM;
+fPM = function() {
+    // First check if any new special tiles can be swapped
+    var newSp = ['pchord', 'csurf', 'encore'];
+    for (var i = 0; i < 36; i++) {
+        if (!G.bd[i] || G.bd[i].ty === 'obstacle') continue;
+        if (newSp.indexOf(G.bd[i].sp) >= 0) {
+            // Find an adjacent non-obstacle tile
+            var neighbors = gN(i);
+            for (var n = 0; n < neighbors.length; n++) {
+                if (G.bd[neighbors[n]] && G.bd[neighbors[n]].ty !== 'obstacle') return [i, neighbors[n]];
+            }
+        }
+    }
+    return _origFPM();
+};
+
+
+// ===================== MOOD-DRIVEN MUSIC =====================
+function getMusicMood(){try{if(!G.tg||G.tg===0)return 1;var s=G.sc/G.tg;var mood=1+s*4;if(G.co>=2)mood+=1;if(G.co>=4)mood+=1;if(G.mv<=5)mood+=.5;if(G.mv<=3)mood+=.5;if(s>=.85)mood+=1;mood+=Math.min(1,(G.cl||1)/30);return Math.min(7,Math.floor(mood))}catch(e){return 1}}
+
+var _origUH_MOOD=uH;
+uH=function(){try{_origUH_MOOD()}catch(e){}try{var mood=getMusicMood();if(mood>bgmIntensity)bgmIntensity=Math.min(7,bgmIntensity+.5);else if(mood<bgmIntensity)bgmIntensity=Math.max(mood,bgmIntensity-.15);var cf=document.getElementById('combo-fill');if(cf){cf.style.width=Math.min(100,bgmIntensity*14)+'%';cf.style.background=bgmIntensity>=5?'linear-gradient(90deg,#ff4500,#ffd700,#ff4500)':bgmIntensity>=3?'linear-gradient(90deg,#dc143c,#ff8c00)':'linear-gradient(90deg,#dc143c,#ffd700)'}}catch(e){}};
+
+// ===================== DYNAMIC VISUALS =====================
+function updateBgMood(){try{var mood=getMusicMood();var bg=document.getElementById('bg-stage');if(!bg)return;var colors=['linear-gradient(135deg,#1a0a0a,#2a1a3a,#1a0a2a)','linear-gradient(135deg,#1a0a0a,#2a1a3a,#2a0a2a)','linear-gradient(135deg,#2a0a0a,#3a1a3a,#2a0a3a)','linear-gradient(135deg,#2a0a0a,#3a1a2a,#3a0a3a)','linear-gradient(135deg,#3a0a0a,#4a1a2a,#3a0a4a)','linear-gradient(135deg,#3a0505,#4a1520,#4a0a4a)','linear-gradient(135deg,#4a0505,#5a1520,#4a0a5a)','linear-gradient(135deg,#5a0505,#6a1520,#5a0a6a)'];bg.style.background=colors[Math.min(mood,7)];bg.style.transition='background 2s ease'}catch(e){}}
+function updateLightIntensity(){try{var mood=getMusicMood();var lights=document.querySelectorAll('.light-beam');if(lights)lights.forEach(function(l){l.style.opacity=Math.min(.7,.3+mood*.06);l.style.transform='scale('+(1+mood*.08)+')';l.style.transition='opacity 2s,transform 2s'})}catch(e){}}
+setInterval(updateBgMood,2000);setInterval(updateLightIntensity,2000);
+
+// ===================== SWIPE THRESHOLD FIX =====================
+// (swipe already at 20px from v9, reduce to 15 for small phones)
+
+// ===================== QA SAFETY =====================
+var _origStrt_QA=strt;strt=function(n){stopBGM();bgmIntensity=0;_origStrt_QA(n)};
+setInterval(function(){if(G.pr&&!document.querySelector('.t.mtch')&&!document.querySelector('.t.fall')){G.pr=false;if(hintsOn)sH()}},5000);
+var _origWn_QA=wn;wn=function(){if(document.querySelector('.win-overlay'))return;_origWn_QA()};
+var _origLs_QA=ls;ls=function(){if(document.querySelector('.win-overlay'))return;_origLs_QA()};
+pickLevelTypes();
+
+// ===================== MERGED SHOP RENDER OVERRIDE =====================
+var _origRenderShop_FINAL=renderShop;
+renderShop=function(catId){try{_origRenderShop_FINAL(catId)}catch(e){}try{var coins=getStarCoins();var grid=document.getElementById('shop-grid');if(!grid)return;var cat=SHOP_CATS.find(function(c){return c.id===catId});if(!cat)return;var els=grid.querySelectorAll('.shop-item');var defs=BONUS_DEFS?BONUS_DEFS[catId]:null;cat.items.forEach(function(item,idx){if(idx>=els.length)return;var el=els[idx];var owned=G.owned&&G.owned[item.id];var prev=item.tier===0||cat.items.some(function(it){return it.tier===item.tier-1&&G.owned[it.id]});if(!owned&&prev&&item.price>0){var pct=Math.min(100,(coins/item.price)*100);var bar=document.createElement('div');bar.className='shop-item-progress';bar.innerHTML='<div class="shop-item-fill" style="width:'+pct+'%"></div>';el.appendChild(bar);if(coins>=item.price)el.classList.add('affordable')}if(defs&&defs[item.tier]){var def=defs[item.tier];if(def.desc&&def.desc!=='No bonus'&&def.desc!=='No special tiles'&&def.desc!=='Basic gear'){var b=document.createElement('div');b.className='shop-bonus';b.textContent='\u26A1 '+def.desc;el.appendChild(b)}}})}catch(e){console.log('shopRender:',e)}};
+
+
+// ===================== SMART SHOP NAVIGATION =====================
+function returnFromShop() {
+    // If we were mid-game, go back to the game board
+    var gs = document.getElementById('gs');
+    if (gs && G.bd && G.bd.length === 36 && G.mv > 0 && !document.querySelector('.win-overlay')) {
+        showS('gs');
+    } else {
+        // Otherwise go to level select
+        showLS();
+    }
+}
 
 </script>
 </body></html>
