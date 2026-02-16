@@ -438,6 +438,22 @@ body{font-family:'Barlow Condensed',sans-serif;background:#000;color:#fff;overfl
 /* ===== Smooth tile transitions ===== */
 .t{transition:all .15s cubic-bezier(.34,1.56,.64,1),box-shadow .2s ease}
 
+
+.tut-full{position:fixed;top:0;left:0;width:100%;height:100%;z-index:20000;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;animation:fi .3s ease}
+.tut-card{background:linear-gradient(135deg,#1a0a2a,#2a1a3a);border:4px solid #ffd700;border-radius:20px;padding:30px 25px;max-width:380px;width:90%;text-align:center;box-shadow:0 0 60px rgba(255,215,0,.3),0 20px 60px rgba(0,0,0,.8);position:relative}
+.tut-step{font-size:.8rem;color:#ff8c00;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.tut-title{font-family:'Archivo Black',sans-serif;font-size:1.5rem;color:#ffd700;margin-bottom:15px}
+.tut-img{font-size:3.5rem;margin:10px 0}
+.tut-text{font-size:1rem;line-height:1.6;margin-bottom:20px;color:#eee}
+.tut-text b{color:#ffd700}
+.tut-text em{color:#ff8c00;font-style:normal}
+.tut-btn{background:linear-gradient(135deg,#dc143c,#8b0000);border:none;color:#fff;padding:14px 40px;font-size:1.1rem;font-weight:700;border-radius:8px;cursor:pointer;box-shadow:0 6px 0 #5a0000,0 8px 20px rgba(0,0,0,.5);text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;transition:all .2s;letter-spacing:1px}
+.tut-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #5a0000}
+.tut-skip{position:absolute;top:12px;right:16px;background:none;border:none;color:#888;font-size:.85rem;cursor:pointer;font-family:'Barlow Condensed',sans-serif}
+.tut-skip:hover{color:#ffd700}
+.tut-dots{display:flex;gap:8px;justify-content:center;margin-top:15px}
+.tut-dot{width:10px;height:10px;border-radius:50%;background:#444;transition:all .2s}
+.tut-dot.active{background:#ffd700;box-shadow:0 0 8px rgba(255,215,0,.6)}
 </style>
 </head>
 <body>
@@ -457,7 +473,7 @@ body{font-family:'Barlow Condensed',sans-serif;background:#000;color:#fff;overfl
 <a href="https://www.redbubble.com/shop/ap/172252421" target="_blank" class="bla">&#128085; Merch</a>
 </div>
 <div class="dc"><div class="cp">&#127928;</div><div class="dco"><div class="dcn">Jake</div><div class="dct">"Ready to go from basement to stadiums? Let's match some instruments and ROCK!"</div></div></div>
-<div class="bg"><button class="btn btn-play" onclick="showLS()">&#127925; LET'S ROCK!</button><br><button class="btn btn2 bs" onclick="showDaily()">&#128293; Daily Challenge</button> <button class="btn" onclick="showRSL()" style="background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;box-shadow:0 8px 0 #b8860b,0 10px 25px rgba(0,0,0,.6)">&#127775; ROCK STAR LIFE</button> <button class="btn btn2 bs" onclick="showBK()">&#127911; Backstage</button><br><button class="btn btn2 bs" onclick="showSets()">&#9881;&#65039; Settings</button> <button class="btn btn2 bs" onclick="tut()">&#128214; How to Play</button></div>
+<div class="bg"><button class="btn btn-play" onclick="startGame()">&#127925; LET'S ROCK!</button><br><button class="btn btn2 bs" onclick="showDaily()">&#128293; Daily Challenge</button> <button class="btn" onclick="showRSL()" style="background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;box-shadow:0 8px 0 #b8860b,0 10px 25px rgba(0,0,0,.6)">&#127775; ROCK STAR LIFE</button> <button class="btn btn2 bs" onclick="showBK()">&#127911; Backstage</button><br><button class="btn btn2 bs" onclick="showSets()">&#9881;&#65039; Settings</button> <button class="btn btn2 bs" onclick="showTutorial(true)">&#128214; How to Play</button></div>
 </div>
 <!-- LEVEL SELECT -->
 <div id="ls" class="screen">
@@ -2686,6 +2702,48 @@ function returnFromShop() {
         // Otherwise go to level select
         showLS();
     }
+}
+
+
+// ===================== FIRST-TIME INTERACTIVE TUTORIAL =====================
+var TUT_STEPS=[
+{title:"Welcome to X-Ray Star!",img:"\u{1F3B8}\u{1F525}\u{1F3B5}",text:"You're the band <b>X-Ray Star</b> \u2014 match instruments to climb from <em>basement nobodies</em> to <em>rock legends!</em>",btn:"LET'S GO!"},
+{title:"Match 3 to Score",img:"\u{1F3B8}\u{1F3B8}\u{1F3B8}",text:"<b>Tap</b> one instrument, then <b>tap an adjacent one</b> to swap them.<br>On mobile you can also <b>swipe</b>!<br><br>Line up <b>3 or more</b> of the same instrument to score.",btn:"GOT IT"},
+{title:"Special Tiles",img:"\u{1F50A} \u2B50 \u26A1",text:"Match <b>4 in a row</b> \u2192 creates an <em>AMP</em> (clears a cross!)<br>Match <b>5+</b> \u2192 creates a <em>ROCKSTAR</em> (clears all of one type!)<br><br><b>Swap</b> a special tile with any neighbor to activate it!",btn:"AWESOME"},
+{title:"Obstacles",img:"\u{1F4E6} \u{1F50C}",text:"<b>Crates</b> (\u2764\uFE0F2 HP) and <b>Cables</b> (\u2764\uFE0F3 HP) block your board.<br><br>You can't move them \u2014 make matches <b>right next to them</b> to destroy them!",btn:"SMASH 'EM"},
+{title:"Rock Star Life",img:"\u{1F3B8} \u{1F576}\uFE0F \u{1F3E0}",text:"Earn <b>stars</b> by completing levels. Spend them in the <em>Rock Star Life</em> shop!<br><br>Each purchase gives <b>gameplay bonuses</b> and moves you up the <em>Fame Ladder!</em>",btn:"ROCK ON"},
+{title:"Pro Tips",img:"\u{1F4A1}",text:"\u2022 Match at the <b>bottom</b> for bigger cascades<br>\u2022 <b>Glowing tiles</b> show you good moves<br>\u2022 <b>Combos</b> multiply your score<br>\u2022 The <b>music builds</b> as you play!",btn:"I'M READY TO ROCK!"}
+];
+var tutStep=0;
+function showTutorial(fromMenu){tutStep=0;renderTutStep(fromMenu)}
+function renderTutStep(fromMenu){
+    var old=document.querySelector('.tut-full');if(old)old.remove();
+    if(tutStep>=TUT_STEPS.length){
+        if(!fromMenu){localStorage.setItem('xrs_tut_done','1');strt(1)}
+        return;
+    }
+    var s=TUT_STEPS[tutStep];
+    var ov=document.createElement('div');ov.className='tut-full';
+    var dots='';for(var i=0;i<TUT_STEPS.length;i++)dots+='<div class="tut-dot'+(i===tutStep?' active':'')+'"></div>';
+    ov.innerHTML='<div class="tut-card">'
+        +'<button class="tut-skip" onclick="skipTutorial('+(fromMenu?'true':'false')+')">Skip \u00BB</button>'
+        +'<div class="tut-step">Step '+(tutStep+1)+' of '+TUT_STEPS.length+'</div>'
+        +'<div class="tut-title">'+s.title+'</div>'
+        +'<div class="tut-img">'+s.img+'</div>'
+        +'<div class="tut-text">'+s.text+'</div>'
+        +'<button class="tut-btn" onclick="nextTutStep('+(fromMenu?'true':'false')+')">'+s.btn+'</button>'
+        +'<div class="tut-dots">'+dots+'</div></div>';
+    document.body.appendChild(ov);
+}
+function nextTutStep(fromMenu){tutStep++;renderTutStep(fromMenu)}
+function skipTutorial(fromMenu){
+    var old=document.querySelector('.tut-full');if(old)old.remove();
+    if(!fromMenu){localStorage.setItem('xrs_tut_done','1');strt(1)}
+}
+function startGame(){
+    iA();
+    if(!localStorage.getItem('xrs_tut_done')){showTutorial(false)}
+    else{showLS()}
 }
 
 </script>
