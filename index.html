@@ -2779,6 +2779,24 @@ body {
   margin: 6px 0 4px; opacity: 0.8;
 }
 
+.win-scroll-cue {
+  position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%);
+  z-index: 110;
+  background: var(--gold); color: var(--bg-deep);
+  font-size: 0.72rem; font-weight: 800; letter-spacing: 0.04em;
+  padding: 7px 14px; border-radius: 999px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5), 0 0 14px rgba(201,161,74,0.6);
+  animation: win-cue-bounce 1.4s ease-in-out infinite;
+  transition: opacity 240ms ease;
+  pointer-events: none;
+  display: none;
+}
+@keyframes win-cue-bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%      { transform: translateX(-50%) translateY(4px); }
+}
+@media (prefers-reduced-motion: reduce) { .win-scroll-cue { animation: none; } }
+
 /* iOS safe-area */
 @supports (padding: max(0px)) {
   .app { padding-bottom: max(80px, env(safe-area-inset-bottom)); }
@@ -4361,6 +4379,7 @@ const buildBoard = (lv) => {
     el.onclick = () => onTileClick(i);
     b.appendChild(el);
   }
+  setupSwipe(b);
 
   clearAccidentalMatches();
   updateObstacleCount();
@@ -4420,7 +4439,87 @@ const isAdjacent = (a, b) => {
 // ============================================================
 // CLICK & SWAP
 // ============================================================
+// ============================================================
+// SWIPE / DRAG TO SWAP — works alongside tap-to-swap.
+// Press a tile and drag toward a neighbor; release to swap.
+// A tiny movement counts as a tap (handled by the click listener).
+// ============================================================
+let _swipe = null;
+let _suppressClickUntil = 0;
+const setupSwipe = (board) => {
+  if (board._swipeBound) return;       // only bind once per board element
+  board._swipeBound = true;
+
+  const tileIndexFromEvent = (e) => {
+    const t = e.target.closest('.tile');
+    if (!t || !board.contains(t)) return null;
+    const idx = parseInt(t.dataset.index, 10);
+    return isNaN(idx) ? null : idx;
+  };
+
+  const start = (x, y, idx) => {
+    if (G.processing || idx === null) return;
+    _swipe = { x, y, idx, moved: false };
+  };
+
+  const end = (x, y) => {
+    if (!_swipe) return;
+    const s = _swipe; _swipe = null;
+    const dx = x - s.x, dy = y - s.y;
+    const dist = Math.hypot(dx, dy);
+    // Threshold: below ~18px it's a tap, let onclick handle selection
+    if (dist < 18) return;
+    // Determine swipe direction → neighbor index
+    let nb;
+    if (Math.abs(dx) > Math.abs(dy)) {
+      nb = dx > 0 ? s.idx + 1 : s.idx - 1;
+      // guard against wrapping across a row edge
+      if (Math.floor(nb / 6) !== Math.floor(s.idx / 6)) return;
+    } else {
+      nb = dy > 0 ? s.idx + 6 : s.idx - 6;
+    }
+    if (nb < 0 || nb > 35) return;
+    if (G.processing) return;
+    // Clear any prior tap-selection so the two systems don't fight
+    if (G.selected !== null) {
+      const tiles = document.querySelectorAll('.tile');
+      if (tiles[G.selected]) tiles[G.selected].classList.remove('selected');
+      G.selected = null;
+    }
+    if (G.board[s.idx] && G.board[s.idx].type === 'obstacle') return;
+    if (G.board[nb] && G.board[nb].type === 'obstacle') return;
+    _suppressClickUntil = Date.now() + 400; // ignore the synthetic click after a swipe
+    initAC();
+    if (!bgmPlaying && G.settings.music) startBGM();
+    clearHints();
+    playSfx('select');
+    swap(s.idx, nb);
+  };
+
+  // Touch
+  board.addEventListener('touchstart', (e) => {
+    const t = e.changedTouches[0];
+    start(t.clientX, t.clientY, tileIndexFromEvent(e));
+  }, { passive: true });
+  board.addEventListener('touchmove', (e) => {
+    if (_swipe) _swipe.moved = true;
+  }, { passive: true });
+  board.addEventListener('touchend', (e) => {
+    const t = e.changedTouches[0];
+    end(t.clientX, t.clientY);
+  }, { passive: true });
+
+  // Mouse (desktop drag)
+  board.addEventListener('mousedown', (e) => {
+    start(e.clientX, e.clientY, tileIndexFromEvent(e));
+  });
+  board.addEventListener('mouseup', (e) => {
+    end(e.clientX, e.clientY);
+  });
+};
+
 const onTileClick = (i) => {
+  if (Date.now() < _suppressClickUntil) return; // a swipe just happened; ignore synthetic click
   if (G.processing) return;
   if (G.board[i] && G.board[i].type === 'obstacle') {
     // Road cases answer back — shake, sound, and a one-line explainer
@@ -4479,11 +4578,11 @@ const glideTiles = (a, b, done) => {
     done();
   };
   try {
-    const opt = { duration: 180, easing: 'cubic-bezier(.32,.72,0,1)' };
+    const opt = { duration: 260, easing: 'cubic-bezier(.32,.72,0,1)', fill: 'both' };
     ea.animate([{ transform: 'translate(0,0)' }, { transform: `translate(${dx}px, ${dy}px)` }], opt);
     const anim = eb.animate([{ transform: 'translate(0,0)' }, { transform: `translate(${-dx}px, ${-dy}px)` }], opt);
     anim.onfinish = finish;
-    setTimeout(finish, 220); // safety net if onfinish doesn't fire
+    setTimeout(finish, 300); // safety net if onfinish doesn't fire
   } catch (e) {
     // Older browsers without WAAPI — just complete instantly
     finish();
@@ -5756,10 +5855,23 @@ const showWinModal = (title, score, stars, unlocks) => {
         <button class="btn btn-ghost" id="winShop">★ Upgrades</button>
       </div>
     </div>
+    <div class="win-scroll-cue" id="winScrollCue">↓ more &amp; buttons below ↓</div>
   `;
   document.body.appendChild(veil);
 
-  const modalEl = veil.querySelector('.modal');
+  // Show the "more below" cue only if the modal actually overflows; hide once scrolled
+  const cueEl = veil.querySelector('#winScrollCue');
+  const modalScroll = veil.querySelector('.win-modal');
+  if (cueEl && modalScroll) {
+    requestAnimationFrame(() => {
+      const overflowing = modalScroll.scrollHeight > modalScroll.clientHeight + 8;
+      cueEl.style.display = overflowing ? 'block' : 'none';
+      modalScroll.addEventListener('scroll', () => {
+        const atBottom = modalScroll.scrollTop + modalScroll.clientHeight >= modalScroll.scrollHeight - 12;
+        cueEl.style.opacity = atBottom ? '0' : '1';
+      });
+    });
+  }
   // Confetti shower for the win — attached to the VEIL (full-screen) so it rains
   // over everything without forcing the modal to clip/blocking its scroll.
   const confColors = ['#ffe08a', '#e8392e', '#8b5cf6', '#3fd0b8', '#fff4d6'];
