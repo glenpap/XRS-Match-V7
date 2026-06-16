@@ -1675,13 +1675,18 @@ body {
   .dialogue { display: none; } /* hide the chatter when vertical space is tight */
 }
 
-/* Reduced motion preference — respect it */
+/* Reduced motion preference — respect it for DECORATIVE motion (spins, parallax,
+   pulsing, starbursts). But keep the gentle, functional tile-glide: a short linear
+   slide that shows where tiles went is an orientation aid, not a vestibular trigger,
+   and removing it makes the game feel broken. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  /* Re-enable the functional swap glide and tile falls so play stays legible */
+  .tile[style*="transition"] { transition-duration: 180ms !important; }
 }
 
 /* =========================================================
