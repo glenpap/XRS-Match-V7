@@ -4641,8 +4641,9 @@ const swap = (a, b) => {
 
   if (aAmp || bAmp || aRS || bRS || aPy || bPy) {
     playSfx('swap');
+    // Commit data swap immediately, glide is cosmetic (same race fix as normal swaps)
+    const tmp = G.board[a]; G.board[a] = G.board[b]; G.board[b] = tmp;
     glideTiles(a, b, () => {
-      const tmp = G.board[a]; G.board[a] = G.board[b]; G.board[b] = tmp;
       updateTile(a); updateTile(b);
       G.moves--;
       updateHud();
@@ -4672,15 +4673,18 @@ const swap = (a, b) => {
   const tmp = G.board[a]; G.board[a] = G.board[b]; G.board[b] = tmp;
   const m = findMatches();
   const willMatch = m.length > 0;
-  // Put the data back; the glide animation decides what happens next
+  // Put the data back; we'll commit the swap atomically below.
   const back = G.board[a]; G.board[a] = G.board[b]; G.board[b] = back;
 
   if (window._XRS_DEBUG) showToast(`swap ${a}↔${b} · match:${willMatch} · proc:${G.processing}`);
 
   if (willMatch || aXr || bXr) {
     playSfx('swap');
+    // Commit the data swap IMMEDIATELY (single source of truth), then glide is
+    // purely cosmetic. This removes the async data-mutation race that could
+    // leave a cell empty after rapid swipes.
+    const t2 = G.board[a]; G.board[a] = G.board[b]; G.board[b] = t2;
     glideTiles(a, b, () => {
-      const t2 = G.board[a]; G.board[a] = G.board[b]; G.board[b] = t2;
       updateTile(a); updateTile(b);
       G.moves--;
       updateHud();
@@ -4692,7 +4696,7 @@ const swap = (a, b) => {
       }
     });
   } else {
-    // Bad swap — glide there and back, no harm done
+    // Bad swap — glide there and back, data never changes
     playSfx('bad');
     glideTilesFail(a, b, () => { G.processing = false; });
   }
