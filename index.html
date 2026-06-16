@@ -5245,6 +5245,9 @@ const checkContinue = () => {
   G.combo = 0;
   G._superGemThisTurn = false;
   G.processing = false;
+  // Safety: fully re-render every cell so no tile is left stuck with a leftover
+  // 'matching'/'falling' animation class (which would show as a blank square).
+  for (let i = 0; i < 36; i++) updateTile(i);
   // Reset cascade crescendo
   const bw = document.querySelector('.board-wrap');
   if (bw) bw.classList.remove('combo-1','combo-2','combo-3','combo-4');
