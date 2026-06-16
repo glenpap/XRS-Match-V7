@@ -4446,6 +4446,7 @@ const isAdjacent = (a, b) => {
 // ============================================================
 let _swipe = null;
 let _suppressClickUntil = 0;
+let _usingTouch = false;
 const setupSwipe = (board) => {
   if (board._swipeBound) return;       // only bind once per board element
   board._swipeBound = true;
@@ -4498,6 +4499,7 @@ const setupSwipe = (board) => {
 
   // Touch
   board.addEventListener('touchstart', (e) => {
+    _usingTouch = true;
     const t = e.changedTouches[0];
     start(t.clientX, t.clientY, tileIndexFromEvent(e));
   }, { passive: true });
@@ -4509,11 +4511,13 @@ const setupSwipe = (board) => {
     end(t.clientX, t.clientY);
   }, { passive: true });
 
-  // Mouse (desktop drag)
+  // Mouse (desktop drag) — ignored on touch devices to avoid emulated double-fire
   board.addEventListener('mousedown', (e) => {
+    if (_usingTouch) return;
     start(e.clientX, e.clientY, tileIndexFromEvent(e));
   });
   board.addEventListener('mouseup', (e) => {
+    if (_usingTouch) return;
     end(e.clientX, e.clientY);
   });
 };
@@ -4616,7 +4620,11 @@ const glideTilesFail = (a, b, done) => {
 };
 
 const swap = (a, b) => {
+  if (G.processing) return;        // hard guard — never let two swaps overlap
+  if (a === b || !isAdjacent(a, b)) return;
   const tA = G.board[a], tB = G.board[b];
+  if (!tA || !tB) return;          // never swap into/with an empty cell
+  if (tA.type === 'obstacle' || tB.type === 'obstacle') return;
   G.processing = true;
 
   // Special tile activations on swap
