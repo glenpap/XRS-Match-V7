@@ -4336,7 +4336,11 @@ const renderTile = (el, data) => {
 };
 
 const updateTile = (i) => {
-  const tiles = document.querySelectorAll('.tile');
+  const board = document.getElementById('board');
+  if (!board) return;
+  // Target by position within the board only — never grab stray .tile elements
+  // elsewhere on the page, and never misalign the index.
+  const tiles = board.children;
   if (tiles[i]) renderTile(tiles[i], G.board[i]);
 };
 
@@ -5248,6 +5252,27 @@ const checkContinue = () => {
   // Safety: fully re-render every cell so no tile is left stuck with a leftover
   // 'matching'/'falling' animation class (which would show as a blank square).
   for (let i = 0; i < 36; i++) updateTile(i);
+  // INTEGRITY CHECK — catch any gap (empty data cell or blank-rendered tile),
+  // report it (when debug on), and auto-repair so the player never sees it.
+  let repaired = 0;
+  const tilesChk = document.querySelectorAll('.tile');
+  for (let i = 0; i < 36; i++) {
+    const dataEmpty = !G.board[i];
+    const domEmpty = tilesChk[i] && tilesChk[i].innerHTML.trim() === '' && !(G.board[i] && G.board[i].type === 'obstacle');
+    if (dataEmpty) {
+      // Data hole — fill it
+      G.board[i] = makeTile();
+      updateTile(i);
+      repaired++;
+      if (window._XRS_DEBUG) console.log(`[XRS] repaired DATA gap at cell ${i}`);
+    } else if (domEmpty) {
+      // Data exists but rendered blank — force re-render
+      updateTile(i);
+      repaired++;
+      if (window._XRS_DEBUG) console.log(`[XRS] repaired RENDER gap at cell ${i}, type=${G.board[i].type}, special=${G.board[i].special}`);
+    }
+  }
+  if (repaired > 0 && window._XRS_DEBUG) showToast(`⚠ repaired ${repaired} gap(s)`);
   // Reset cascade crescendo
   const bw = document.querySelector('.board-wrap');
   if (bw) bw.classList.remove('combo-1','combo-2','combo-3','combo-4');
