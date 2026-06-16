@@ -776,6 +776,14 @@ body {
   from { opacity: 0; transform: translateY(12px) scale(0.98); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
+/* Win modal: must always be scrollable so the Next Level button is reachable
+   even on short phone screens. Confetti is clipped by the veil, not the modal. */
+.win-modal {
+  max-height: 88vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.win-modal .win-confetti { display: none; } /* confetti moved to veil layer below */
 .modal-title {
   font-family: var(--serif);
   font-weight: 600;
@@ -4454,29 +4462,32 @@ const onTileClick = (i) => {
   }
 };
 
-// FLIP-style glide — the two tiles visibly trade places before the board updates
+// FLIP-style glide via Web Animations API — reliable on mobile and not affected
+// by the CSS reduced-motion transition override.
 const glideTiles = (a, b, done) => {
   const tiles = document.querySelectorAll('#board .tile');
   const ea = tiles[a], eb = tiles[b];
   if (!ea || !eb) { done(); return; }
-  // Kill any lingering selected-wobble animation/transform that would fight the glide
-  [ea, eb].forEach(t => { t.classList.remove('selected'); t.style.animation = 'none'; t.style.transform = 'none'; });
+  [ea, eb].forEach(t => { t.classList.remove('selected'); });
   const ra = ea.getBoundingClientRect(), rb = eb.getBoundingClientRect();
   const dx = rb.left - ra.left, dy = rb.top - ra.top;
   ea.style.zIndex = '6'; eb.style.zIndex = '5';
-  // Double rAF so the browser commits the start state before transitioning (reliable on mobile)
-  requestAnimationFrame(() => {
-    ea.style.transition = 'transform 180ms cubic-bezier(.32,.72,0,1)';
-    eb.style.transition = 'transform 180ms cubic-bezier(.32,.72,0,1)';
-    requestAnimationFrame(() => {
-      ea.style.transform = `translate(${dx}px, ${dy}px)`;
-      eb.style.transform = `translate(${-dx}px, ${-dy}px)`;
-    });
-  });
-  setTimeout(() => {
-    [ea, eb].forEach(t => { t.style.transition = ''; t.style.transform = ''; t.style.zIndex = ''; t.style.animation = ''; });
+  let finished = false;
+  const finish = () => {
+    if (finished) return; finished = true;
+    ea.style.zIndex = ''; eb.style.zIndex = '';
     done();
-  }, 200);
+  };
+  try {
+    const opt = { duration: 180, easing: 'cubic-bezier(.32,.72,0,1)' };
+    ea.animate([{ transform: 'translate(0,0)' }, { transform: `translate(${dx}px, ${dy}px)` }], opt);
+    const anim = eb.animate([{ transform: 'translate(0,0)' }, { transform: `translate(${-dx}px, ${-dy}px)` }], opt);
+    anim.onfinish = finish;
+    setTimeout(finish, 220); // safety net if onfinish doesn't fire
+  } catch (e) {
+    // Older browsers without WAAPI — just complete instantly
+    finish();
+  }
 };
 
 // Failed swap — glide there, then glide back. The classic "nope."
@@ -4484,26 +4495,25 @@ const glideTilesFail = (a, b, done) => {
   const tiles = document.querySelectorAll('#board .tile');
   const ea = tiles[a], eb = tiles[b];
   if (!ea || !eb) { done(); return; }
-  [ea, eb].forEach(t => { t.classList.remove('selected'); t.style.animation = 'none'; t.style.transform = 'none'; });
+  [ea, eb].forEach(t => { t.classList.remove('selected'); });
   const ra = ea.getBoundingClientRect(), rb = eb.getBoundingClientRect();
   const dx = rb.left - ra.left, dy = rb.top - ra.top;
   ea.style.zIndex = '6'; eb.style.zIndex = '5';
-  requestAnimationFrame(() => {
-    ea.style.transition = 'transform 150ms cubic-bezier(.32,.72,0,1)';
-    eb.style.transition = 'transform 150ms cubic-bezier(.32,.72,0,1)';
-    requestAnimationFrame(() => {
-      ea.style.transform = `translate(${dx}px, ${dy}px)`;
-      eb.style.transform = `translate(${-dx}px, ${-dy}px)`;
-    });
-  });
-  setTimeout(() => {
-    ea.style.transform = 'none';
-    eb.style.transform = 'none';
-    setTimeout(() => {
-      [ea, eb].forEach(t => { t.style.transition = ''; t.style.transform = ''; t.style.zIndex = ''; t.style.animation = ''; });
-      done();
-    }, 165);
-  }, 160);
+  let finished = false;
+  const finish = () => {
+    if (finished) return; finished = true;
+    ea.style.zIndex = ''; eb.style.zIndex = '';
+    done();
+  };
+  try {
+    const opt = { duration: 320, easing: 'ease-in-out' };
+    ea.animate([{ transform: 'translate(0,0)' }, { transform: `translate(${dx}px, ${dy}px)` }, { transform: 'translate(0,0)' }], opt);
+    const anim = eb.animate([{ transform: 'translate(0,0)' }, { transform: `translate(${-dx}px, ${-dy}px)` }, { transform: 'translate(0,0)' }], opt);
+    anim.onfinish = finish;
+    setTimeout(finish, 360);
+  } catch (e) {
+    finish();
+  }
 };
 
 const swap = (a, b) => {
@@ -5724,7 +5734,7 @@ const showWinModal = (title, score, stars, unlocks) => {
   const veil = document.createElement('div');
   veil.className = 'modal-veil';
   veil.innerHTML = `
-    <div class="modal" style="position: relative; text-align:center; overflow: hidden;">
+    <div class="modal win-modal" style="position: relative; text-align:center;">
       <div class="eyebrow gold-ink">Encore</div>
       <h2 class="modal-title">${title}</h2>
       <div class="win-stars">
@@ -5750,18 +5760,19 @@ const showWinModal = (title, score, stars, unlocks) => {
   document.body.appendChild(veil);
 
   const modalEl = veil.querySelector('.modal');
-  // Confetti shower for the win — gold/red/violet pieces rain down
+  // Confetti shower for the win — attached to the VEIL (full-screen) so it rains
+  // over everything without forcing the modal to clip/blocking its scroll.
   const confColors = ['#ffe08a', '#e8392e', '#8b5cf6', '#3fd0b8', '#fff4d6'];
   const confCount = stars >= 3 ? 36 : (stars === 2 ? 24 : 14);
   for (let i = 0; i < confCount; i++) {
     const c = document.createElement('div');
-    c.className = 'win-confetti';
+    c.className = 'win-confetti veil-confetti';
     c.style.background = confColors[i % confColors.length];
     c.style.setProperty('--cfx', (Math.random() * 280 - 140) + 'px');
     c.style.setProperty('--cfr', (Math.random() * 720 - 360) + 'deg');
     c.style.left = (Math.random() * 100) + '%';
     c.style.animationDelay = (Math.random() * 0.4) + 's';
-    modalEl.appendChild(c);
+    veil.appendChild(c);
     setTimeout(() => c.remove(), 2200);
   }
 
