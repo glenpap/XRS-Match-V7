@@ -4447,6 +4447,7 @@ const isAdjacent = (a, b) => {
 let _swipe = null;
 let _suppressClickUntil = 0;
 let _usingTouch = false;
+let _swipeLock = false;
 const setupSwipe = (board) => {
   if (board._swipeBound) return;       // only bind once per board element
   board._swipeBound = true;
@@ -4466,6 +4467,7 @@ const setupSwipe = (board) => {
   const end = (x, y) => {
     if (!_swipe) return;
     const s = _swipe; _swipe = null;
+    if (_swipeLock) return;            // a swipe is already being handled this gesture
     const dx = x - s.x, dy = y - s.y;
     const dist = Math.hypot(dx, dy);
     // Threshold: below ~18px it's a tap, let onclick handle selection
@@ -4489,7 +4491,9 @@ const setupSwipe = (board) => {
     }
     if (G.board[s.idx] && G.board[s.idx].type === 'obstacle') return;
     if (G.board[nb] && G.board[nb].type === 'obstacle') return;
-    _suppressClickUntil = Date.now() + 400; // ignore the synthetic click after a swipe
+    _swipeLock = true;                 // block any duplicate event for this gesture
+    setTimeout(() => { _swipeLock = false; }, 450);
+    _suppressClickUntil = Date.now() + 450; // ignore the synthetic click after a swipe
     initAC();
     if (!bgmPlaying && G.settings.music) startBGM();
     clearHints();
@@ -4670,6 +4674,8 @@ const swap = (a, b) => {
   const willMatch = m.length > 0;
   // Put the data back; the glide animation decides what happens next
   const back = G.board[a]; G.board[a] = G.board[b]; G.board[b] = back;
+
+  if (window._XRS_DEBUG) showToast(`swap ${a}↔${b} · match:${willMatch} · proc:${G.processing}`);
 
   if (willMatch || aXr || bXr) {
     playSfx('swap');
