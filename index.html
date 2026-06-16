@@ -4336,11 +4336,7 @@ const renderTile = (el, data) => {
 };
 
 const updateTile = (i) => {
-  const board = document.getElementById('board');
-  if (!board) return;
-  // Target by position within the board only — never grab stray .tile elements
-  // elsewhere on the page, and never misalign the index.
-  const tiles = board.children;
+  const tiles = document.querySelectorAll('.tile');
   if (tiles[i]) renderTile(tiles[i], G.board[i]);
 };
 
@@ -4444,94 +4440,69 @@ const isAdjacent = (a, b) => {
 // CLICK & SWAP
 // ============================================================
 // ============================================================
-// SWIPE / DRAG TO SWAP — works alongside tap-to-swap.
-// Press a tile and drag toward a neighbor; release to swap.
-// A tiny movement counts as a tap (handled by the click listener).
+// MINIMAL SWIPE — a swipe is just a shortcut for "tap tile A, tap neighbor B".
+// It reuses the exact same proven onTileClick path; no separate swap logic.
 // ============================================================
-let _swipe = null;
-let _suppressClickUntil = 0;
-let _usingTouch = false;
-let _swipeLock = false;
+let _sw = null;          // { x, y, idx }
+let _swBlockClick = 0;   // timestamp until which synthetic clicks are ignored
+let _swInternal = false; // true while swipe is calling onTileClick itself
+
 const setupSwipe = (board) => {
-  if (board._swipeBound) return;       // only bind once per board element
-  board._swipeBound = true;
+  if (board._swBound) return;
+  board._swBound = true;
 
-  const tileIndexFromEvent = (e) => {
-    const t = e.target.closest('.tile');
+  const idxFrom = (target) => {
+    const t = target.closest && target.closest('.tile');
     if (!t || !board.contains(t)) return null;
-    const idx = parseInt(t.dataset.index, 10);
-    return isNaN(idx) ? null : idx;
+    const i = parseInt(t.dataset.index, 10);
+    return isNaN(i) ? null : i;
   };
 
-  const start = (x, y, idx) => {
-    if (G.processing || idx === null) return;
-    _swipe = { x, y, idx, moved: false };
+  const begin = (x, y, target) => {
+    if (G.processing) { _sw = null; return; }
+    const idx = idxFrom(target);
+    _sw = idx === null ? null : { x, y, idx };
   };
 
-  const end = (x, y) => {
-    if (!_swipe) return;
-    const s = _swipe; _swipe = null;
-    if (_swipeLock) return;            // a swipe is already being handled this gesture
+  const finishGesture = (x, y) => {
+    if (!_sw) return;
+    const s = _sw; _sw = null;
     const dx = x - s.x, dy = y - s.y;
-    const dist = Math.hypot(dx, dy);
-    // Threshold: below ~18px it's a tap, let onclick handle selection
-    if (dist < 18) return;
-    // Determine swipe direction → neighbor index
+    if (Math.hypot(dx, dy) < 20) return;  // too small = it's a tap, let click handle it
+    // direction → neighbor
     let nb;
     if (Math.abs(dx) > Math.abs(dy)) {
       nb = dx > 0 ? s.idx + 1 : s.idx - 1;
-      // guard against wrapping across a row edge
-      if (Math.floor(nb / 6) !== Math.floor(s.idx / 6)) return;
+      if (Math.floor(nb / 6) !== Math.floor(s.idx / 6)) return; // row-edge guard
     } else {
       nb = dy > 0 ? s.idx + 6 : s.idx - 6;
     }
     if (nb < 0 || nb > 35) return;
-    if (G.processing) return;
-    // Clear any prior tap-selection so the two systems don't fight
+    // Reuse the proven tap path: clear any selection, then select A and B.
     if (G.selected !== null) {
       const tiles = document.querySelectorAll('.tile');
       if (tiles[G.selected]) tiles[G.selected].classList.remove('selected');
       G.selected = null;
     }
-    if (G.board[s.idx] && G.board[s.idx].type === 'obstacle') return;
-    if (G.board[nb] && G.board[nb].type === 'obstacle') return;
-    _swipeLock = true;                 // block any duplicate event for this gesture
-    setTimeout(() => { _swipeLock = false; }, 450);
-    _suppressClickUntil = Date.now() + 450; // ignore the synthetic click after a swipe
-    initAC();
-    if (!bgmPlaying && G.settings.music) startBGM();
-    clearHints();
-    playSfx('select');
-    swap(s.idx, nb);
+    _swBlockClick = Date.now() + 500; // ignore the synthetic click this gesture produces
+    _swInternal = true;
+    onTileClick(s.idx);   // selects A
+    onTileClick(nb);      // adjacent → triggers the normal swap
+    _swInternal = false;
   };
 
-  // Touch
   board.addEventListener('touchstart', (e) => {
-    _usingTouch = true;
     const t = e.changedTouches[0];
-    start(t.clientX, t.clientY, tileIndexFromEvent(e));
-  }, { passive: true });
-  board.addEventListener('touchmove', (e) => {
-    if (_swipe) _swipe.moved = true;
+    begin(t.clientX, t.clientY, e.target);
   }, { passive: true });
   board.addEventListener('touchend', (e) => {
     const t = e.changedTouches[0];
-    end(t.clientX, t.clientY);
+    finishGesture(t.clientX, t.clientY);
   }, { passive: true });
-
-  // Mouse (desktop drag) — ignored on touch devices to avoid emulated double-fire
-  board.addEventListener('mousedown', (e) => {
-    if (_usingTouch) return;
-    start(e.clientX, e.clientY, tileIndexFromEvent(e));
-  });
-  board.addEventListener('mouseup', (e) => {
-    if (_usingTouch) return;
-    end(e.clientX, e.clientY);
-  });
 };
 
 const onTileClick = (i) => {
-  if (Date.now() < _suppressClickUntil) return; // a swipe just happened; ignore synthetic click
+  if (!_swInternal && Date.now() < _swBlockClick) return; // ignore post-swipe ghost click
   if (G.processing) return;
   if (G.board[i] && G.board[i].type === 'obstacle') {
     // Road cases answer back — shake, sound, and a one-line explainer
@@ -4628,11 +4599,7 @@ const glideTilesFail = (a, b, done) => {
 };
 
 const swap = (a, b) => {
-  if (G.processing) return;        // hard guard — never let two swaps overlap
-  if (a === b || !isAdjacent(a, b)) return;
   const tA = G.board[a], tB = G.board[b];
-  if (!tA || !tB) return;          // never swap into/with an empty cell
-  if (tA.type === 'obstacle' || tB.type === 'obstacle') return;
   G.processing = true;
 
   // Special tile activations on swap
@@ -4645,9 +4612,8 @@ const swap = (a, b) => {
 
   if (aAmp || bAmp || aRS || bRS || aPy || bPy) {
     playSfx('swap');
-    // Commit data swap immediately, glide is cosmetic (same race fix as normal swaps)
-    const tmp = G.board[a]; G.board[a] = G.board[b]; G.board[b] = tmp;
     glideTiles(a, b, () => {
+      const tmp = G.board[a]; G.board[a] = G.board[b]; G.board[b] = tmp;
       updateTile(a); updateTile(b);
       G.moves--;
       updateHud();
@@ -4677,18 +4643,13 @@ const swap = (a, b) => {
   const tmp = G.board[a]; G.board[a] = G.board[b]; G.board[b] = tmp;
   const m = findMatches();
   const willMatch = m.length > 0;
-  // Put the data back; we'll commit the swap atomically below.
+  // Put the data back; the glide animation decides what happens next
   const back = G.board[a]; G.board[a] = G.board[b]; G.board[b] = back;
-
-  if (window._XRS_DEBUG) showToast(`swap ${a}↔${b} · match:${willMatch} · proc:${G.processing}`);
 
   if (willMatch || aXr || bXr) {
     playSfx('swap');
-    // Commit the data swap IMMEDIATELY (single source of truth), then glide is
-    // purely cosmetic. This removes the async data-mutation race that could
-    // leave a cell empty after rapid swipes.
-    const t2 = G.board[a]; G.board[a] = G.board[b]; G.board[b] = t2;
     glideTiles(a, b, () => {
+      const t2 = G.board[a]; G.board[a] = G.board[b]; G.board[b] = t2;
       updateTile(a); updateTile(b);
       G.moves--;
       updateHud();
@@ -4700,7 +4661,7 @@ const swap = (a, b) => {
       }
     });
   } else {
-    // Bad swap — glide there and back, data never changes
+    // Bad swap — glide there and back, no harm done
     playSfx('bad');
     glideTilesFail(a, b, () => { G.processing = false; });
   }
@@ -5249,30 +5210,6 @@ const checkContinue = () => {
   G.combo = 0;
   G._superGemThisTurn = false;
   G.processing = false;
-  // Safety: fully re-render every cell so no tile is left stuck with a leftover
-  // 'matching'/'falling' animation class (which would show as a blank square).
-  for (let i = 0; i < 36; i++) updateTile(i);
-  // INTEGRITY CHECK — catch any gap (empty data cell or blank-rendered tile),
-  // report it (when debug on), and auto-repair so the player never sees it.
-  let repaired = 0;
-  const tilesChk = document.querySelectorAll('.tile');
-  for (let i = 0; i < 36; i++) {
-    const dataEmpty = !G.board[i];
-    const domEmpty = tilesChk[i] && tilesChk[i].innerHTML.trim() === '' && !(G.board[i] && G.board[i].type === 'obstacle');
-    if (dataEmpty) {
-      // Data hole — fill it
-      G.board[i] = makeTile();
-      updateTile(i);
-      repaired++;
-      if (window._XRS_DEBUG) console.log(`[XRS] repaired DATA gap at cell ${i}`);
-    } else if (domEmpty) {
-      // Data exists but rendered blank — force re-render
-      updateTile(i);
-      repaired++;
-      if (window._XRS_DEBUG) console.log(`[XRS] repaired RENDER gap at cell ${i}, type=${G.board[i].type}, special=${G.board[i].special}`);
-    }
-  }
-  if (repaired > 0 && window._XRS_DEBUG) showToast(`⚠ repaired ${repaired} gap(s)`);
   // Reset cascade crescendo
   const bw = document.querySelector('.board-wrap');
   if (bw) bw.classList.remove('combo-1','combo-2','combo-3','combo-4');
