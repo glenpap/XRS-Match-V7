@@ -4454,19 +4454,24 @@ const glideTiles = (a, b, done) => {
   const tiles = document.querySelectorAll('#board .tile');
   const ea = tiles[a], eb = tiles[b];
   if (!ea || !eb) { done(); return; }
+  // Kill any lingering selected-wobble animation/transform that would fight the glide
+  [ea, eb].forEach(t => { t.classList.remove('selected'); t.style.animation = 'none'; t.style.transform = 'none'; });
   const ra = ea.getBoundingClientRect(), rb = eb.getBoundingClientRect();
   const dx = rb.left - ra.left, dy = rb.top - ra.top;
-  ea.style.transition = 'transform 170ms cubic-bezier(.32,.72,0,1)';
-  eb.style.transition = 'transform 170ms cubic-bezier(.32,.72,0,1)';
   ea.style.zIndex = '6'; eb.style.zIndex = '5';
+  // Double rAF so the browser commits the start state before transitioning (reliable on mobile)
   requestAnimationFrame(() => {
-    ea.style.transform = `translate(${dx}px, ${dy}px)`;
-    eb.style.transform = `translate(${-dx}px, ${-dy}px)`;
+    ea.style.transition = 'transform 180ms cubic-bezier(.32,.72,0,1)';
+    eb.style.transition = 'transform 180ms cubic-bezier(.32,.72,0,1)';
+    requestAnimationFrame(() => {
+      ea.style.transform = `translate(${dx}px, ${dy}px)`;
+      eb.style.transform = `translate(${-dx}px, ${-dy}px)`;
+    });
   });
   setTimeout(() => {
-    [ea, eb].forEach(t => { t.style.transition = ''; t.style.transform = ''; t.style.zIndex = ''; });
+    [ea, eb].forEach(t => { t.style.transition = ''; t.style.transform = ''; t.style.zIndex = ''; t.style.animation = ''; });
     done();
-  }, 185);
+  }, 200);
 };
 
 // Failed swap — glide there, then glide back. The classic "nope."
@@ -4474,19 +4479,23 @@ const glideTilesFail = (a, b, done) => {
   const tiles = document.querySelectorAll('#board .tile');
   const ea = tiles[a], eb = tiles[b];
   if (!ea || !eb) { done(); return; }
+  [ea, eb].forEach(t => { t.classList.remove('selected'); t.style.animation = 'none'; t.style.transform = 'none'; });
   const ra = ea.getBoundingClientRect(), rb = eb.getBoundingClientRect();
   const dx = rb.left - ra.left, dy = rb.top - ra.top;
-  [ea, eb].forEach(t => { t.style.transition = 'transform 150ms cubic-bezier(.32,.72,0,1)'; });
   ea.style.zIndex = '6'; eb.style.zIndex = '5';
   requestAnimationFrame(() => {
-    ea.style.transform = `translate(${dx}px, ${dy}px)`;
-    eb.style.transform = `translate(${-dx}px, ${-dy}px)`;
+    ea.style.transition = 'transform 150ms cubic-bezier(.32,.72,0,1)';
+    eb.style.transition = 'transform 150ms cubic-bezier(.32,.72,0,1)';
+    requestAnimationFrame(() => {
+      ea.style.transform = `translate(${dx}px, ${dy}px)`;
+      eb.style.transform = `translate(${-dx}px, ${-dy}px)`;
+    });
   });
   setTimeout(() => {
-    ea.style.transform = '';
-    eb.style.transform = '';
+    ea.style.transform = 'none';
+    eb.style.transform = 'none';
     setTimeout(() => {
-      [ea, eb].forEach(t => { t.style.transition = ''; t.style.zIndex = ''; });
+      [ea, eb].forEach(t => { t.style.transition = ''; t.style.transform = ''; t.style.zIndex = ''; t.style.animation = ''; });
       done();
     }, 165);
   }, 160);
@@ -4662,16 +4671,26 @@ const processMatches = (matches) => {
       }
     });
   });
+  // If a big match COULD have made a special but it's still locked, tell the
+  // player the reward is coming — otherwise a 5-match feels like it did nothing.
+  let lockedHint = null;
+  const noteLocked = (key) => {
+    const u = TILE_UNLOCKS.find(t => t.key === key);
+    if (u && !tileUnlocked(key)) lockedHint = u;
+  };
   lastRunsH.forEach(run => {
     if (run.some(c => used[c])) return;
-    if (run.length >= 5 && tileUnlocked('rockstar')) { specials.push({ idx: run[2], type: 'rockstar' }); run.forEach(c => used[c] = true); }
-    else if (run.length === 4 && tileUnlocked('amp')) { specials.push({ idx: run[1], type: 'amp', dir: 'row' }); run.forEach(c => used[c] = true); }
+    if (run.length >= 5) { if (tileUnlocked('rockstar')) { specials.push({ idx: run[2], type: 'rockstar' }); run.forEach(c => used[c] = true); } else noteLocked('rockstar'); }
+    else if (run.length === 4) { if (tileUnlocked('amp')) { specials.push({ idx: run[1], type: 'amp', dir: 'row' }); run.forEach(c => used[c] = true); } else noteLocked('amp'); }
   });
   lastRunsV.forEach(run => {
     if (run.some(c => used[c])) return;
-    if (run.length >= 5 && tileUnlocked('rockstar')) { specials.push({ idx: run[2], type: 'rockstar' }); run.forEach(c => used[c] = true); }
-    else if (run.length === 4 && tileUnlocked('amp')) { specials.push({ idx: run[1], type: 'amp', dir: 'col' }); run.forEach(c => used[c] = true); }
+    if (run.length >= 5) { if (tileUnlocked('rockstar')) { specials.push({ idx: run[2], type: 'rockstar' }); run.forEach(c => used[c] = true); } else noteLocked('rockstar'); }
+    else if (run.length === 4) { if (tileUnlocked('amp')) { specials.push({ idx: run[1], type: 'amp', dir: 'col' }); run.forEach(c => used[c] = true); } else noteLocked('amp'); }
   });
+  if (lockedHint) {
+    setTimeout(() => showToast(`✨ ${lockedHint.name} unlocks at Level ${lockedHint.level}!`), 250);
+  }
 
   const tiles = document.querySelectorAll('.tile');
   let total = 0;
