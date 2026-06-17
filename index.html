@@ -4617,7 +4617,10 @@ const glideTilesFail = (a, b, done) => {
 };
 
 const swap = (a, b) => {
+  if (G.processing) return;                 // never start a swap mid-cascade
   const tA = G.board[a], tB = G.board[b];
+  if (!tA || !tB) return;                   // never swap an empty/null cell
+  if (a === b || !isAdjacent(a, b)) return; // must be two distinct neighbors
   G.processing = true;
 
   // Special tile activations on swap
@@ -5227,6 +5230,37 @@ const checkContinue = () => {
   }
   G.combo = 0;
   G._superGemThisTurn = false;
+
+  // ---- BLANK CATCHER --------------------------------------------------
+  // The board is about to go idle. Guarantee every cell is filled & rendered.
+  // If anything is empty here, it's a bug upstream — repair it so the player
+  // never sees a hole, and (when debug on) report it so we can trace the source.
+  let holes = 0;
+  const boardEl = document.getElementById('board');
+  for (let i = 0; i < 36; i++) {
+    if (!G.board[i]) {
+      G.board[i] = makeTile();
+      holes++;
+      if (window._XRS_DEBUG) console.log('[XRS] DATA hole at', i);
+    }
+    // Re-render every cell from data — clears any stuck animation class too
+    const el = boardEl && boardEl.children[i];
+    if (el) {
+      renderTile(el, G.board[i]);
+      // detect a cell that rendered empty despite having (non-obstacle) data
+      if (window._XRS_DEBUG && el.innerHTML.trim() === '' && G.board[i] && G.board[i].type !== 'obstacle') {
+        console.log('[XRS] RENDER hole at', i, JSON.stringify(G.board[i]));
+      }
+    }
+  }
+  if (holes > 0) {
+    // A new hole was filled — it may create a match, so keep the loop honest
+    if (window._XRS_DEBUG) showToast('⚠ filled ' + holes + ' hole(s)');
+    const m2 = findMatches();
+    if (m2.length > 0) { processMatches(m2); return; }
+  }
+  // ---------------------------------------------------------------------
+
   G.processing = false;
   // Reset cascade crescendo
   const bw = document.querySelector('.board-wrap');
