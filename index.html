@@ -4406,10 +4406,8 @@ const buildBoard = (lv) => {
 const clearAccidentalMatches = () => {
   let m = findMatches();
   let iter = 0;
-  while (m.length > 0 && iter < 100) {
-    const flat = [];
-    m.forEach(arr => arr.forEach(x => flat.push(x)));
-    flat.forEach(i => {
+  while (m.cells.length > 0 && iter < 100) {
+    m.cells.forEach(i => {
       if (G.board[i] && G.board[i].type !== 'obstacle') {
         G.board[i] = makeTile();
         updateTile(i);
@@ -4568,7 +4566,10 @@ const glideTilesFail = (a, b, done) => {
 };
 
 const swap = (a, b) => {
+  if (G.processing) return;                  // never start a swap mid-cascade
   const tA = G.board[a], tB = G.board[b];
+  if (!tA || !tB) return;                    // never swap an empty cell
+  if (a === b || !isAdjacent(a, b)) return;  // must be two distinct neighbors
   G.processing = true;
 
   // Special tile activations on swap
@@ -4610,8 +4611,7 @@ const swap = (a, b) => {
 
   // Test the swap in data only — does it produce a match?
   const tmp = G.board[a]; G.board[a] = G.board[b]; G.board[b] = tmp;
-  const m = findMatches();
-  const willMatch = m.length > 0;
+  const willMatch = hasMatch();
   // Put the data back; the glide animation decides what happens next
   const back = G.board[a]; G.board[a] = G.board[b]; G.board[b] = back;
 
@@ -4626,6 +4626,7 @@ const swap = (a, b) => {
         const xi = aXr ? b : a; // X-Ray's position after the glide
         setTimeout(() => activateXray(xi), 60);
       } else {
+        // Re-scan the committed board and process — single fresh scan, no stale data
         setTimeout(() => processMatches(findMatches()), 60);
       }
     });
@@ -4644,15 +4645,20 @@ const swap = (a, b) => {
 // got swallowed by cross-run dedupe and never cleared.
 let lastRunsH = [], lastRunsV = [];
 
+// findMatches() — PURE detection. Returns { cells, runsH, runsV }.
+//   cells : deduped flat list of every matched cell (the clear-group)
+//   runsH/runsV : the directional runs (used for special-tile creation)
+// It still updates the module-level lastRunsH/V for any legacy callers, but
+// callers should prefer the returned object so two calls never stomp on
+// each other's run data (the bug behind "3-in-a-row that won't clear").
 const findMatches = () => {
-  lastRunsH = []; lastRunsV = [];
+  const runsH = [], runsV = [];
 
   // Horizontal runs
   for (let row = 0; row < 6; row++) {
     let col = 0;
     while (col < 6) {
-      const i = row * 6 + col;
-      const t = G.board[i];
+      const t = G.board[row * 6 + col];
       if (!t || t.type === 'xray' || t.type === 'obstacle') { col++; continue; }
       let len = 1;
       while (col + len < 6) {
@@ -4663,7 +4669,7 @@ const findMatches = () => {
       if (len >= 3) {
         const run = [];
         for (let c = col; c < col + len; c++) run.push(row * 6 + c);
-        lastRunsH.push(run);
+        runsH.push(run);
       }
       col += len;
     }
@@ -4673,8 +4679,7 @@ const findMatches = () => {
   for (let col = 0; col < 6; col++) {
     let row = 0;
     while (row < 6) {
-      const i = row * 6 + col;
-      const t = G.board[i];
+      const t = G.board[row * 6 + col];
       if (!t || t.type === 'xray' || t.type === 'obstacle') { row++; continue; }
       let len = 1;
       while (row + len < 6) {
@@ -4685,26 +4690,38 @@ const findMatches = () => {
       if (len >= 3) {
         const run = [];
         for (let r = row; r < row + len; r++) run.push(r * 6 + col);
-        lastRunsV.push(run);
+        runsV.push(run);
       }
       row += len;
     }
   }
 
-  // Merge all run cells into one deduped clear-group — every arm of every
-  // L and T clears completely now
+  // Deduped flat clear-group
   const seen = {};
-  const all = [];
-  [...lastRunsH, ...lastRunsV].forEach(run => run.forEach(c => {
-    if (!seen[c]) { seen[c] = true; all.push(c); }
+  const cells = [];
+  [...runsH, ...runsV].forEach(run => run.forEach(c => {
+    if (!seen[c]) { seen[c] = true; cells.push(c); }
   }));
-  return all.length ? [all] : [];
+
+  // Keep legacy globals in sync (some callers still read them)
+  lastRunsH = runsH; lastRunsV = runsV;
+
+  return { cells, runsH, runsV, length: cells.length ? 1 : 0 };
 };
+
+// Convenience: does the CURRENT board have any match? (boolean)
+const hasMatch = () => findMatches().cells.length > 0;
 
 // ============================================================
 // PROCESS MATCHES
 // ============================================================
 const processMatches = (matches) => {
+  // Accept the pure findMatches() result { cells, runsH, runsV }.
+  const cells = matches.cells || [];
+  const runsH = matches.runsH || [];
+  const runsV = matches.runsV || [];
+  if (cells.length === 0) { G.processing = false; return; }
+
   G.combo++;
   // Cascade crescendo — board energizes with the combo chain
   const bw = document.querySelector('.board-wrap');
@@ -4716,9 +4733,7 @@ const processMatches = (matches) => {
   const bonuses = getAllBonuses();
 
   // Stats
-  let count = 0;
-  matches.forEach(mt => count += mt.length);
-  G.stats.totalMatches = (G.stats.totalMatches || 0) + count;
+  G.stats.totalMatches = (G.stats.totalMatches || 0) + cells.length;
   if (G.combo > G.stats.maxCombo) G.stats.maxCombo = G.combo;
 
   // Special creation from the directional runs:
@@ -4727,8 +4742,8 @@ const processMatches = (matches) => {
   //   run of 4               → Amp (line blast, oriented with the match)
   const specials = [];
   const used = {};
-  lastRunsH.forEach(hr => {
-    lastRunsV.forEach(vr => {
+  runsH.forEach(hr => {
+    runsV.forEach(vr => {
       const cross = hr.find(c => vr.indexOf(c) !== -1);
       if (cross !== undefined && tileUnlocked('pyro') && !used[cross]) {
         specials.push({ idx: cross, type: 'pyro' });
@@ -4744,12 +4759,12 @@ const processMatches = (matches) => {
     const u = TILE_UNLOCKS.find(t => t.key === key);
     if (u && !tileUnlocked(key)) lockedHint = u;
   };
-  lastRunsH.forEach(run => {
+  runsH.forEach(run => {
     if (run.some(c => used[c])) return;
     if (run.length >= 5) { if (tileUnlocked('rockstar')) { specials.push({ idx: run[2], type: 'rockstar' }); run.forEach(c => used[c] = true); } else noteLocked('rockstar'); }
     else if (run.length === 4) { if (tileUnlocked('amp')) { specials.push({ idx: run[1], type: 'amp', dir: 'row' }); run.forEach(c => used[c] = true); } else noteLocked('amp'); }
   });
-  lastRunsV.forEach(run => {
+  runsV.forEach(run => {
     if (run.some(c => used[c])) return;
     if (run.length >= 5) { if (tileUnlocked('rockstar')) { specials.push({ idx: run[2], type: 'rockstar' }); run.forEach(c => used[c] = true); } else noteLocked('rockstar'); }
     else if (run.length === 4) { if (tileUnlocked('amp')) { specials.push({ idx: run[1], type: 'amp', dir: 'col' }); run.forEach(c => used[c] = true); } else noteLocked('amp'); }
@@ -4763,31 +4778,27 @@ const processMatches = (matches) => {
   const allMatched = [];
   let hasGem = false;
 
-  // Score & mark for clear
-  matches.forEach(mt => {
-    mt.forEach(i => {
-      const t = G.board[i];
-      if (!t) return;
-      const gemMulti = (bonuses.guitars.gemMulti || 3);
-      let baseScore = 100;
-      if (t.special === 'supergem') baseScore = 2000;
-      else if (t.special === 'gem') baseScore = 100 * gemMulti;
-      // Cap combo multiplier so long cascades don't balloon score past all reason.
-      const rawCombo = G.combo + (bonuses.fashion.comboBonus || 0);
-      const comboMulti = Math.min(8, rawCombo);
-      total += baseScore * comboMulti;
-      tiles[i].classList.add('matching');
-      allMatched.push(i);
-      // Spark burst per cleared tile
-      const tr = tiles[i].getBoundingClientRect();
-      spawnSparks(
-        tr.left + tr.width / 2,
-        tr.top + tr.height / 2,
-        { count: t.special === 'supergem' ? 20 : (t.special === 'gem' ? 11 : 7), gem: t.special === 'gem' || t.special === 'supergem' }
-      );
-      if (t.special === 'supergem') { playSfx('combo', 7); spawnComboShockwave(); }
-      else if (t.special === 'gem') { playSfx('gem'); hasGem = true; }
-    });
+  // Score & mark for clear — one flat deduped list, no nested arrays
+  cells.forEach(i => {
+    const t = G.board[i];
+    if (!t) return;
+    const gemMulti = (bonuses.guitars.gemMulti || 3);
+    let baseScore = 100;
+    if (t.special === 'supergem') baseScore = 2000;
+    else if (t.special === 'gem') baseScore = 100 * gemMulti;
+    const rawCombo = G.combo + (bonuses.fashion.comboBonus || 0);
+    const comboMulti = Math.min(8, rawCombo);
+    total += baseScore * comboMulti;
+    tiles[i].classList.add('matching');
+    allMatched.push(i);
+    const tr = tiles[i].getBoundingClientRect();
+    spawnSparks(
+      tr.left + tr.width / 2,
+      tr.top + tr.height / 2,
+      { count: t.special === 'supergem' ? 20 : (t.special === 'gem' ? 11 : 7), gem: t.special === 'gem' || t.special === 'supergem' }
+    );
+    if (t.special === 'supergem') { playSfx('combo', 7); spawnComboShockwave(); }
+    else if (t.special === 'gem') { playSfx('gem'); hasGem = true; }
   });
 
   // Apply scoreMulti from cribs
@@ -4799,7 +4810,7 @@ const processMatches = (matches) => {
   playSfx(G.combo >= 3 ? 'combo' : 'match', G.combo - 1);
 
   // Score popup at first match
-  const firstIdx = matches[0][0];
+  const firstIdx = cells[0];
   const rect = tiles[firstIdx].getBoundingClientRect();
   showFloatScore(rect.left + rect.width/2, rect.top + rect.height/2, '+' + total);
 
@@ -5172,13 +5183,17 @@ const refillBoard = () => {
 // ============================================================
 const checkContinue = () => {
   const m = findMatches();
-  if (m.length > 0) {
+  if (m.cells.length > 0) {
     processMatches(m);
     return;
   }
   G.combo = 0;
   G._superGemThisTurn = false;
   G.processing = false;
+  // Safety net: guarantee no empty/blank cell survives into the idle state
+  for (let i = 0; i < 36; i++) {
+    if (!G.board[i]) { G.board[i] = makeTile(); updateTile(i); }
+  }
   // Reset cascade crescendo
   const bw = document.querySelector('.board-wrap');
   if (bw) bw.classList.remove('combo-1','combo-2','combo-3','combo-4');
@@ -5221,7 +5236,7 @@ const findFirstPossibleMove = () => {
       const tmp = G.board[i]; G.board[i] = G.board[j]; G.board[j] = tmp;
       const m = findMatches();
       const back = G.board[i]; G.board[i] = G.board[j]; G.board[j] = back;
-      if (m.length > 0) return [i, j];
+      if (m.cells.length > 0) return [i, j];
     }
   }
   return null;
