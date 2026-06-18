@@ -4376,9 +4376,10 @@ const buildBoard = (lv) => {
     el.className = 'tile';
     el.dataset.index = i;
     renderTile(el, G.board[i]);
+    el.onclick = () => onTileClick(i);
     b.appendChild(el);
   }
-  setupInput(b);   // unified pointer-event input (mouse + touch)
+  setupSwipeNudge(b);   // detect swipe attempts → guide players to tap instead
 
   clearAccidentalMatches();
   updateObstacleCount();
@@ -4439,127 +4440,77 @@ const isAdjacent = (a, b) => {
 // CLICK & SWAP
 // ============================================================
 // ============================================================
+// SWIPE NUDGE — this game uses TAP-to-swap (tap a tile, then a neighbor).
+// Many mobile players instinctively try to SWIPE. Rather than let that
+// silently do nothing, we detect the drag gesture and show a friendly hint
+// pointing them to the tap method. This ONLY detects; it never moves tiles,
+// so it cannot affect game state.
 // ============================================================
-// BOARD INPUT — unified Pointer Events (mouse + touch + pen, one path).
-//
-//  pointerdown : remember which tile + where, lift it visually
-//  pointermove : if dragged past threshold toward a neighbor → SWIPE-swap
-//  pointerup   : if it never crossed the threshold → TAP (select / swap)
-//
-// No click / touchstart / touchend, so there is no emulated-mouse ghost-tap
-// to fight. selectTile() and trySwap() are the single shared actions both
-// gestures funnel into.
-// ============================================================
-const SWIPE_THRESHOLD = 14;     // px of drag before it counts as a swipe (not a tap)
-let _ptr = null;                // active gesture: { id, startX, startY, idx, fired }
+let _nudgePtr = null;
+let _lastNudge = 0;
+const setupSwipeNudge = (board) => {
+  if (board._nudgeBound) return;
+  board._nudgeBound = true;
 
-// Visually mark / unmark a tile as the current selection
-const markSelected = (idx, on) => {
-  const board = document.getElementById('board');
-  if (!board || !board.children[idx]) return;
-  board.children[idx].classList.toggle('selected', on);
+  board.addEventListener('pointerdown', (e) => {
+    _nudgePtr = { x: e.clientX, y: e.clientY };
+  });
+  board.addEventListener('pointerup', (e) => {
+    if (!_nudgePtr) return;
+    const dx = e.clientX - _nudgePtr.x, dy = e.clientY - _nudgePtr.y;
+    _nudgePtr = null;
+    // A real drag (not a tap) = a swipe attempt
+    if (Math.hypot(dx, dy) >= 24) {
+      const now = Date.now();
+      if (now - _lastNudge > 4000) {   // throttle so it never nags
+        _lastNudge = now;
+        showToast('👆 Tap a tile, then tap a neighbor to swap them!');
+      }
+    }
+  });
+  board.addEventListener('pointercancel', () => { _nudgePtr = null; });
 };
 
-const clearSelection = () => {
-  if (G.selected !== null) { markSelected(G.selected, false); G.selected = null; }
-};
-
-// A road case was tapped — give feedback, no selection
-const pokeObstacle = (idx) => {
-  const board = document.getElementById('board');
-  const el = board && board.children[idx];
-  if (el) { el.classList.add('shake-hit'); setTimeout(() => el.classList.remove('shake-hit'), 320); }
-  playSfx('obs');
-  if (!window._obsTapToast) {
-    window._obsTapToast = true;
-    showToast('📦 Road case! Make matches RIGHT NEXT to it to bust it open.');
-    setTimeout(() => { window._obsTapToast = false; }, 6000);
-  }
-};
-
-// TAP action: classic select-first-then-adjacent-to-swap
-const selectTile = (idx) => {
+const onTileClick = (i) => {
   if (G.processing) return;
-  if (G.board[idx] && G.board[idx].type === 'obstacle') { pokeObstacle(idx); return; }
-  beginInteract();
-  if (G.selected === null) {
-    G.selected = idx; markSelected(idx, true); playSfx('select');
-  } else if (G.selected === idx) {
-    clearSelection();
-  } else if (isAdjacent(G.selected, idx)) {
-    const a = G.selected; markSelected(a, false); G.selected = null;
-    swap(a, idx);
-  } else {
-    markSelected(G.selected, false);
-    G.selected = idx; markSelected(idx, true); playSfx('select');
+  if (G.board[i] && G.board[i].type === 'obstacle') {
+    // Road cases answer back — shake, sound, and a one-line explainer
+    const tiles = document.querySelectorAll('.tile');
+    tiles[i].classList.add('shake-hit');
+    setTimeout(() => tiles[i].classList.remove('shake-hit'), 320);
+    playSfx('obs');
+    if (!window._obsTapToast) {
+      window._obsTapToast = true;
+      showToast('📦 Road case! Make matches RIGHT NEXT to it to bust it open.');
+      setTimeout(() => { window._obsTapToast = false; }, 6000);
+    }
+    return;
   }
-};
 
-// SWIPE action: swap a tile with the neighbor in the dragged direction
-const trySwapDir = (idx, dx, dy) => {
-  if (G.processing) return;
-  if (G.board[idx] && G.board[idx].type === 'obstacle') return;
-  let nb;
-  if (Math.abs(dx) > Math.abs(dy)) {
-    nb = dx > 0 ? idx + 1 : idx - 1;
-    if (Math.floor(nb / 6) !== Math.floor(idx / 6)) return;   // don't wrap across rows
-  } else {
-    nb = dy > 0 ? idx + 6 : idx - 6;
-  }
-  if (nb < 0 || nb > 35) return;
-  if (G.board[nb] && G.board[nb].type === 'obstacle') return;
-  clearSelection();
-  beginInteract();
-  swap(idx, nb);
-};
-
-// Shared "first interaction" side effects (audio unlock, music, clear hints)
-const beginInteract = () => {
   initAC();
   if (!bgmPlaying && G.settings.music) startBGM();
   clearHints();
-};
 
-const tileIndexFromPoint = (board, x, y) => {
-  const el = document.elementFromPoint(x, y);
-  const tile = el && el.closest && el.closest('.tile');
-  if (!tile || !board.contains(tile)) return null;
-  const i = parseInt(tile.dataset.index, 10);
-  return isNaN(i) ? null : i;
-};
+  const tiles = document.querySelectorAll('.tile');
 
-const setupInput = (board) => {
-  if (board._inputBound) return;
-  board._inputBound = true;
-  board.style.touchAction = 'none';   // stop the browser scrolling/zooming on board drags
-
-  board.addEventListener('pointerdown', (e) => {
-    if (G.processing) return;
-    const idx = tileIndexFromPoint(board, e.clientX, e.clientY);
-    if (idx === null) return;
-    _ptr = { id: e.pointerId, startX: e.clientX, startY: e.clientY, idx, fired: false };
-    try { board.setPointerCapture(e.pointerId); } catch (_) {}
-  });
-
-  board.addEventListener('pointermove', (e) => {
-    if (!_ptr || e.pointerId !== _ptr.id || _ptr.fired) return;
-    const dx = e.clientX - _ptr.startX, dy = e.clientY - _ptr.startY;
-    if (Math.hypot(dx, dy) >= SWIPE_THRESHOLD) {
-      _ptr.fired = true;            // this gesture is a swipe; lock out the tap
-      trySwapDir(_ptr.idx, dx, dy);
-    }
-  });
-
-  const endGesture = (e) => {
-    if (!_ptr || e.pointerId !== _ptr.id) return;
-    const wasSwipe = _ptr.fired;
-    const idx = _ptr.idx;
-    _ptr = null;
-    try { board.releasePointerCapture(e.pointerId); } catch (_) {}
-    if (!wasSwipe) selectTile(idx);   // no drag happened → treat as a tap
-  };
-  board.addEventListener('pointerup', endGesture);
-  board.addEventListener('pointercancel', (e) => { if (_ptr && e.pointerId === _ptr.id) _ptr = null; });
+  if (G.selected === null) {
+    G.selected = i;
+    tiles[i].classList.add('selected');
+    playSfx('select');
+  } else if (G.selected === i) {
+    tiles[i].classList.remove('selected');
+    G.selected = null;
+  } else if (isAdjacent(G.selected, i)) {
+    const a = G.selected;
+    tiles[a].classList.remove('selected');
+    G.selected = null;
+    swap(a, i);
+  } else {
+    tiles[G.selected].classList.remove('selected');
+    G.selected = i;
+    tiles[i].classList.add('selected');
+    playSfx('select');
+  }
 };
 
 // FLIP-style glide via Web Animations API — reliable on mobile and not affected
@@ -4617,10 +4568,7 @@ const glideTilesFail = (a, b, done) => {
 };
 
 const swap = (a, b) => {
-  if (G.processing) return;                 // never start a swap mid-cascade
   const tA = G.board[a], tB = G.board[b];
-  if (!tA || !tB) return;                   // never swap an empty/null cell
-  if (a === b || !isAdjacent(a, b)) return; // must be two distinct neighbors
   G.processing = true;
 
   // Special tile activations on swap
@@ -5230,37 +5178,6 @@ const checkContinue = () => {
   }
   G.combo = 0;
   G._superGemThisTurn = false;
-
-  // ---- BLANK CATCHER --------------------------------------------------
-  // The board is about to go idle. Guarantee every cell is filled & rendered.
-  // If anything is empty here, it's a bug upstream — repair it so the player
-  // never sees a hole, and (when debug on) report it so we can trace the source.
-  let holes = 0;
-  const boardEl = document.getElementById('board');
-  for (let i = 0; i < 36; i++) {
-    if (!G.board[i]) {
-      G.board[i] = makeTile();
-      holes++;
-      if (window._XRS_DEBUG) console.log('[XRS] DATA hole at', i);
-    }
-    // Re-render every cell from data — clears any stuck animation class too
-    const el = boardEl && boardEl.children[i];
-    if (el) {
-      renderTile(el, G.board[i]);
-      // detect a cell that rendered empty despite having (non-obstacle) data
-      if (window._XRS_DEBUG && el.innerHTML.trim() === '' && G.board[i] && G.board[i].type !== 'obstacle') {
-        console.log('[XRS] RENDER hole at', i, JSON.stringify(G.board[i]));
-      }
-    }
-  }
-  if (holes > 0) {
-    // A new hole was filled — it may create a match, so keep the loop honest
-    if (window._XRS_DEBUG) showToast('⚠ filled ' + holes + ' hole(s)');
-    const m2 = findMatches();
-    if (m2.length > 0) { processMatches(m2); return; }
-  }
-  // ---------------------------------------------------------------------
-
   G.processing = false;
   // Reset cascade crescendo
   const bw = document.querySelector('.board-wrap');
@@ -7174,7 +7091,7 @@ const startDaily = () => {
 // ============================================================
 let tutStep = 0;
 const TUTORIAL_STEPS = [
-  { icon: '🎸', title: 'Match Instruments', text: 'Tap two side-by-side tiles to swap them. Line up <b>3 or more</b> of the same instrument to score.' },
+  { icon: '🎸', title: 'How to Play', text: '<b>Tap a tile, then tap a neighbor</b> to swap them. (Tap-to-swap — no swiping needed!) Line up <b>3 or more</b> of the same instrument to score.' },
   { icon: '↔', title: 'The Amp — a Power Tile', text: 'Match <b>4 in a row</b> to forge an <b>Amp</b> (look for the ↔ or ↕ badge). Here\'s the trick: you can <b>swap an Amp with any neighbor — no match needed</b> — to fire it. It blasts that whole row or column.' },
   { icon: '🔥', title: 'Pyro & Rockstar', text: 'Match in an <b>L or T shape</b> to make a <b>Pyro</b> 🔥 (3×3 blast). Match <b>5</b> to make a <b>Rockstar</b> ★ (clears every tile of one instrument). Swap them like the Amp to set them off.' },
   { icon: '💎', title: 'Gems & Hype', text: '<b>Golden gear</b> tiles score big. Every match fills your <b>HYPE meter</b> — top it off and a <b>Super Gem</b> drops for a huge payoff.' },
