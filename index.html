@@ -198,7 +198,7 @@ body.v-arena .stage-bg{background:
 }
 
 /* ===== message + controls ===== */
-.msg{margin-top:14px; font-size:.82rem; color:var(--cream-mute); min-height:1.2em; text-align:center; line-height:1.4;}
+.msg{margin-top:14px; font-size:.82rem; color:var(--cream-mute); min-height:1.2em; max-height:2.9em; overflow:hidden; text-align:center; line-height:1.4;}
 .controls{margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;}
 button{font-family:var(--sans); background:linear-gradient(160deg,var(--surface-hi),var(--surface)); color:var(--cream);
   border:1px solid var(--line); border-radius:11px; padding:9px 16px; font-size:.82rem; font-weight:600; cursor:pointer;
@@ -313,6 +313,11 @@ button.primary{background:linear-gradient(160deg,var(--gold),var(--gold-deep)); 
 .panel h3{font-family:var(--serif); font-weight:700; font-size:1.2rem; color:var(--gold-hi); margin-bottom:8px;}
 .tut-text{font-size:.9rem; color:var(--cream); line-height:1.5; margin-bottom:16px;}
 .tut-text b{color:var(--gold-warm);}
+/* set-intro story card */
+.si-eyebrow{font-family:var(--mono); font-size:.7rem; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); margin-bottom:12px;}
+.si-goal{font-family:var(--serif); font-weight:700; font-size:1.35rem; color:var(--gold-hi); margin-bottom:6px;}
+.si-why{font-size:.82rem; color:var(--cream-mute); line-height:1.45; margin-bottom:16px;}
+.si-story{font-size:.92rem; color:var(--cream); line-height:1.55; margin-bottom:18px; border-top:1px solid var(--line); padding-top:14px; font-style:italic;}
 .tut-dots{display:flex; gap:7px; justify-content:center; margin-bottom:16px;}
 .tut-dot{width:7px; height:7px; border-radius:50%; background:var(--surface-hi); transition:background .2s var(--ease), transform .2s var(--bounce);}
 .tut-dot.on{background:var(--gold); transform:scale(1.25);}
@@ -623,6 +628,17 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* fixed viewport — th
         <button id="tutSkip" onclick="Game.skipTutorial()">Skip</button>
         <button class="primary" id="tutNext" onclick="Game.nextTutorial()">Next →</button>
       </div>
+    </div>
+  </div>
+
+  <!-- SET INTRO — readable story + goal card at the start of each set (tap to begin) -->
+  <div class="overlay" id="setIntro" onclick="if(event.target.id==='setIntro')hideSetIntro()">
+    <div class="panel si-panel">
+      <div class="si-eyebrow" id="siEyebrow"></div>
+      <div class="si-goal" id="siGoal"></div>
+      <div class="si-why" id="siWhy"></div>
+      <div class="si-story" id="siStory"></div>
+      <button class="primary" onclick="hideSetIntro()">Let’s go ★</button>
     </div>
   </div>
 
@@ -1791,7 +1807,7 @@ Game.newGame = function() {
   levelIntroVenue(lv.n, v.name);
   setFeaturedLink(lv.n);
   updateCoinDisplays();
-  setMsg(STORY[(lv.n - 1) % STORY.length]);                  // the comedy beat, kept on screen
+  setMsg(objectiveText());                                   // short goal reminder in the bar (full story is on the set card)
   if (assist > 0) setMsg(assist >= 3 ? 'The band brought the WHOLE arsenal — go get \u2019em! \uD83C\uDF86' : 'The band brought backup. Break a leg! \uD83C\uDFB8');
   if (typeof window !== 'undefined' && window.scrollTo) { try { window.scrollTo(0, 0); } catch (_) {} }
 };
@@ -2621,7 +2637,28 @@ function startLevel(n) {
   Game.level = n;
   Game.newGame();
   if (advancing && Sfx.levelUpSting) Sfx.levelUpSting();
+  showSetIntro();
 }
+function showSetIntro() {
+  const lv = currentLevelData(), v = venueFor(lv.n), o = levelObj(lv);
+  document.getElementById('siEyebrow').textContent = 'Set ' + lv.n + ' · ' + v.name;
+  let goal, why;
+  if (o.k === 'collect') {
+    goal = 'Collect ' + o.need + ' ' + (TYPE_ICON[o.tile] || '') + ' ' + (TYPE_LABEL[o.tile] || o.tile);
+    why = 'The band needs them for tonight\u2019s set — match that many to finish the level.';
+  } else if (o.k === 'crates') {
+    goal = 'Clear ' + o.need + ' road cases 📦';
+    why = 'The gear\u2019s in the way. Match right next to a case to smash it — clear them all to finish.';
+  } else {
+    goal = 'Reach ' + lv.t.toLocaleString() + ' points';
+    why = 'Rack up the target score before you run out of moves.';
+  }
+  document.getElementById('siGoal').textContent = goal;
+  document.getElementById('siWhy').textContent = why;
+  document.getElementById('siStory').textContent = STORY[(lv.n - 1) % STORY.length];
+  document.getElementById('setIntro').classList.add('show');
+}
+function hideSetIntro() { document.getElementById('setIntro').classList.remove('show'); }
 
 function buildBand() {
   updateCoinDisplays();
