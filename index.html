@@ -187,12 +187,19 @@ body.v-arena .stage-bg{background:
   0%,100%{box-shadow:inset 0 0 16px rgba(255,255,255,.4), 0 0 0 2px #fff4d6, 0 0 20px -2px rgba(255,224,138,.8);}
   50%{box-shadow:inset 0 0 26px rgba(255,255,255,.65), 0 0 0 3px #fff, 0 0 38px 0 rgba(255,224,138,1);}}
 
-.tile-inner.amp .tile-svg, .tile-inner.rockstar .tile-svg, .tile-inner.pyro .tile-svg{
+.tile-inner.bassdrop{background:radial-gradient(circle at 50% 45%, #8ad0ff 0%, #2f7adf 50%, #1b2db8 100%); border-color:#cfe6ff; transform:scale(1.04); overflow:hidden; z-index:4;
+  box-shadow:inset 0 0 16px rgba(180,220,255,.5), 0 0 0 2px #cfe6ff, 0 0 18px -2px rgba(90,160,255,.85); animation:bass-breathe 2.4s ease-in-out infinite;}
+.tile-inner.bassdrop::before{content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
+  background:linear-gradient(0deg, transparent 44%, rgba(255,255,255,.5) 50%, transparent 56%), linear-gradient(90deg, transparent 44%, rgba(255,255,255,.5) 50%, transparent 56%);}
+.tile-inner.bassdrop::after{content:'✛'; position:absolute; top:0px; right:3px; color:#fff; font-size:.95rem; z-index:3; text-shadow:0 0 8px rgba(150,200,255,1);}
+@keyframes bass-breathe{0%,100%{box-shadow:inset 0 0 16px rgba(180,220,255,.45), 0 0 0 2px #cfe6ff, 0 0 18px -2px rgba(90,160,255,.8);} 50%{box-shadow:inset 0 0 24px rgba(180,220,255,.7), 0 0 0 3px #fff, 0 0 34px 0 rgba(90,160,255,1);}}
+
+.tile-inner.amp .tile-svg, .tile-inner.rockstar .tile-svg, .tile-inner.pyro .tile-svg, .tile-inner.bassdrop .tile-svg{
   filter:drop-shadow(0 1px 2px rgba(0,0,0,.55)) drop-shadow(0 0 1px rgba(0,0,0,.6));}
 
 /* photosensitivity safety: kill the looping glows for reduced-motion users */
 @media (prefers-reduced-motion:reduce){
-  .tile-inner.amp,.tile-inner.pyro,.tile-inner.rockstar{animation:none;}
+  .tile-inner.amp,.tile-inner.pyro,.tile-inner.rockstar,.tile-inner.bassdrop{animation:none;}
   .tile-inner.amp::before,.tile-inner.rockstar::before{animation:none;}
   .tile.pop .tile-inner,.tile.drop .tile-inner{animation:none;}
 }
@@ -315,6 +322,9 @@ button.primary{background:linear-gradient(160deg,var(--gold),var(--gold-deep)); 
 .tut-text b{color:var(--gold-warm);}
 /* set-intro story card */
 .si-eyebrow{font-family:var(--mono); font-size:.7rem; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); margin-bottom:12px;}
+.si-new{display:none; background:linear-gradient(160deg, rgba(90,160,255,.22), rgba(139,92,246,.18)); border:1px solid rgba(150,200,255,.5);
+  border-radius:12px; padding:10px 12px; margin-bottom:14px; font-size:.82rem; line-height:1.45; color:var(--cream);}
+.si-new b{color:#bfe0ff; font-family:var(--serif); font-size:1rem;}
 .si-goal{font-family:var(--serif); font-weight:700; font-size:1.35rem; color:var(--gold-hi); margin-bottom:6px;}
 .si-why{font-size:.82rem; color:var(--cream-mute); line-height:1.45; margin-bottom:16px;}
 .si-story{font-size:.92rem; color:var(--cream); line-height:1.55; margin-bottom:18px; border-top:1px solid var(--line); padding-top:14px; font-style:italic;}
@@ -524,7 +534,7 @@ button.arm{border-color:var(--gold-hi) !important; color:var(--gold-hi) !importa
 .hub-links-note{font-family:var(--mono); font-size:.58rem; letter-spacing:.14em; text-transform:uppercase; color:var(--gold-warm);}
 .app-links{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:12px; padding-top:12px; border-top:1px solid var(--line); width:100%;}
 .app-links .link{font-size:.72rem;}
-@media (prefers-reduced-motion:reduce){ .tile-inner.amp,.tile-inner.pyro,.tile-inner.rockstar{animation:none;} .tile.spawned .tile-inner{animation:none;} .float-label{animation:none; opacity:1;} .map-upgrade-banner,.band-cta.nudge{animation:none;} }
+@media (prefers-reduced-motion:reduce){ .tile-inner.amp,.tile-inner.pyro,.tile-inner.rockstar,.tile-inner.bassdrop{animation:none;} .tile.spawned .tile-inner{animation:none;} .float-label{animation:none; opacity:1;} .map-upgrade-banner,.band-cta.nudge{animation:none;} }
 .app{position:relative; z-index:1; width:100%; max-width:460px; display:flex; flex-direction:column; align-items:center; margin:0 auto;}
 /* ===== COMPACT in-game chrome so the score/HUD always fits in small embeds ===== */
 body{padding-top:8px; height:100vh; overflow:hidden;}   /* fixed viewport — the game fits, nothing scrolls the score away */
@@ -577,13 +587,12 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* fixed viewport — th
 
     <div class="board-wrap" id="boardWrap"><div class="combo-tag" id="comboTag"></div><div class="board" id="board"></div></div>
 
-    <div class="msg" id="msg">Swipe or tap two neighbors to swap. Match 4 → Amp · 5 → Rockstar · L/T → Pyro. Swap a special into any neighbor to fire it.</div>
+    <div class="msg" id="msg"></div>
     <div class="controls">
       <button onclick="showMap()">☰ Menu</button>
       <button class="band-cta" onclick="showBand()">★ The Band</button>
       <button onclick="Game.newGame()">↻ Replay</button>
     </div>
-    <div class="app-links" id="featuredLinkWrap"><a class="link featured-link" id="featuredLink" href="https://open.spotify.com/artist/7kuG094aXgRmkgIOH9Tpdi" target="_blank" rel="noopener">🎵 X-Ray Star on Spotify</a></div>
   </div>
 
   <!-- win / lose overlay -->
@@ -635,6 +644,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* fixed viewport — th
   <div class="overlay" id="setIntro" onclick="if(event.target.id==='setIntro')hideSetIntro()">
     <div class="panel si-panel">
       <div class="si-eyebrow" id="siEyebrow"></div>
+      <div class="si-new" id="siNew"></div>
       <div class="si-goal" id="siGoal"></div>
       <div class="si-why" id="siWhy"></div>
       <div class="si-story" id="siStory"></div>
@@ -857,7 +867,13 @@ const LOSE_FLAVORS = [
   'Brian offers a four-minute explanation of where you went wrong. You leave during minute two.',
   'Geoff did not stand. Geoff stands for no half-measures. Run it back.',
 ];
-const UNLOCK = { amp:1, pyro:2, rockstar:3 };
+const UNLOCK = { amp:1, pyro:3, rockstar:7, bassdrop:12 };   // toys unlock as you climb, so the kit keeps growing
+const UNLOCK_INFO = {
+  amp:      { name:'Amp',        icon:'↔', how:'Match 4 in a row to earn one. Fire it to clear a whole row or column.' },
+  pyro:     { name:'Pyro',       icon:'🔥', how:'Make an L or T shape to earn one. Fire it to blow up a 3×3 area.' },
+  rockstar: { name:'X-Ray Star', icon:'★', how:'Match 5 to earn one. Fire it to clear EVERY tile of one instrument.' },
+  bassdrop: { name:'Bass Drop',  icon:'✛', how:'Match 6 (or a big block) to earn one. Fire it to clear its whole row AND column at once.' },
+};
 // ===== B-SIDES — collectible lore vignettes, revealed as you climb the Journey =====
 const BSIDES = [
   { i:'\uD83D\uDC3E', t:'Geoff\u2019s Diary \u2014 Entry One',
@@ -969,6 +985,7 @@ function createsImmediate(board, i, type) {
 
 function tileUnlocked(key) { return Game.level >= (UNLOCK[key] || 99); }
 function specialForRun(run) {
+  if (run.len >= 6 && tileUnlocked('bassdrop')) return 'bassdrop';
   if (run.len >= 5 && tileUnlocked('rockstar')) return 'rockstar';
   if (run.len === 4 && tileUnlocked('amp')) return 'amp';
   return null;
@@ -1020,7 +1037,7 @@ function resolveBoard() {
         });
       }
       if (comp.length >= 5 && !comp.some(c => used.has(c))) {
-        const want = comp.length >= 6 ? 'rockstar' : 'pyro';
+        const want = comp.length >= 6 ? (tileUnlocked('bassdrop') ? 'bassdrop' : 'rockstar') : 'pyro';
         const sp = tileUnlocked(want) ? want : tileUnlocked('amp') ? 'amp' : null;
         if (sp) {
           const anchor = comp[Math.floor(comp.length / 2)];
@@ -1081,6 +1098,9 @@ function specialBlastCells(board, sidx, swappedWithType) {
   } else if (t.special === 'pyro') {
     for (let rr = Math.max(0, r - 1); rr <= Math.min(SIZE - 1, r + 1); rr++)
       for (let cc = Math.max(0, c - 1); cc <= Math.min(SIZE - 1, c + 1); cc++) cells.add(idx(rr, cc));
+  } else if (t.special === 'bassdrop') {
+    for (let rr = 0; rr < SIZE; rr++) cells.add(idx(rr, c));   // full column
+    for (let cc = 0; cc < SIZE; cc++) cells.add(idx(r, cc));   // full row
   } else if (t.special === 'rockstar') {
     if (swappedWithType && swappedWithType !== 'obstacle') {
       for (let i = 0; i < CELLS; i++) if (board[i] && board[i].type === swappedWithType) cells.add(i);
@@ -1199,6 +1219,7 @@ function paintTile(inner, t) {
   if (t.special === 'amp') cls += ' amp' + (t.dir === 'col' ? ' amp-col' : '');
   else if (t.special === 'pyro') cls += ' pyro';
   else if (t.special === 'rockstar') cls += ' rockstar';
+  else if (t.special === 'bassdrop') cls += ' bassdrop';
   inner.className = cls;
   inner.setAttribute('data-type', t.type);
   inner.innerHTML = (SVG[t.type] || '') + '<i class="gloss"></i>';
@@ -1409,6 +1430,11 @@ function blastFx(sidx, special, dir) {
   } else if (special === 'pyro') {
     fxEl('fx-ring', { left: cx + '%', top: cy + '%', width: '70%', height: '70%' });
     fireworks(sidx, { count: 16, reach: 56, colors: ['#ffd34d', '#ff7a3c', '#ff5a2c', '#ffae5a', '#fff2c0'] });
+  } else if (special === 'bassdrop') {
+    fxEl('fx-beam-row', { top: (r * u) + '%' });
+    fxEl('fx-beam-col', { left: (c * u) + '%' });
+    fireworks(sidx, { count: 20, reach: 70, colors: ['#8ad0ff', '#2f7adf', '#b388ff', '#cfe6ff', '#ffffff'] });
+    screenPulse();
   } else if (special === 'rockstar') {
     // the X-Ray Star special — our game's signature, so make it the most spectacular thing on screen
     fxEl('fx-burst', { left: cx + '%', top: cy + '%', width: '140%', height: '140%' });
@@ -1807,8 +1833,7 @@ Game.newGame = function() {
   levelIntroVenue(lv.n, v.name);
   setFeaturedLink(lv.n);
   updateCoinDisplays();
-  setMsg(objectiveText());                                   // short goal reminder in the bar (full story is on the set card)
-  if (assist > 0) setMsg(assist >= 3 ? 'The band brought the WHOLE arsenal — go get \u2019em! \uD83C\uDF86' : 'The band brought backup. Break a leg! \uD83C\uDFB8');
+  setMsg(assist > 0 ? (assist >= 3 ? 'The band brought the WHOLE arsenal — go get \u2019em! \uD83C\uDF86' : 'The band brought backup. Break a leg! \uD83C\uDFB8') : '');   // goal is shown up top; keep the bottom clear
   if (typeof window !== 'undefined' && window.scrollTo) { try { window.scrollTo(0, 0); } catch (_) {} }
 };
 
@@ -1851,6 +1876,7 @@ function unlockedSpecials() {
   if (tileUnlocked('amp')) list.push('amp');
   if (tileUnlocked('pyro')) list.push('pyro');
   if (tileUnlocked('rockstar')) list.push('rockstar');
+  if (tileUnlocked('bassdrop')) list.push('bassdrop');
   return list.length ? list : ['amp'];
 }
 function makeSpecialAt(cell, sp) {
@@ -1936,6 +1962,8 @@ Game.runSelfTest = function() {
   bd = mkBoard(); bd[idx(2,3)] = {type:'guitar',special:'amp',dir:'col'};
   blast = specialBlastCells(bd, idx(2,3), null);
   assert(blast.length === 6 && blast.every(c => c%SIZE === 3), 'amp(col) clears its 6-cell column');
+  bd = mkBoard(); bd[idx(2,2)] = {type:'guitar',special:'bassdrop',dir:null};
+  assert(specialBlastCells(bd, idx(2,2), null).length === 11, 'bass drop clears full row + column = 11');
   bd = mkBoard(); bd[idx(2,2)] = {type:'guitar',special:'pyro',dir:null};
   assert(specialBlastCells(bd, idx(2,2), null).length === 9, 'pyro (center) clears 3x3 = 9');
   bd = mkBoard(); bd[idx(0,0)] = {type:'guitar',special:'pyro',dir:null};
@@ -2193,8 +2221,25 @@ const Sfx = {
     const t = this.ctx.currentTime;
     if (type === 'amp') this.tone(220, 0.28, 'sawtooth', 0.22, t, 660);
     else if (type === 'pyro') { this.boom(); }                              // PYRO goes off like an M80
+    else if (type === 'bassdrop') { this.bassDropSfx(); }                   // BASS DROP — deep sweeping sub
     else if (type === 'rockstar') { this.starPower(); }                    // the X-Ray Star special — big and shimmering
     else this.tone(330, 0.2, 'sawtooth', 0.2, t, 520);
+  },
+  // BASS DROP — a deep sub sweeping down with a growl and an impact tick
+  bassDropSfx() {
+    if (!this.ctx || this.muted) return;
+    const t = this.ctx.currentTime, M = this.master;
+    const o = this.ctx.createOscillator(), g = this.ctx.createGain(), lp = this.ctx.createBiquadFilter();
+    o.type = 'sine'; o.frequency.setValueAtTime(140, t); o.frequency.exponentialRampToValueAtTime(34, t + 0.5);
+    lp.type = 'lowpass'; lp.frequency.value = 420;
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.5, t + 0.02); g.gain.setValueAtTime(0.5, t + 0.34); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.7);
+    o.connect(lp); lp.connect(g); g.connect(M); o.start(t); o.stop(t + 0.75);
+    const o2 = this.ctx.createOscillator(), g2 = this.ctx.createGain(), lp2 = this.ctx.createBiquadFilter();
+    o2.type = 'sawtooth'; o2.frequency.setValueAtTime(140, t); o2.frequency.exponentialRampToValueAtTime(48, t + 0.45);
+    lp2.type = 'lowpass'; lp2.frequency.setValueAtTime(900, t); lp2.frequency.exponentialRampToValueAtTime(200, t + 0.4);
+    g2.gain.setValueAtTime(0.0001, t); g2.gain.exponentialRampToValueAtTime(0.16, t + 0.03); g2.gain.exponentialRampToValueAtTime(0.0001, t + 0.55);
+    o2.connect(lp2); lp2.connect(g2); g2.connect(M); o2.start(t); o2.stop(t + 0.6);
+    this.tone(520, 0.05, 'square', 0.12, t, 120);                          // impact tick
   },
   // X-Ray Star "star power": a rising shimmer arpeggio with sparkle, a power swell, and a sweep-up whoosh
   starPower() {
@@ -2472,7 +2517,7 @@ Game.toggleMute = function() {
 const TUTORIAL_STEPS = [
   { icon: '🎸', title: 'How to Play', text: '<b>Tap a tile, then a neighbor</b> — or just <b>swipe</b> — to swap them. Line up <b>3 or more</b> of the same instrument to score.' },
   { icon: '↔', title: 'The Amp', text: 'Match <b>4 in a row</b> to forge an <b>Amp</b> (look for the ↔ or ↕ badge). The trick: <b>swap an Amp into any neighbor — no match needed</b> — to fire it. It blasts that whole row or column.' },
-  { icon: '🔥', title: 'Pyro & Rockstar', text: 'An <b>L or T</b> shape makes a <b>Pyro</b> 🔥 (3×3 blast). Match <b>5</b> for a <b>Rockstar</b> ★ — swap it onto any instrument to clear <b>every tile</b> of that kind. Fire them like the Amp.' },
+  { icon: '🔥', title: 'More Toys as You Climb', text: 'New specials <b>unlock as you rise through the venues</b> — the <b>Pyro</b> 🔥 (L/T shape, 3×3 blast), the <b>X-Ray Star</b> ★ (match 5, clears a whole instrument), and the <b>Bass Drop</b> ✛ (match 6, clears a full row <i>and</i> column). The game tells you when each one arrives.' },
   { icon: '⭐', title: 'Win the Set', text: 'Every set has a <b>goal</b> shown up top — usually a <b>target score</b>, but some ask you to <b>collect</b> a certain instrument, or to clear the band\u2019s <b>road cases</b> 📦 (match next to a case to smash it). Finish with <b>moves to spare</b> for an <b>Encore</b> and more <b>stars</b>.' },
   { icon: '🎶', title: 'Ready to Rock', text: 'This whole game is a love letter to <b>X-Ray Star</b>. Have fun up there — and go give the real band a listen.' },
 ];
@@ -2655,6 +2700,12 @@ function showSetIntro() {
   }
   document.getElementById('siGoal').textContent = goal;
   document.getElementById('siWhy').textContent = why;
+  const newKey = Object.keys(UNLOCK).find(k => UNLOCK[k] === lv.n);   // does this set introduce a new toy?
+  const newEl = document.getElementById('siNew');
+  if (newKey && UNLOCK_INFO[newKey]) {
+    newEl.innerHTML = '<b>NEW TOY ' + UNLOCK_INFO[newKey].icon + ' ' + UNLOCK_INFO[newKey].name + '!</b><br>' + UNLOCK_INFO[newKey].how;
+    newEl.style.display = 'block';
+  } else { newEl.style.display = 'none'; }
   document.getElementById('siStory').textContent = STORY[(lv.n - 1) % STORY.length];
   document.getElementById('setIntro').classList.add('show');
 }
