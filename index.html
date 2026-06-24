@@ -329,7 +329,9 @@ button.primary{background:linear-gradient(160deg,var(--gold),var(--gold-deep)); 
 .mini-instr svg{width:100%; height:100%; display:block;}
 .si-goal{font-family:var(--serif); font-weight:700; font-size:1.35rem; color:var(--gold-hi); margin-bottom:6px;}
 .si-why{font-size:.82rem; color:var(--cream-mute); line-height:1.45; margin-bottom:16px;}
-.si-story{font-size:.92rem; color:var(--cream); line-height:1.55; margin-bottom:18px; border-top:1px solid var(--line); padding-top:14px; font-style:italic;}
+.si-story{font-size:.92rem; color:var(--cream); line-height:1.55; margin-bottom:14px; border-top:1px solid var(--line); padding-top:14px; font-style:italic;}
+.si-quip{font-size:.82rem; color:var(--gold-warm); line-height:1.5; margin-bottom:18px; opacity:.92;}
+.si-quip::before{content:'♫ '; color:var(--gold);}
 .tut-dots{display:flex; gap:7px; justify-content:center; margin-bottom:16px;}
 .tut-dot{width:7px; height:7px; border-radius:50%; background:var(--surface-hi); transition:background .2s var(--ease), transform .2s var(--bounce);}
 .tut-dot.on{background:var(--gold); transform:scale(1.25);}
@@ -513,6 +515,24 @@ button.arm{border-color:var(--gold-hi) !important; color:var(--gold-hi) !importa
 .bc-btn.maxed{background:transparent; border-color:var(--gold-deep); color:var(--gold-hi);}
 .band-bonus{text-align:center; font-family:var(--mono); font-size:.62rem; letter-spacing:.1em; text-transform:uppercase;
   color:var(--gold-warm); margin:16px 0 0;}
+.lifestyle-head{font-family:var(--serif); font-weight:700; font-size:1.25rem; color:var(--gold-hi); margin:30px 0 2px; text-align:center;}
+.fame-badge{display:inline-block; font-family:var(--mono); font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; color:#10131c;
+  background:linear-gradient(160deg,var(--gold-hi),var(--gold)); padding:3px 9px; border-radius:999px; vertical-align:middle; margin-left:6px;}
+.lifestyle-sub{text-align:center; color:var(--cream-mute); font-size:.8rem; line-height:1.45; margin:0 auto 16px; max-width:420px;}
+.lifestyle-grid{display:flex; flex-direction:column; gap:12px;}
+.ls-card{background:var(--surface-low); border:1px solid var(--line); border-radius:14px; padding:13px 15px;}
+.ls-top{display:flex; align-items:center; gap:8px; margin-bottom:4px;}
+.ls-icon{font-size:1.2rem;}
+.ls-label{font-family:var(--mono); font-size:.62rem; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); flex:1;}
+.ls-pips{display:flex; gap:4px;}
+.ls-pip{width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,.16);}
+.ls-pip.on{background:var(--gold-hi); box-shadow:0 0 6px -1px var(--gold);}
+.ls-name{font-family:var(--serif); font-weight:700; font-size:1.05rem; color:var(--cream); margin-bottom:3px;}
+.ls-flavor{font-size:.8rem; color:var(--cream-mute); line-height:1.45; margin-bottom:11px; font-style:italic;}
+.ls-buy{width:100%; font-family:var(--sans); font-weight:600; font-size:.84rem; color:#10131c; background:linear-gradient(160deg,var(--gold-hi),var(--gold));
+  border:none; border-radius:10px; padding:10px; cursor:pointer;}
+.ls-buy.off{background:var(--surface); color:var(--cream-mute); cursor:default; border:1px solid var(--line);}
+.ls-maxed{text-align:center; font-family:var(--mono); font-size:.66rem; letter-spacing:.14em; text-transform:uppercase; color:var(--gold-hi); padding:9px;}
 @media (prefers-reduced-motion:reduce){ .j-node.current .j-dot{animation:none;} .coin-chip.bump{animation:none;} }
 /* ===== specials feel like treasure: a slow idle halo + a forge pop ===== */
 .tile-inner.amp, .tile-inner.pyro, .tile-inner.rockstar{
@@ -658,6 +678,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* fixed viewport — th
       <div class="si-goal" id="siGoal"></div>
       <div class="si-why" id="siWhy"></div>
       <div class="si-story" id="siStory"></div>
+      <div class="si-quip" id="siQuip"></div>
       <button class="primary" onclick="hideSetIntro()">Let’s go ★</button>
     </div>
   </div>
@@ -702,6 +723,9 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* fixed viewport — th
       </div>
       <div class="j-sub">Spend your earnings on the band — and watch them rise from nobodies to superstars.</div>
       <div class="band-grid" id="bandGrid"></div>
+      <div class="lifestyle-head">The Good Life <span class="fame-badge" id="fameBadge"></span></div>
+      <div class="lifestyle-sub">As you rise, treat the band. Pure flair — bragging rights for your trip out of the basement.</div>
+      <div class="lifestyle-grid" id="lifestyleGrid"></div>
       <div class="j-foot"><button class="primary" onclick="hideBand()">← Back to the Journey</button></div>
       <div class="hub-links">
         <div class="hub-links-note">Hear the real X-Ray Star ★</div>
@@ -834,7 +858,7 @@ const STORY = [
   'Jake, Maya, Dave and Kat meet in a basement. Dave brought one drum and three sticks. They play a single chord. The cat leaves the room.',
   'Maya hauls an amp home from behind the Chinese place. Unplugged, it hums. Jake calls this "characterful."',
   'Dave breaks his first stick of the night. (Sticks broken: 1.) Mom\u2019s electric bill arrives: $87.40. "How," says Jake.',
-  'Kat says, "The walls will not always be this strong." Nobody knows what she means. Geoff the possum applauds only the loud parts.',
+  'The name comes down to "Black Velvet Funeral," "The Hot Dogs," and "Refrigerator." Jake settles it: they are Plasma Cathedral. Maya hates it privately and says nothing. Geoff the possum, unbothered, applauds the loud parts.',
   // THE COFFEE SHOP
   'First real gig: the Crooked Knee. Trevor the sound guy has heard everything since 1987. He listens, pauses, and says: "I\u2019ll get the second mic."',
   'A lone internet review: "The bassist seemed angry. The drummer has potential. Would see again, maybe." The band frames a screenshot.',
@@ -852,7 +876,7 @@ const STORY = [
   'A man in a wrinkled suit takes notes and does not clap. His card says only "Verdant." He smells faintly of tuna.',
   'They record the album in a basement studio. A cat walks across the soundboard during the only good take. They keep it.',
   'Mom\u2019s bill: $284.91. "We weren\u2019t even home," says Jake. The amp glows, briefly, a color with no name.',
-  'Mournful Plumbing release your single as "an homage." Maya is so angry her bass hum changes key.',
+  'Mournful Plumbing release your single as "an homage." Maya is so angry she finally wins the oldest argument in the band: "Plasma Cathedral" is dead. They are X-Ray Star now. It fits like it was theirs all along.',
   'Dave takes a four-minute drum solo. The room drops twelve degrees. Geoff stands and applauds with both paws.',
   // THE THEATER
   'The Theater. Velvet seats, a balcony, and a man in row G who insists he discovered you. He sells churros.',
@@ -867,6 +891,44 @@ const STORY = [
   'Twenty thousand phones light up. From orbit it spells X-RAY STAR. Mrs. Krenshaw, second row, mouths every word.',
   'The lights drop. The amp glows white, then goes quiet \u2014 for good. A voicemail arrives: three seconds of static, then a familiar voice. "Soon." Final bill: $2.18. You came from a basement. Take a bow.',
 ];
+// Rotating one-liners ("B-sides from the road"). A fresh one shows on the set card every time it appears,
+// so replaying the early levels never serves the same joke twice. The two crowd favorites are first.
+const ROAD_QUIPS = [
+  'They attempt "Smoke on the Water" and somehow play three different songs at once. Maya: "I think we\u2019ve found our sound."',
+  'Dave brought a snare and three sticks. Maya brought a bass with two strings. They play one chord. The cat leaves the room.',
+  'Band-name shortlist: "Black Velvet Funeral," "The Hot Dogs," "Refrigerator." They settle on X-Ray Star. Maya privately hates it.',
+  'The amp hums while unplugged. Jake calls this "characterful."',
+  'Mom\u2019s electric bill: $87.40. "How," says Jake.',
+  'Mom\u2019s bill: $142.18. "We aren\u2019t running anything different." The amp hums in agreement.',
+  'Mom\u2019s bill hits $284.91. "We weren\u2019t even home," says Jake.',
+  'Mom opens the bill: $612.47. "We don\u2019t own a 600-dollar appliance," she says.',
+  'Dave breaks his fourth stick in twenty minutes. (Sticks broken: 7.)',
+  'Dave switches to a wooden spoon. It sounds, somehow, better.',
+  'Geoff the possum sleeps through every rehearsal except the loud parts, during which he applauds.',
+  'Geoff stands on his hind legs and applauds with both paws. Kat takes notes.',
+  'Kat says, "The walls will not always be this strong." Nobody knows what she means.',
+  'The amp says a single word \u2014 "Soon" \u2014 and only Maya is there to hear it.',
+  'The amp says "Welcome back." Maya goes pale. Dave was eating chips and missed it.',
+  'Mournful Plumbing sign up for the open mic. Brian explains each song for four minutes. The songs are, annoyingly, good.',
+  'Mournful Plumbing release your single as "an homage." Maya is so angry her bass hum changes key.',
+  'Trevor the sound guy has done this since 1987. He listens a full minute, then: "I\u2019ll get the second mic."',
+  'Mrs. Krenshaw asks, very politely, if they could form the band more quietly.',
+  'Mrs. Krenshaw reviews the new poster as "concerning."',
+  'Someone leaves a tip of $1.40 and a pickle. Maya frames the pickle.',
+  'A man in a wrinkled suit takes notes and never claps. His card says only "Verdant." He smells faintly of tuna.',
+  'The cassette deck eats two of the thirty demos. Jake hands one to a stranger at a gas station. It is, somehow, played.',
+  'A lone review: "The bassist seems angry. The drummer has potential. Would see again, maybe." They frame the screenshot.',
+  'The Wendy\u2019s manager cries during the bridge and hands them free Frostys. Best gig of the tour.',
+  'Dave\u2019s mom drives two hours, sits in the front row alone, and cries during the bridge. Every time.',
+  'Jake\u2019s album-cover idea: an upside-down crucifix made of forks. Maya: "We can\u2019t." Jake: "Why." Maya: "We just can\u2019t, Jake."',
+  'The chandelier vibrates in sympathy. Maintenance is concerned. The band is thrilled.',
+  'A critic writes "too many notes." They add more, purely out of spite.',
+  'Kat plays a chord nobody played. The amp answers in a key no one has heard.',
+  'Greg, Maya\u2019s twelve-year-old cousin, auditions on bass. He is, alarmingly, the best of the three.',
+  'The fog machine has its own rider now. The fog is non-negotiable.',
+];
+let _quipIx = (Math.random() * 9999) | 0;   // start somewhere random so restarts open on a different joke
+function nextQuip() { const q = ROAD_QUIPS[_quipIx % ROAD_QUIPS.length]; _quipIx++; return q; }
 const WIN_FLAVORS = [
   'The crowd wants one more. Geoff applauds with both paws.',
   'Trevor the sound guy nods once. From Trevor, that is a standing ovation.',
@@ -881,7 +943,7 @@ const LOSE_FLAVORS = [
   'Brian offers a four-minute explanation of where you went wrong. You leave during minute two.',
   'Geoff did not stand. Geoff stands for no half-measures. Run it back.',
 ];
-const UNLOCK = { amp:1, pyro:3, rockstar:7, bassdrop:12 };   // toys unlock as you climb, so the kit keeps growing
+const UNLOCK = { amp:1, pyro:3, rockstar:5, bassdrop:12 };   // toys unlock as you climb, so the kit keeps growing
 const UNLOCK_INFO = {
   amp:      { name:'Amp',        icon:'↔', how:'Match 4 in a row to earn one. Fire it to clear a whole row or column.' },
   pyro:     { name:'Pyro',       icon:'🔥', how:'Make an L or T shape to earn one. Fire it to blow up a 3×3 area.' },
@@ -1826,7 +1888,7 @@ Game.newGame = function() {
   Game.selected = null; Game.busy = false; Game.ended = false;
   Game.dropCounter = 0;
   Game.board = generateBoard();
-  seedStartingSpecials(2 + assist * 2);                      // 2 normally; up to 10 on repeated tries — the backup
+  seedStartingSpecials(2 + assist * 2 + Save.startSpecialBonus());   // 2 base + backup on retries + the band's investment payoff
   Game.collected = {};                                       // COLLECT objective tally
   Game.cratesLeft = 0; Game.cratesTotal = 0;                 // CASES objective
   const obj = levelObj(lv);
@@ -1925,7 +1987,8 @@ function seedCrates(count) {
 function maybeDropSpecial() {
   if (Game.ended || objectiveMet() || Game.moves <= 0) return;
   Game.dropCounter = (Game.dropCounter || 0) + 1;
-  const every = Game.level <= 4 ? 2 : Game.level <= 9 ? 3 : Game.level <= 14 ? 4 : 5;
+  const baseEvery = Game.level <= 4 ? 2 : Game.level <= 9 ? 3 : Game.level <= 14 ? 4 : 5;
+  const every = Math.max(2, baseEvery - Save.dropSpeedup());   // band investment keeps the rewards coming as it gets harder
   if (Game.dropCounter < every) return;
   Game.dropCounter = 0;
   const cells = [];
@@ -1978,6 +2041,8 @@ Game.runSelfTest = function() {
   assert(blast.length === 6 && blast.every(c => c%SIZE === 3), 'amp(col) clears its 6-cell column');
   bd = mkBoard(); bd[idx(2,2)] = {type:'guitar',special:'bassdrop',dir:null};
   assert(specialBlastCells(bd, idx(2,2), null).length === 11, 'bass drop clears full row + column = 11');
+  assert(ROAD_QUIPS.length >= 20, 'road-quip pool has plenty of lines');
+  { const a = nextQuip(), b = nextQuip(); assert(a !== b && ROAD_QUIPS.indexOf(a) >= 0, 'nextQuip rotates through the pool'); }
   bd = mkBoard(); bd[idx(2,2)] = {type:'guitar',special:'pyro',dir:null};
   assert(specialBlastCells(bd, idx(2,2), null).length === 9, 'pyro (center) clears 3x3 = 9');
   bd = mkBoard(); bd[idx(0,0)] = {type:'guitar',special:'pyro',dir:null};
@@ -2128,6 +2193,28 @@ const BAND = [
 ];
 const BAND_TIERS = ['Rookie', 'Rising', 'Headliner', 'Superstar'];   // 0..3
 const UPGRADE_COST = [200, 450, 900];                                // cost to reach tier 1, 2, 3
+// "The Good Life" — pure status/flavor purchases that show the band's rise. Tier 0 is where everyone starts (free).
+const LIFESTYLE = [
+  { key: 'ride', label: 'The Ride', icon: '🚗', tiers: [
+    { name: "Mom's Hatchback", flavor: 'Smells of fries. Two doors. One of them works.' },
+    { name: 'Rusty Tour Van', flavor: 'They named it "The Coffin." It runs on hope and old oil.' },
+    { name: 'Sleeper Bus', flavor: 'Twelve bunks. Dave sleeps in the luggage bay, by choice.' },
+    { name: 'Private Jet', flavor: 'The amp gets its own seat. It insisted, somehow.' },
+  ] },
+  { key: 'threads', label: 'The Look', icon: '🧥', tiers: [
+    { name: 'Thrift-Store Tees', flavor: 'Three for a dollar. One is inside-out on purpose.' },
+    { name: 'Matching Leather Jackets', flavor: "Maya's idea. Dave's is already ruined." },
+    { name: 'Custom Stage Fits', flavor: 'A tailor who "gets the vibe." Charges like it.' },
+    { name: 'Designer Everything', flavor: 'Kat will not explain the cape. There is now a cape.' },
+  ] },
+  { key: 'crib', label: 'The Crib', icon: '🏠', tiers: [
+    { name: "Mom's Basement", flavor: 'Rent: free. Electric bill: catastrophic.' },
+    { name: 'Shared Apartment', flavor: 'Four people, one bathroom, one possum named Geoff.' },
+    { name: 'House with a Studio', flavor: 'Soundproofed. Mrs. Krenshaw moves in next door anyway.' },
+    { name: 'Hilltop Mansion', flavor: 'Gold records on the wall. The amp has its own wing.' },
+  ] },
+];
+const LIFESTYLE_COST = [600, 1800, 4500];   // cost to reach tier 1, 2, 3
 const Save = {
   data: null,
   load() {
@@ -2138,12 +2225,13 @@ const Save = {
       coins: typeof d.coins === 'number' ? d.coins : 0,
       band: Object.assign({ guitar: 0, mic: 0, drums: 0, bass: 0 }, d.band || {}),
       bsidesSeen: d.bsidesSeen || 0,
+      lifestyle: Object.assign({ ride: 0, threads: 0, crib: 0 }, d.lifestyle || {}),
     };
     return this.data;
   },
   save() { Prefs.set('save', this.data); },
   reset() {
-    this.data = { unlocked: 1, stars: {}, coins: 0, band: { guitar: 0, mic: 0, drums: 0, bass: 0 }, bsidesSeen: 0 };
+    this.data = { unlocked: 1, stars: {}, coins: 0, band: { guitar: 0, mic: 0, drums: 0, bass: 0 }, bsidesSeen: 0, lifestyle: { ride: 0, threads: 0, crib: 0 } };
     this.save();
   },
   maxCleared() { const k = Object.keys(this.data.stars).map(Number); return k.length ? Math.max.apply(null, k) : 0; },
@@ -2160,8 +2248,16 @@ const Save = {
   },
   bandLevel() { const b = this.data.band; return b.guitar + b.mic + b.drums + b.bass; },
   bandBonus() { return this.bandLevel() * 0.05; },          // +5% coins per upgrade owned
+  startSpecialBonus() { return Math.floor(this.bandLevel() / 3); },   // +1 starting special per 3 upgrades (0..4)
+  dropSpeedup() { return Math.floor(this.bandLevel() / 4); },         // specials drop more often as the band levels (0..3)
   memberTier(key) { return this.data.band[key] || 0; },
   upgradeCost(key) { const t = this.memberTier(key); return t >= 3 ? null : UPGRADE_COST[t]; },
+  lifestyleTier(key) { return this.data.lifestyle[key] || 0; },
+  lifestyleCost(key) { const t = this.lifestyleTier(key); return t >= 3 ? null : LIFESTYLE_COST[t]; },
+  canBuyLifestyle(key) { const c = this.lifestyleCost(key); return c != null && this.data.coins >= c; },
+  buyLifestyle(key) { const c = this.lifestyleCost(key); if (c == null || this.data.coins < c) return false; this.data.coins -= c; this.data.lifestyle[key]++; this.save(); return true; },
+  lifestyleTotal() { const l = this.data.lifestyle; return l.ride + l.threads + l.crib; },
+  fameLabel() { const t = this.lifestyleTotal(); return t >= 8 ? 'Superstars' : t >= 5 ? 'Living Large' : t >= 2 ? 'On the Rise' : t >= 1 ? 'Getting By' : 'Basement Days'; },
   canUpgrade(key) { const c = this.upgradeCost(key); return c != null && this.data.coins >= c; },
   upgrade(key) {
     const c = this.upgradeCost(key);
@@ -2721,6 +2817,7 @@ function showSetIntro() {
     newEl.style.display = 'block';
   } else { newEl.style.display = 'none'; }
   document.getElementById('siStory').textContent = STORY[(lv.n - 1) % STORY.length];
+  document.getElementById('siQuip').textContent = nextQuip();   // fresh one-liner every time the card shows
   document.getElementById('setIntro').classList.add('show');
 }
 function hideSetIntro() { document.getElementById('setIntro').classList.remove('show'); }
@@ -2747,10 +2844,50 @@ function buildBand() {
     </div>`;
   }).join('');
   const bonus = Math.round(Save.bandBonus() * 100);
-  document.getElementById('bandGrid').insertAdjacentHTML('afterend', '');
+  const extra = Save.startSpecialBonus(), faster = Save.dropSpeedup();
   let bb = document.getElementById('bandBonusLine');
   if (!bb) { bb = document.createElement('div'); bb.id = 'bandBonusLine'; bb.className = 'band-bonus'; grid.parentNode.insertBefore(bb, grid.nextSibling); }
-  bb.textContent = bonus > 0 ? `Band bonus: +${bonus}% coins from every set` : 'Upgrade the band to earn bonus coins';
+  if (bonus > 0) {
+    let perks = `+${bonus}% coins`;
+    if (extra > 0) perks += ` · +${extra} special${extra > 1 ? 's' : ''} on the board at the start`;
+    if (faster > 0) perks += ` · the band finds specials more often`;
+    bb.innerHTML = `<b>Band perks:</b> ${perks}`;
+  } else {
+    bb.textContent = 'Level up the band for bonus coins — and more specials right when sets get tough.';
+  }
+  buildLifestyle();
+}
+function buildLifestyle() {
+  const grid = document.getElementById('lifestyleGrid');
+  if (!grid) return;
+  const fb = document.getElementById('fameBadge'); if (fb) fb.textContent = Save.fameLabel();
+  grid.innerHTML = LIFESTYLE.map(cat => {
+    const tier = Save.lifestyleTier(cat.key);
+    const cur = cat.tiers[tier];
+    const cost = Save.lifestyleCost(cat.key);
+    const maxed = cost == null;
+    const afford = Save.canBuyLifestyle(cat.key);
+    const pips = [0, 1, 2, 3].map(i => `<span class="ls-pip${i <= tier ? ' on' : ''}"></span>`).join('');
+    let btn;
+    if (maxed) btn = `<div class="ls-maxed">Maxed ★</div>`;
+    else {
+      const next = cat.tiers[tier + 1];
+      btn = `<button class="ls-buy${afford ? '' : ' off'}" ${afford ? '' : 'disabled'} onclick="buyLifestyle('${cat.key}')">Buy ${next.name} · 🪙 ${cost.toLocaleString()}</button>`;
+    }
+    return `<div class="ls-card">
+      <div class="ls-top"><span class="ls-icon">${cat.icon}</span><span class="ls-label">${cat.label}</span><span class="ls-pips">${pips}</span></div>
+      <div class="ls-name">${cur.name}</div>
+      <div class="ls-flavor">${cur.flavor}</div>
+      ${btn}
+    </div>`;
+  }).join('');
+}
+function buyLifestyle(key) {
+  if (Save.buyLifestyle(key)) {
+    if (Sfx.coin) Sfx.coin(); else if (Sfx.tone) Sfx.tone(660, 0.12, 'sine', 0.16);
+    updateCoinDisplays();
+    buildBand();
+  } else if (Sfx.tone) { Sfx.tone(180, 0.1, 'sine', 0.12); }
 }
 function showBand() {
   hideOverlay();
