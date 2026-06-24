@@ -344,6 +344,10 @@ button.primary{background:linear-gradient(160deg,var(--gold),var(--gold-deep)); 
 .relic-shelf{text-align:center; margin-top:18px;}
 .relic-shelf-btn{font-family:var(--mono); font-size:.66rem; letter-spacing:.14em; text-transform:uppercase; color:#c79be6;
   background:rgba(138,79,198,.12); border:1px solid rgba(150,90,210,.4); border-radius:999px; padding:9px 16px; cursor:pointer;}
+.band-extras{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:0 0 18px;}
+.extra-btn{font-family:var(--mono); font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; color:var(--gold-hi);
+  background:rgba(255,224,138,.1); border:1px solid rgba(255,224,138,.35); border-radius:999px; padding:9px 15px; cursor:pointer;}
+.extra-btn.relic{color:#c79be6; background:rgba(138,79,198,.14); border-color:rgba(150,90,210,.45);}
 .bc-portrait{cursor:pointer; position:relative;}
 .bc-zoom{position:absolute; right:6px; bottom:6px; font-size:.7rem; color:var(--cream); background:rgba(16,16,30,.6); border-radius:6px; padding:1px 4px; line-height:1; opacity:.7;}
 .zoom-panel{text-align:center;}
@@ -763,11 +767,11 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* fixed viewport — th
         <div class="j-title">The Band</div>
       </div>
       <div class="j-sub">Level up each member\u2019s <b>gear</b> \u2014 better instruments mean a better sound, more coins, and more specials on the board when you play.</div>
+      <div class="band-extras" id="bandExtras"></div>
       <div class="band-grid" id="bandGrid"></div>
       <div class="lifestyle-head">The Good Life <span class="fame-badge" id="fameBadge"></span></div>
       <div class="lifestyle-sub">As you rise, treat the band. Pure flair — bragging rights for your trip out of the basement.</div>
       <div class="lifestyle-grid" id="lifestyleGrid"></div>
-      <div id="relicShelf" class="relic-shelf" style="display:none"><button class="relic-shelf-btn" onclick="showRelic()">♦ Plasma Cathedral relics</button></div>
       <div class="j-foot"><button class="primary" onclick="hideBand()">← Back to the Journey</button></div>
       <div class="hub-links">
         <div class="hub-links-note">Hear the real X-Ray Star ★</div>
@@ -785,9 +789,12 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* fixed viewport — th
   <!-- B-SIDES — collectible lore vignettes -->
   <div class="bandscreen" id="bsideScreen">
     <div class="band-inner">
+      <div class="band-topbar">
+        <button class="band-back-btn" onclick="hideBsides()">← Back to the Game</button>
+        <div class="j-coins" id="bsideCount">0 / 8</div>
+      </div>
       <div class="j-head">
         <div class="j-title">B-Sides</div>
-        <div class="j-coins" id="bsideCount">0 / 8</div>
       </div>
       <div class="j-sub">Scraps from the world of X-Ray Star. Clear deeper levels to dig up more.</div>
       <div class="bside-list" id="bsideList"></div>
@@ -816,8 +823,8 @@ const LEVELS = [
   {s:1,n:13,m:22,t:29000},{s:1,n:14,m:22,t:31000},{s:1,n:15,m:24,t:34000},
   {s:2,n:16,m:24,t:36000},{s:2,n:17,m:24,t:39000},{s:2,n:18,m:22,t:42000},{s:2,n:19,m:22,t:45000},
   {s:2,n:20,m:22,t:48000},{s:2,n:21,m:24,t:52000},{s:2,n:22,m:22,t:56000},{s:2,n:23,m:22,t:60000},
-  {s:2,n:24,m:22,t:64000},{s:2,n:25,m:22,t:68000},{s:2,n:26,m:24,t:72000},{s:2,n:27,m:22,t:77000},
-  {s:2,n:28,m:22,t:82000},{s:2,n:29,m:22,t:87000},{s:2,n:30,m:26,t:95000}
+  {s:2,n:24,m:24,t:58000},{s:2,n:25,m:26,t:60000},{s:2,n:26,m:24,t:66000},{s:2,n:27,m:24,t:70000},
+  {s:2,n:28,m:24,t:76000},{s:2,n:29,m:24,t:82000},{s:2,n:30,m:28,t:88000}
 ];
 const STAGE_NAME = {1:'Basement Dreamers', 2:'Coffee Shop Circuit'};
 
@@ -938,14 +945,14 @@ const STORY = [
 const ROAD_QUIPS = [
   'They attempt "Smoke on the Water" and somehow play three different songs at once. Maya: "I think we\u2019ve found our sound."',
   'Dave brought a snare and three sticks. Maya brought a bass with two strings. They play one chord. The cat leaves the room.',
-  'Band-name shortlist: "Black Velvet Funeral," "The Hot Dogs," "Refrigerator." They settle on X-Ray Star. Maya privately hates it.',
+  'The old shortlist: "Black Velvet Funeral," "The Hot Dogs," "Refrigerator," "Plasma Cathedral." Thank goodness they landed on X-Ray Star. Even Maya admits it \u2014 it\u2019s the one that finally felt like them.',
   'The amp hums while unplugged. Jake calls this "characterful."',
   'Mom\u2019s electric bill: $87.40. "How," says Jake.',
   'Mom\u2019s bill: $142.18. "We aren\u2019t running anything different." The amp hums in agreement.',
   'Mom\u2019s bill hits $284.91. "We weren\u2019t even home," says Jake.',
   'Mom opens the bill: $612.47. "We don\u2019t own a 600-dollar appliance," she says.',
   'Dave breaks his fourth stick in twenty minutes. (Sticks broken: 7.)',
-  'Dave switches to a wooden spoon. It sounds, somehow, better.',
+  'Dave switches to wooden spoons and has to relearn his grip \u2014 hold them like a baby bird, not a hammer. He gets there. It sounds, somehow, better.',
   'Geoff the possum sleeps through every rehearsal except the loud parts, during which he applauds.',
   'Geoff stands on his hind legs and applauds with both paws. Kat takes notes.',
   'Kat says, "The walls will not always be this strong." Nobody knows what she means.',
@@ -1321,10 +1328,16 @@ function comboBlastCells(board, ia, ib) {
 function fireComboAndResolve(ia, ib) {
   const steps = [];
   const { cells, name } = comboBlastCells(Game.board, ia, ib);
-  const gained = cells.length * 300 + 500;
+  const cellSet = new Set(cells);
+  const gained = cellSet.size * 300 + 500;
   Game.score += gained;
-  steps.push({ kind: 'clear', cells, chain: 1, blast: true, combo: true, comboName: name, gained, special: 'combo' });
-  cells.forEach(c => { Game.board[c] = null; });
+  tallyCollected(cellSet);                                     // COLLECT objective — combos count too
+  const crateSet = new Set(crateBreaksFor(cellSet));           // CASES objective — combos break (and count) cases too
+  crateSet.forEach(c => cellSet.add(c));
+  Game.cratesLeft = Math.max(0, (Game.cratesLeft || 0) - crateSet.size);
+  const all = [...cellSet];
+  steps.push({ kind: 'clear', cells: all, chain: 1, blast: true, combo: true, comboName: name, gained, special: 'combo', crates: crateSet.size });
+  all.forEach(c => { Game.board[c] = null; });
   const moved = applyGravityData();
   steps.push({ kind: 'settle', moved });
   const cascade = resolveBoard();
@@ -2204,6 +2217,15 @@ Game.runSelfTest = function() {
     let crates=0; for (let i=0;i<CELLS;i++) if (Game.board[i] && Game.board[i].crate) crates++;
     assert(Game.cratesLeft === 0 && crates === 0, 'a match beside a crate breaks it');
     assert((Game.collected.guitar||0) >= 3, 'collect tally counts cleared tiles');
+    // a COMBO that engulfs a crate must count it (regression guard for the level-22 bug)
+    Game.cratesLeft = 3; Game.cratesTotal = 3; Game.score = 0;
+    Game.board = []; for (let i=0;i<CELLS;i++) Game.board[i] = {type:'z'+i,special:null,dir:null};
+    Game.board[idx(0,0)] = {type:'guitar',special:'amp',dir:'row'};
+    Game.board[idx(0,1)] = {type:'mic',special:'amp',dir:'col'};
+    Game.board[idx(0,3)] = {type:'crate',crate:true,special:null,dir:null};
+    Game.board[idx(3,1)] = {type:'crate',crate:true,special:null,dir:null};
+    fireComboAndResolve(idx(0,0), idx(0,1));
+    assert(Game.cratesLeft < 3, 'a combo blast counts the crates it destroys');
     // reshuffle must keep the cases exactly in place (or a crate level could soft-lock)
     Game.board = []; for (let i=0;i<CELLS;i++) Game.board[i] = {type:'q'+i,special:null,dir:null};
     Game.board[idx(2,2)] = {type:'crate',crate:true,special:null,dir:null};
@@ -2270,7 +2292,7 @@ const LIFESTYLE = [
     { name: 'Hilltop Mansion', flavor: 'Gold records on the wall. The amp has its own wing.' },
   ] },
 ];
-const LIFESTYLE_COST = [600, 1800, 4500];   // cost to reach tier 1, 2, 3
+const LIFESTYLE_COST = [500, 1400, 3200];   // cost to reach tier 1, 2, 3
 const Save = {
   data: null,
   load() {
@@ -2314,6 +2336,7 @@ const Save = {
   canBuyLifestyle(key) { const c = this.lifestyleCost(key); return c != null && this.data.coins >= c; },
   buyLifestyle(key) { const c = this.lifestyleCost(key); if (c == null || this.data.coins < c) return false; this.data.coins -= c; this.data.lifestyle[key]++; this.save(); return true; },
   lifestyleTotal() { const l = this.data.lifestyle; return l.ride + l.threads + l.crib; },
+  fameBonus() { return this.lifestyleTotal() * 0.05; },        // the bigger they live, the more each win pays (+5% per lifestyle tier)
   fameLabel() { const t = this.lifestyleTotal(); return t >= 8 ? 'Superstars' : t >= 5 ? 'Living Large' : t >= 2 ? 'On the Rise' : t >= 1 ? 'Getting By' : 'Basement Days'; },
   canUpgrade(key) { const c = this.upgradeCost(key); return c != null && this.data.coins >= c; },
   upgrade(key) {
@@ -2326,9 +2349,9 @@ Save.load();
 
 // coins earned for a win — rewards reaching deeper levels and finishing strong
 function coinsForWin(levelN, stars, score, target) {
-  const base = 70 + levelN * 12 + stars * 45;
-  const overflow = Math.min(120, Math.floor(Math.max(0, score - target) / 1200) * 6);
-  return Math.round((base + overflow) * (1 + Save.bandBonus()));
+  const base = 80 + levelN * 16 + stars * 50;
+  const overflow = Math.min(160, Math.floor(Math.max(0, score - target) / 1100) * 7);
+  return Math.round((base + overflow) * (1 + Save.bandBonus() + Save.fameBonus()));
 }
 function totalStars() { return Object.values(Save.data.stars).reduce((a, b) => a + b, 0); }
 
@@ -2761,6 +2784,7 @@ function memberPortrait(key, tier) {
         : `<path d="M41 71 Q50 79 59 71" fill="none" stroke="${accent}" stroke-width="2" opacity="0.7"/>`}
     ${dress === 0 && key === 'guitar' ? `<g opacity="0.95"><text x="50" y="87" text-anchor="middle" font-size="6.4" font-family="Georgia,serif" font-style="italic" fill="#46306a">Feel the PlaZZ</text><text x="50" y="94" text-anchor="middle" font-size="4.4" font-family="Georgia,serif" letter-spacing="0.6" fill="#6b5a86">TOUR &apos;77</text></g>` : ''}
     ${dress >= 2 ? `<path d="M14 99 Q14 74 30 71 L34 99 Z M86 99 Q86 74 70 71 L66 99 Z" fill="${accent}" opacity="0.35"/>` : ''}
+    ${(dress === 1 || dress === 2) && key === 'guitar' ? `<path d="M45 70 L55 70 L52.5 85 L47.5 85 Z" fill="#c4c8d6"/><text x="50" y="79" text-anchor="middle" font-size="3.4" font-family="Georgia,serif" font-style="italic" fill="#5a3f7e">PlaZZ</text>` : ''}
     <rect x="44" y="58" width="12" height="15" rx="3" fill="${skin}"/>
     <circle cx="50" cy="44" r="20" fill="${skin}" stroke="#10101e" stroke-width="2"/>
     ${shades
@@ -2950,7 +2974,9 @@ function buildLifestyle() {
   const grid = document.getElementById('lifestyleGrid');
   if (!grid) return;
   const fb = document.getElementById('fameBadge'); if (fb) fb.textContent = Save.fameLabel();
-  const shelf = document.getElementById('relicShelf'); if (shelf) shelf.style.display = Save.data.relicUnlocked ? 'block' : 'none';
+  const ex = document.getElementById('bandExtras');
+  if (ex) ex.innerHTML = '<button class="extra-btn" onclick="hideBand();showBsides()">♫ B-Sides</button>'
+    + (Save.data.relicUnlocked ? '<button class="extra-btn relic" onclick="showRelic()">♦ Plasma Cathedral relics</button>' : '');
   grid.innerHTML = LIFESTYLE.map(cat => {
     const tier = Save.lifestyleTier(cat.key);
     const cur = cat.tiers[tier];
