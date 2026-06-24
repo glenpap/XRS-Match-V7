@@ -332,6 +332,25 @@ button.primary{background:linear-gradient(160deg,var(--gold),var(--gold-deep)); 
 .si-story{font-size:.92rem; color:var(--cream); line-height:1.55; margin-bottom:14px; border-top:1px solid var(--line); padding-top:14px; font-style:italic;}
 .si-quip{font-size:.82rem; color:var(--gold-warm); line-height:1.5; margin-bottom:18px; opacity:.92;}
 .si-quip::before{content:'♫ '; color:var(--gold);}
+.relic-panel{text-align:center;}
+.relic-eyebrow{font-family:var(--mono); font-size:.66rem; letter-spacing:.22em; text-transform:uppercase; color:#c79be6; margin-bottom:10px;}
+.relic-title{font-family:var(--serif); font-weight:700; font-size:1.7rem; color:#e6c9ff; letter-spacing:.02em; margin-bottom:14px;
+  text-shadow:0 0 18px rgba(150,90,210,.6);}
+.relic-body{font-size:.9rem; color:var(--cream); line-height:1.6; margin-bottom:20px;}
+.relic-buy{display:block; text-decoration:none; font-family:var(--serif); font-weight:700; font-size:1rem; color:#10131c;
+  background:linear-gradient(160deg,#d9b3ff,#8a4fc6); border-radius:12px; padding:13px; margin-bottom:10px;
+  box-shadow:0 6px 20px -6px rgba(138,79,198,.8);}
+.relic-close{width:100%; background:none; border:1px solid var(--line); color:var(--cream-mute); border-radius:11px; padding:11px; font-size:.85rem; cursor:pointer;}
+.relic-shelf{text-align:center; margin-top:18px;}
+.relic-shelf-btn{font-family:var(--mono); font-size:.66rem; letter-spacing:.14em; text-transform:uppercase; color:#c79be6;
+  background:rgba(138,79,198,.12); border:1px solid rgba(150,90,210,.4); border-radius:999px; padding:9px 16px; cursor:pointer;}
+.bc-portrait{cursor:pointer; position:relative;}
+.bc-zoom{position:absolute; right:6px; bottom:6px; font-size:.7rem; color:var(--cream); background:rgba(16,16,30,.6); border-radius:6px; padding:1px 4px; line-height:1; opacity:.7;}
+.zoom-panel{text-align:center;}
+.zoom-portrait{width:min(72vw,280px); height:min(72vw,280px); margin:4px auto 14px; background:radial-gradient(circle at 50% 40%, rgba(255,255,255,.06), transparent 70%); border-radius:18px;}
+.zoom-portrait svg{width:100%; height:100%; display:block;}
+.zoom-name{font-family:var(--serif); font-weight:700; font-size:1.25rem; color:var(--gold-hi); margin-bottom:8px;}
+.zoom-desc{font-family:var(--mono); font-size:.72rem; letter-spacing:.04em; color:var(--cream-mute); line-height:1.8; margin-bottom:18px;}
 .tut-dots{display:flex; gap:7px; justify-content:center; margin-bottom:16px;}
 .tut-dot{width:7px; height:7px; border-radius:50%; background:var(--surface-hi); transition:background .2s var(--ease), transform .2s var(--bounce);}
 .tut-dot.on{background:var(--gold); transform:scale(1.25);}
@@ -670,6 +689,27 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* fixed viewport — th
     </div>
   </div>
 
+  <!-- ONE-TIME relic drop: the Plasma Cathedral merch Easter egg, fired at the rename -->
+  <div class="overlay" id="relicCard" onclick="if(event.target.id==='relicCard')hideRelic()">
+    <div class="panel relic-panel">
+      <div class="relic-eyebrow">A relic surfaces</div>
+      <div class="relic-title">Plasma Cathedral</div>
+      <div class="relic-body">The name is gone. The band moved on. But somewhere in a box, a few shirts from the <i>Feel the PlaZZ &rsquo;77</i> tour survived the rebrand.<br><br>The vote to rename was 4&ndash;1. This is the evidence.</div>
+      <a class="relic-buy" href="#" id="relicBuy" target="_blank" rel="noopener">See the Plasma Cathedral relics ▸</a>
+      <button class="relic-close" onclick="hideRelic()">Back to the show ★</button>
+    </div>
+  </div>
+
+  <!-- TAP-TO-ZOOM character viewer -->
+  <div class="overlay" id="zoomCard" onclick="if(event.target.id==='zoomCard')hideZoom()">
+    <div class="panel zoom-panel">
+      <div class="zoom-portrait" id="zoomPortrait"></div>
+      <div class="zoom-name" id="zoomName"></div>
+      <div class="zoom-desc" id="zoomDesc"></div>
+      <button class="relic-close" onclick="hideZoom()">Close ★</button>
+    </div>
+  </div>
+
   <!-- SET INTRO — readable story + goal card at the start of each set (tap to begin) -->
   <div class="overlay" id="setIntro" onclick="if(event.target.id==='setIntro')hideSetIntro()">
     <div class="panel si-panel">
@@ -726,6 +766,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* fixed viewport — th
       <div class="lifestyle-head">The Good Life <span class="fame-badge" id="fameBadge"></span></div>
       <div class="lifestyle-sub">As you rise, treat the band. Pure flair — bragging rights for your trip out of the basement.</div>
       <div class="lifestyle-grid" id="lifestyleGrid"></div>
+      <div id="relicShelf" class="relic-shelf" style="display:none"><button class="relic-shelf-btn" onclick="showRelic()">♦ Plasma Cathedral relics</button></div>
       <div class="j-foot"><button class="primary" onclick="hideBand()">← Back to the Journey</button></div>
       <div class="hub-links">
         <div class="hub-links-note">Hear the real X-Ray Star ★</div>
@@ -862,7 +903,7 @@ const STORY = [
   // THE COFFEE SHOP
   'First real gig: the Crooked Knee. Trevor the sound guy has heard everything since 1987. He listens, pauses, and says: "I\u2019ll get the second mic."',
   'A lone internet review: "The bassist seemed angry. The drummer has potential. Would see again, maybe." The band frames a screenshot.',
-  'A rival appears: Mournful Plumbing. Their singer Brian explains each song for four minutes. The songs are, annoyingly, good.',
+  'A rival appears: Mournful Plumbing. Their singer Brian explains each song for four minutes \u2014 and the songs are, annoyingly, good. Watching him, Maya has a horrible thought: "Plasma Cathedral" is exactly the kind of name Brian would adore. She finally wins the oldest argument in the band. They are X-Ray Star now. She still can\u2019t say what it means \u2014 but for the first time she\u2019s relieved to say the band\u2019s name out loud.',
   'The amp hums during the quiet parts now. Mom\u2019s bill: $142.18. "We aren\u2019t running anything different," says Jake. The amp hums in agreement.',
   'Someone tips $1.40 and a pickle. Maya frames the pickle. (Sticks broken: 7.)',
   // THE DIVE BAR
@@ -876,7 +917,7 @@ const STORY = [
   'A man in a wrinkled suit takes notes and does not clap. His card says only "Verdant." He smells faintly of tuna.',
   'They record the album in a basement studio. A cat walks across the soundboard during the only good take. They keep it.',
   'Mom\u2019s bill: $284.91. "We weren\u2019t even home," says Jake. The amp glows, briefly, a color with no name.',
-  'Mournful Plumbing release your single as "an homage." Maya is so angry she finally wins the oldest argument in the band: "Plasma Cathedral" is dead. They are X-Ray Star now. She still can\u2019t say what it means \u2014 but for the first time she\u2019s relieved to say the band\u2019s name out loud.',
+  'Mournful Plumbing release a twenty-minute prog epic. It is called, with no irony whatsoever, "Plasma Cathedral." Brian calls it "an homage." Watching their discarded name become a twenty-minute Brian solo, the band feel something settle \u2014 not anger, relief. They strip the sound back, leaner and louder, and never look back.',
   'Dave takes a four-minute drum solo. The room drops twelve degrees. Geoff stands and applauds with both paws.',
   // THE THEATER
   'The Theater. Velvet seats, a balcony, and a man in row G who insists he discovered you. He sells churros.',
@@ -926,9 +967,16 @@ const ROAD_QUIPS = [
   'Kat plays a chord nobody played. The amp answers in a key no one has heard.',
   'Greg, Maya\u2019s twelve-year-old cousin, auditions on bass. He is, alarmingly, the best of the three.',
   'The fog machine has its own rider now. The fog is non-negotiable.',
+  'Mid-rehearsal Jake stops, stares into the middle distance, and says only: "...A flower?" Nobody answers. Kat writes it down.',
 ];
 let _quipIx = (Math.random() * 9999) | 0;   // start somewhere random so restarts open on a different joke
 function nextQuip() { const q = ROAD_QUIPS[_quipIx % ROAD_QUIPS.length]; _quipIx++; return q; }
+
+// ===== One-time "Plasma Cathedral relics" merch Easter egg =====
+// Fires once, at the rename moment (level 19), then lives quietly on the Band screen.
+// NOTE: confirm this is the public fan link (the "Share" link on the product page). Studio/promote links are seller-only.
+const PLASMA_MERCH_URL = 'https://www.redbubble.com/shop/ap/181765220?asc=u';
+const RENAME_LEVEL = 7;
 const WIN_FLAVORS = [
   'The crowd wants one more. Geoff applauds with both paws.',
   'Trevor the sound guy nods once. From Trevor, that is a standing ovation.',
@@ -2233,12 +2281,13 @@ const Save = {
       band: Object.assign({ guitar: 0, mic: 0, drums: 0, bass: 0 }, d.band || {}),
       bsidesSeen: d.bsidesSeen || 0,
       lifestyle: Object.assign({ ride: 0, threads: 0, crib: 0 }, d.lifestyle || {}),
+      relicUnlocked: !!d.relicUnlocked,
     };
     return this.data;
   },
   save() { Prefs.set('save', this.data); },
   reset() {
-    this.data = { unlocked: 1, stars: {}, coins: 0, band: { guitar: 0, mic: 0, drums: 0, bass: 0 }, bsidesSeen: 0, lifestyle: { ride: 0, threads: 0, crib: 0 } };
+    this.data = { unlocked: 1, stars: {}, coins: 0, band: { guitar: 0, mic: 0, drums: 0, bass: 0 }, bsidesSeen: 0, lifestyle: { ride: 0, threads: 0, crib: 0 }, relicUnlocked: false };
     this.save();
   },
   maxCleared() { const k = Object.keys(this.data.stars).map(Number); return k.length ? Math.max.apply(null, k) : 0; },
@@ -2686,10 +2735,12 @@ function memberPortrait(key, tier) {
   const C = MEM_COLOR[key];
   const look = MEM_LOOK[key];
   const skin = look.skin, hair = look.hair;
-  // OUTFIT is driven by "The Look" purchases (threads): 0 thrift tee · 1 leather jacket · 2 custom fit · 3 designer
+  // OUTFIT is driven by "The Look" purchases (threads): 0 thrift tee · 1 black leather jacket · 2 custom stage fit · 3 designer
   const dress = (typeof Save !== 'undefined' && Save.lifestyleTier) ? Save.lifestyleTier('threads') : 0;
-  const jacket = dress >= 1 ? C : '#39344f';
-  const trim = dress >= 1 ? '#ffe08a' : '#2a2540';
+  let bodyFill, accent, collarDark;
+  if (dress >= 2) { bodyFill = C; accent = '#ffe08a'; collarDark = '#10101e'; }        // custom/designer: bright stage fit, gold trim
+  else if (dress === 1) { bodyFill = '#23232e'; accent = C; collarDark = '#15151c'; }  // leather jacket: black, member-color zipper
+  else { bodyFill = '#b9bdcc'; accent = '#6b6f84'; collarDark = '#8b8fa3'; }            // thrift tee: light heather
   const hairPath = {
     guitar: 'M28 42 Q26 18 50 18 Q74 18 72 42 Q70 30 60 27 L64 20 L54 26 Q50 24 46 26 L40 19 L43 28 Q32 31 28 42 Z', // spiky
     mic:    'M26 56 Q23 15 50 15 Q77 15 74 56 Q73 38 68 31 L72 58 L62 31 Q56 28 50 28 Q44 28 38 31 L28 58 L32 31 Q27 38 26 56 Z', // long
@@ -2700,11 +2751,15 @@ function memberPortrait(key, tier) {
   const star = dress >= 3;
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
     ${star ? `<path d="M50 2 L53 9 L60 9 L54.5 13.5 L57 21 L50 16.5 L43 21 L45.5 13.5 L40 9 L47 9 Z" fill="#ffe08a" stroke="#8c6e2f" stroke-width="1"/>` : ''}
-    ${dress >= 3 && key === 'guitar' ? `<g><path d="M26 65 Q5 80 6 99 L31 99 Q27 82 31 68 Z M74 65 Q95 80 94 99 L69 99 Q73 82 69 68 Z" fill="#6a2c9e" stroke="#ffe08a" stroke-width="1.4"/><g fill="#fff7d6"><circle cx="13" cy="90" r="1.1"/><circle cx="20" cy="96" r="1"/><circle cx="9" cy="84" r=".9"/><circle cx="87" cy="90" r="1.1"/><circle cx="80" cy="96" r="1"/><circle cx="91" cy="84" r=".9"/></g><g fill="#ffe08a"><circle cx="17" cy="93" r=".8"/><circle cx="83" cy="93" r=".8"/><circle cx="11" cy="87" r=".7"/><circle cx="89" cy="87" r=".7"/><circle cx="24" cy="98" r=".7"/><circle cx="76" cy="98" r=".7"/></g></g>` : ''}
-    <path d="M14 99 Q14 70 50 70 Q86 70 86 99 Z" fill="${jacket}" stroke="#10101e" stroke-width="2.2"/>
-    <path d="M50 70 L44 88 L50 95 L56 88 Z" fill="${trim}" opacity="${dress >= 1 ? 0.9 : 0.5}"/>
-    ${dress === 0 && key === 'guitar' ? `<g opacity="0.92"><text x="50" y="87" text-anchor="middle" font-size="6.4" font-family="Georgia,serif" font-style="italic" fill="#e6c477">Feel the PlaZZ</text><text x="50" y="94" text-anchor="middle" font-size="4.4" font-family="Georgia,serif" letter-spacing="0.6" fill="#c2a065">TOUR &apos;77</text></g>` : ''}
-    ${dress >= 2 ? `<path d="M14 99 Q14 74 30 71 L34 99 Z M86 99 Q86 74 70 71 L66 99 Z" fill="${trim}" opacity="0.35"/>` : ''}
+    ${dress >= 3 && key === 'guitar' ? `<g><path d="M26 65 Q5 80 6 99 L31 99 Q27 82 31 68 Z M74 65 Q95 80 94 99 L69 99 Q73 82 69 68 Z" fill="#6a2c9e" stroke="#ffe08a" stroke-width="1.4"/><text x="18" y="88" text-anchor="middle" font-size="5.2" font-family="Georgia,serif" font-weight="bold" fill="#fff7d6" transform="rotate(-9 18 88)">X-RAY</text><text x="82" y="88" text-anchor="middle" font-size="5.2" font-family="Georgia,serif" font-weight="bold" fill="#fff7d6" transform="rotate(9 82 88)">STAR</text><g fill="#fff7d6"><circle cx="13" cy="92" r="1.1"/><circle cx="24" cy="96" r="1"/><circle cx="9" cy="84" r=".9"/><circle cx="87" cy="92" r="1.1"/><circle cx="76" cy="96" r="1"/><circle cx="91" cy="84" r=".9"/></g><g fill="#ffe08a"><circle cx="11" cy="88" r=".7"/><circle cx="89" cy="88" r=".7"/><circle cx="28" cy="99" r=".7"/><circle cx="72" cy="99" r=".7"/></g></g>` : ''}
+    <path d="M14 99 Q14 70 50 70 Q86 70 86 99 Z" fill="${bodyFill}" stroke="#10101e" stroke-width="2.2"/>
+    ${dress >= 2
+      ? `<path d="M50 70 L44 88 L50 95 L56 88 Z" fill="${accent}" opacity="0.9"/>`
+      : dress === 1
+        ? `<path d="M45 70 L39 87 L49 80 Z" fill="${collarDark}"/><path d="M55 70 L61 87 L51 80 Z" fill="${collarDark}"/><line x1="50" y1="73" x2="50" y2="96" stroke="${accent}" stroke-width="1.8"/>`
+        : `<path d="M41 71 Q50 79 59 71" fill="none" stroke="${accent}" stroke-width="2" opacity="0.7"/>`}
+    ${dress === 0 && key === 'guitar' ? `<g opacity="0.95"><text x="50" y="87" text-anchor="middle" font-size="6.4" font-family="Georgia,serif" font-style="italic" fill="#46306a">Feel the PlaZZ</text><text x="50" y="94" text-anchor="middle" font-size="4.4" font-family="Georgia,serif" letter-spacing="0.6" fill="#6b5a86">TOUR &apos;77</text></g>` : ''}
+    ${dress >= 2 ? `<path d="M14 99 Q14 74 30 71 L34 99 Z M86 99 Q86 74 70 71 L66 99 Z" fill="${accent}" opacity="0.35"/>` : ''}
     <rect x="44" y="58" width="12" height="15" rx="3" fill="${skin}"/>
     <circle cx="50" cy="44" r="20" fill="${skin}" stroke="#10101e" stroke-width="2"/>
     ${shades
@@ -2831,7 +2886,28 @@ function showSetIntro() {
   document.getElementById('siQuip').textContent = nextQuip();   // fresh one-liner every time the card shows
   document.getElementById('setIntro').classList.add('show');
 }
-function hideSetIntro() { document.getElementById('setIntro').classList.remove('show'); }
+function hideSetIntro() {
+  document.getElementById('setIntro').classList.remove('show');
+  if (Game.level === RENAME_LEVEL && !Save.data.relicUnlocked) {   // the moment Plasma Cathedral dies, a relic surfaces — once, ever
+    Save.data.relicUnlocked = true; Save.save();
+    setTimeout(showRelic, 350);
+  }
+}
+function showRelic() {
+  const a = document.getElementById('relicBuy'); if (a) a.href = PLASMA_MERCH_URL;
+  document.getElementById('relicCard').classList.add('show');
+}
+function hideRelic() { document.getElementById('relicCard').classList.remove('show'); }
+function zoomMember(key) {
+  const m = BAND.find(x => x.key === key); if (!m) return;
+  const tier = Save.memberTier(key), dress = Save.lifestyleTier('threads');
+  document.getElementById('zoomPortrait').innerHTML = memberPortrait(key, tier);
+  document.getElementById('zoomName').textContent = m.name + ' · ' + m.role;
+  const lookName = LIFESTYLE.find(c => c.key === 'threads').tiers[dress].name;
+  document.getElementById('zoomDesc').innerHTML = '🎸 ' + GEAR[key][tier] + ' &nbsp;·&nbsp; ' + BAND_TIERS[tier] + '<br>🧥 ' + lookName;
+  document.getElementById('zoomCard').classList.add('show');
+}
+function hideZoom() { document.getElementById('zoomCard').classList.remove('show'); }
 
 function buildBand() {
   updateCoinDisplays();
@@ -2847,7 +2923,7 @@ function buildBand() {
       ? `<button class="bc-btn maxed" disabled>★ Top-Shelf Gear</button>`
       : `<button class="bc-btn" ${can ? '' : 'disabled'} onclick="upgradeMember('${m.key}')">New gear: ${GEAR[m.key][tier + 1]} · ${cost} 🪙</button>`;
     return `<div class="band-card ${maxed ? 'maxed' : ''}" data-tier="${tier}" style="--mem-color:${MEM_COLOR[m.key]}">
-      <div class="bc-portrait">${memberPortrait(m.key, tier)}<span class="bc-glow"></span></div>
+      <div class="bc-portrait" onclick="zoomMember('${m.key}')">${memberPortrait(m.key, tier)}<span class="bc-glow"></span><span class="bc-zoom">⤢</span></div>
       <div class="bc-name">${m.name}</div>
       <div class="bc-role">${m.role} · ${BAND_TIERS[tier]}</div>
       <div class="bc-tier">🎸 ${gearNow}</div>
@@ -2873,6 +2949,7 @@ function buildLifestyle() {
   const grid = document.getElementById('lifestyleGrid');
   if (!grid) return;
   const fb = document.getElementById('fameBadge'); if (fb) fb.textContent = Save.fameLabel();
+  const shelf = document.getElementById('relicShelf'); if (shelf) shelf.style.display = Save.data.relicUnlocked ? 'block' : 'none';
   grid.innerHTML = LIFESTYLE.map(cat => {
     const tier = Save.lifestyleTier(cat.key);
     const cur = cat.tiers[tier];
