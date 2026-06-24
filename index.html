@@ -325,6 +325,8 @@ button.primary{background:linear-gradient(160deg,var(--gold),var(--gold-deep)); 
 .si-new{display:none; background:linear-gradient(160deg, rgba(90,160,255,.22), rgba(139,92,246,.18)); border:1px solid rgba(150,200,255,.5);
   border-radius:12px; padding:10px 12px; margin-bottom:14px; font-size:.82rem; line-height:1.45; color:var(--cream);}
 .si-new b{color:#bfe0ff; font-family:var(--serif); font-size:1rem;}
+.mini-instr{display:inline-block; width:1.5em; height:1.5em; vertical-align:-0.42em; margin:0 1px;}
+.mini-instr svg{width:100%; height:100%; display:block;}
 .si-goal{font-family:var(--serif); font-weight:700; font-size:1.35rem; color:var(--gold-hi); margin-bottom:6px;}
 .si-why{font-size:.82rem; color:var(--cream-mute); line-height:1.45; margin-bottom:16px;}
 .si-story{font-size:.92rem; color:var(--cream); line-height:1.55; margin-bottom:18px; border-top:1px solid var(--line); padding-top:14px; font-style:italic;}
@@ -444,6 +446,14 @@ button.arm{border-color:var(--gold-hi) !important; color:var(--gold-hi) !importa
   border-radius:99px; padding:6px 14px; letter-spacing:.05em; white-space:nowrap;}
 .j-sub{font-family:var(--mono); font-size:.62rem; letter-spacing:.13em; text-transform:uppercase; color:var(--cream-low); margin:6px 0 20px;}
 .j-foot{display:flex; gap:10px; justify-content:center; margin-top:26px; flex-wrap:wrap;}
+.band-topbar{position:fixed; top:0; left:0; right:0; z-index:90; display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:12px 16px; background:linear-gradient(180deg, var(--bg-deep) 76%, rgba(20,16,28,0));
+  backdrop-filter:blur(5px); -webkit-backdrop-filter:blur(5px);}
+.band-topbar .j-coins{margin:0;}
+.bandscreen .band-inner{padding-top:46px;}   /* clear the fixed back bar */
+.band-back-btn{font-family:var(--serif); font-weight:700; font-size:.95rem; color:#10131c; background:linear-gradient(160deg,var(--gold-hi),var(--gold));
+  border:none; border-radius:11px; padding:11px 16px; cursor:pointer; box-shadow:0 4px 14px -4px rgba(255,224,138,.6);}
+.band-back-btn:active{transform:translateY(1px);}
 .j-menu{margin-top:12px; margin-bottom:6px;}
 
 /* ===== journey path ===== */
@@ -683,9 +693,12 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* fixed viewport — th
   <!-- THE BAND — roster that levels up as you spend -->
   <div class="bandscreen" id="bandScreen">
     <div class="band-inner">
+      <div class="band-topbar">
+        <button class="band-back-btn" onclick="hideBand()">← Back to the Game</button>
+        <div class="j-coins" id="bandCoins">🪙 0</div>
+      </div>
       <div class="j-head">
         <div class="j-title">The Band</div>
-        <div class="j-coins" id="bandCoins">🪙 0</div>
       </div>
       <div class="j-sub">Spend your earnings on the band — and watch them rise from nobodies to superstars.</div>
       <div class="band-grid" id="bandGrid"></div>
@@ -771,9 +784,10 @@ function objectiveMet() {
   if (o.k === 'crates') return (Game.cratesLeft || 0) <= 0;
   return Game.score >= Game.target;
 }
+function instrMini(type) { return '<span class="mini-instr">' + (SVG[type] || '') + '</span>'; }   // the actual tile art, so the goal always matches the board
 function objectiveText(lv) {
   const o = levelObj(lv);
-  if (o.k === 'collect') return 'Collect ' + o.need + ' ' + (TYPE_ICON[o.tile] || '') + ' ' + (TYPE_LABEL[o.tile] || o.tile);
+  if (o.k === 'collect') return 'Collect ' + o.need + ' ' + instrMini(o.tile) + ' ' + (TYPE_LABEL[o.tile] || o.tile);
   if (o.k === 'crates') return 'Clear ' + o.need + ' road cases 📦';
   return 'Reach ' + ((lv || currentLevelData()).t).toLocaleString() + ' pts';
 }
@@ -1271,7 +1285,7 @@ function updateHUD() {
     const have = Math.min(Game.collected[o.tile] || 0, o.need);
     pct = Math.round(have / o.need * 100);
     if (lab) lab.textContent = 'Collect';
-    tgt.textContent = (TYPE_ICON[o.tile] || '') + ' ' + have + '/' + o.need;
+    tgt.innerHTML = instrMini(o.tile) + ' ' + have + '/' + o.need;
     objLabel = pct >= 100 ? 'Got them all!' : ('Collect ' + o.need + ' ' + (TYPE_LABEL[o.tile] || o.tile));
   } else if (o.k === 'crates') {
     const total = Game.cratesTotal || o.need, left = Game.cratesLeft || 0;
@@ -1740,7 +1754,7 @@ function showOverlay(won) {
   document.getElementById('ovFlavor').textContent = pool[(Math.random() * pool.length) | 0];
   const _o = levelObj(lv);
   let _objLine = '';
-  if (won && _o.k === 'collect') _objLine = `Collected all ${_o.need} ${TYPE_ICON[_o.tile] || ''} ${TYPE_LABEL[_o.tile] || _o.tile}!`;
+  if (won && _o.k === 'collect') _objLine = `Collected all ${_o.need} ${instrMini(_o.tile)} ${TYPE_LABEL[_o.tile] || _o.tile}!`;
   else if (won && _o.k === 'crates') _objLine = `All ${_o.need} road cases cleared! 📦`;
   document.getElementById('ovScore').innerHTML =
     (_objLine ? `<div class="obj-done">${_objLine}</div>` : '')
@@ -1866,7 +1880,7 @@ function levelIntroVenue(n, venueName) {
   if (!wrap) return;
   document.getElementById('liN').textContent = 'Set ' + n;
   document.getElementById('liT').textContent = venueName;
-  const ob = document.getElementById('liObj'); if (ob) ob.textContent = objectiveText();
+  const ob = document.getElementById('liObj'); if (ob) ob.innerHTML = objectiveText();
   wrap.classList.remove('show'); void wrap.offsetWidth; wrap.classList.add('show');
 }
 
@@ -2689,7 +2703,7 @@ function showSetIntro() {
   document.getElementById('siEyebrow').textContent = 'Set ' + lv.n + ' · ' + v.name;
   let goal, why;
   if (o.k === 'collect') {
-    goal = 'Collect ' + o.need + ' ' + (TYPE_ICON[o.tile] || '') + ' ' + (TYPE_LABEL[o.tile] || o.tile);
+    goal = 'Collect ' + o.need + ' ' + instrMini(o.tile) + ' ' + (TYPE_LABEL[o.tile] || o.tile);
     why = 'The band needs them for tonight\u2019s set — match that many to finish the level.';
   } else if (o.k === 'crates') {
     goal = 'Clear ' + o.need + ' road cases 📦';
@@ -2698,7 +2712,7 @@ function showSetIntro() {
     goal = 'Reach ' + lv.t.toLocaleString() + ' points';
     why = 'Rack up the target score before you run out of moves.';
   }
-  document.getElementById('siGoal').textContent = goal;
+  document.getElementById('siGoal').innerHTML = goal;
   document.getElementById('siWhy').textContent = why;
   const newKey = Object.keys(UNLOCK).find(k => UNLOCK[k] === lv.n);   // does this set introduce a new toy?
   const newEl = document.getElementById('siNew');
