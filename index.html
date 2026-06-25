@@ -1702,14 +1702,18 @@ function onSwipe(i, dx, dy) {
   attemptSwap(i, nb);
 }
 function setupInput() {
+  // NOTE: we deliberately do NOT use setPointerCapture. On desktop a mouse capture
+  // can get "stuck" on the board and then silently swallow every later click —
+  // which made the Band / Continue buttons appear dead. Instead we track the
+  // swipe on the window, so swipes still follow the cursor off the board, but the
+  // pointer is never hijacked away from the page's buttons. Touch is unaffected.
   boardEl.addEventListener('pointerdown', e => {
     if (Game.busy) return;
     noteInteraction();
     const i = tileAt(e.clientX, e.clientY); if (i == null) return;
     ptr = { id: e.pointerId, x: e.clientX, y: e.clientY, i, fired: false };
-    try { boardEl.setPointerCapture(e.pointerId); } catch (_) {}
   });
-  boardEl.addEventListener('pointermove', e => {
+  window.addEventListener('pointermove', e => {
     if (!ptr || e.pointerId !== ptr.id || ptr.fired) return;
     const dx = e.clientX - ptr.x, dy = e.clientY - ptr.y;
     if (Math.hypot(dx, dy) >= SWIPE_MIN) { ptr.fired = true; onSwipe(ptr.i, dx, dy); }
@@ -1717,11 +1721,10 @@ function setupInput() {
   const end = e => {
     if (!ptr || e.pointerId !== ptr.id) return;
     const wasSwipe = ptr.fired, i = ptr.i; ptr = null;
-    try { boardEl.releasePointerCapture(e.pointerId); } catch (_) {}
     if (!wasSwipe) onTap(i);
   };
-  boardEl.addEventListener('pointerup', end);
-  boardEl.addEventListener('pointercancel', e => { if (ptr && e.pointerId === ptr.id) ptr = null; });
+  window.addEventListener('pointerup', end);
+  window.addEventListener('pointercancel', e => { if (ptr && e.pointerId === ptr.id) ptr = null; });
 }
 
 /* ===== swap flow (unchanged logic) ===== */
