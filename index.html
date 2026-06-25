@@ -215,9 +215,11 @@ button.primary{background:linear-gradient(160deg,var(--gold),var(--gold-deep)); 
 
 /* ===== WIN / LOSE OVERLAY ===== */
 .overlay{position:fixed; inset:0; z-index:50; display:none; align-items:center; justify-content:center; padding:24px;
+  overflow-y:auto;   /* short desktop windows: scroll the popup instead of clipping its buttons off the bottom */
   background:radial-gradient(ellipse at center, rgba(26,18,38,.86), rgba(13,10,20,.94)); backdrop-filter:blur(3px);}
 .overlay.show{display:flex;}
 .panel{position:relative; width:100%; max-width:360px; text-align:center;
+  max-height:calc(100vh - 32px); overflow-y:auto;   /* never taller than the window — buttons always reachable */
   background:linear-gradient(160deg,var(--surface),var(--surface-low)); border:1px solid var(--line); border-radius:22px;
   padding:26px 22px 22px; box-shadow:0 30px 70px -20px rgba(0,0,0,.8); animation:panel-in .4s var(--bounce);}
 @keyframes panel-in{0%{transform:scale(.86) translateY(10px); opacity:0;}100%{transform:scale(1) translateY(0); opacity:1;}}
@@ -591,8 +593,16 @@ button.arm{border-color:var(--gold-hi) !important; color:var(--gold-hi) !importa
 @media (prefers-reduced-motion:reduce){ .tile-inner.amp,.tile-inner.pyro,.tile-inner.rockstar,.tile-inner.bassdrop{animation:none;} .tile.spawned .tile-inner{animation:none;} .float-label{animation:none; opacity:1;} .map-upgrade-banner,.band-cta.nudge{animation:none;} }
 .app{position:relative; z-index:1; width:100%; max-width:460px; display:flex; flex-direction:column; align-items:center; margin:0 auto;}
 /* ===== COMPACT in-game chrome so the score/HUD always fits in small embeds ===== */
-body{padding-top:8px; height:100vh; overflow:hidden;}   /* fixed viewport — the game fits, nothing scrolls the score away */
+body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewport so the score never scrolls away */
 .app{max-height:100vh;}
+/* Desktop / wider windows are often SHORTER than a phone screen after browser chrome,
+   which pushed the bottom Menu/Band/Replay buttons off the clipped edge. On wider
+   screens, let the page scroll so those buttons are always reachable. Phones (<700px
+   wide) keep the locked layout above. */
+@media (min-width:700px){
+  body{ height:auto; min-height:100vh; overflow-y:auto; }
+  .app{ max-height:none; }
+}
 .app-top{display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; margin-bottom:2px;}
 .wordmark-sm{font-family:var(--serif); font-weight:700; font-size:1.02rem; letter-spacing:.02em; color:var(--cream);}
 .wordmark-sm .star{color:var(--gold-hi);}
