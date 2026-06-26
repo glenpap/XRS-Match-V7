@@ -617,6 +617,20 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
 .controls{margin-top:8px;}
 .app-links{border-top:none; padding-top:8px; margin-top:8px;}
 .featured-link{background:linear-gradient(160deg,var(--surface-hi),var(--surface-low)); border:1px solid var(--gold-deep); border-radius:99px; padding:7px 16px; color:var(--gold-hi)!important; font-weight:700;}
+
+/* =====================================================================
+   PERFORMANCE — stop the *continuous* glow loops on special tiles.
+   Animating box-shadow / filter / a spinning conic-gradient forever is
+   cheap on a phone's GPU but hammers a desktop CPU; once a couple of
+   specials sat on the board it could peg the processor and freeze a
+   slide mid-animation. The specials keep their distinct look (static),
+   and the brief one-shot blast effects when they fire are untouched.
+   Bonus: fully static idle glows are even safer for photosensitivity.
+   ===================================================================== */
+.tile-inner.amp, .tile-inner.pyro, .tile-inner.rockstar, .tile-inner.bassdrop { animation:none !important; }
+.tile-inner.amp::before, .tile-inner.rockstar::before { animation:none !important; }
+.tile.sel .tile-inner { animation:none !important; }
+.tile.hint .tile-inner { animation:none !important; }
 </style>
 </head>
 <body>
@@ -1639,50 +1653,70 @@ function showHintNow() {
 function startHintLoop() {
   if (hintStarted) return;
   hintStarted = true;
+  let busyTicks = 0;
   setInterval(() => {
+    // WATCHDOG: after a move the board data is already in its final state (the engine
+    // resolves synchronously; the slides are just decoration). So if 'busy' ever sticks
+    // — a stalled slide on a slow machine — we can safely abort the animation, draw the
+    // finished board, and hand control back. The game can never stay frozen.
+    const ov = document.getElementById('overlay');
+    const overlayShown = ov && ov.classList.contains('show');
+    if (Game.busy && !Game.ended && !overlayShown) {
+      if (++busyTicks >= 6) { busyTicks = 0; try { render(); } catch (_) {} Game.busy = false; clearHint(); try { checkEnd(); } catch (_) {} }
+    } else busyTicks = 0;
     if (!inPlay()) { hintIdle = 0; return; }
     if (hintCells.length) return;
     if (++hintIdle >= HINT_SECONDS) showHintNow();
   }, 1000);
 }
 
-/* ===== animation player (unchanged) ===== */
+/* ===== animation player — now crash-proof: a decorative effect that throws,
+   or a stalled step, can never halt the chain or freeze the board. ===== */
 function playSteps(steps, done) {
   let i = 0;
   const next = () => {
-    if (i >= steps.length) { render(); done && done(); return; }
+    if (i >= steps.length) { try { render(); } catch (_) {} done && done(); return; }
     const step = steps[i++];
-    if (step.kind === 'clear') {
-      const tiles = boardEl.children;
-      if (step.blast) shakeBoard();
-      if (step.combo) { showComboBanner(step.comboName); screenPulse(); }
-      floatScore(step.cells, step.gained || 0);
-      const tint = (step.combo || step.special === 'rockstar') ? '#ffe08a' : step.special === 'pyro' ? '#ff9a3c' : null;
-      spawnSparks(step.cells, tint);
-      if (step.chained && step.blasts && step.blasts.length > 1) {
-        showComboBanner('CHAIN ×' + step.blasts.length);
-        screenPulse();
-        step.blasts.slice(0, 6).forEach((bl, k) => setTimeout(() => blastFx(bl.origin, bl.special, bl.dir), k * 70));
-      }
-      if (step.chain >= 2) showCombo(step.chain);
-      // SOUND — every detonating special speaks; a chain fires them in sequence (spectacular)
-      if (step.combo) { Sfx.comboFire(); }
-      else if (step.blast) {
-        const sps = (step.blasts && step.blasts.length) ? step.blasts.map(b => b.special).filter(Boolean) : (step.special ? [step.special] : []);
-        (sps.length ? sps : ['amp']).slice(0, 6).forEach((sp, k) => setTimeout(() => Sfx.special(sp), k * 90));
-      } else { Sfx.match(step.chain); }
-      step.cells.forEach(c => { if (tiles[c]) tiles[c].classList.add('pop'); });
-      setTimeout(next, 200);
-    } else if (step.kind === 'spawn') {
-      render();
-      if (step.list) step.list.forEach(s => celebrateSpecial(s.idx, s.type, false));
-      setTimeout(next, step.list && step.list.length ? 260 : 0);
-    } else if (step.kind === 'settle') {
-      render();
-      const tiles = boardEl.children;
-      step.moved.forEach(c => { if (tiles[c]) { tiles[c].classList.remove('pop'); tiles[c].classList.add('drop'); } });
-      setTimeout(() => { for (const el of tiles) el.classList.remove('drop'); next(); }, 200);
-    } else { next(); }
+    let advanced = false;
+    const go = ms => { if (advanced) return; advanced = true; setTimeout(next, ms); };
+    try {
+      if (step.kind === 'clear') {
+        const tiles = boardEl.children;
+        if (step.blast) shakeBoard();
+        if (step.combo) { showComboBanner(step.comboName); screenPulse(); }
+        floatScore(step.cells, step.gained || 0);
+        const tint = (step.combo || step.special === 'rockstar') ? '#ffe08a' : step.special === 'pyro' ? '#ff9a3c' : null;
+        spawnSparks(step.cells, tint);
+        if (step.chained && step.blasts && step.blasts.length > 1) {
+          showComboBanner('CHAIN ×' + step.blasts.length);
+          screenPulse();
+          step.blasts.slice(0, 6).forEach((bl, k) => setTimeout(() => { try { blastFx(bl.origin, bl.special, bl.dir); } catch (_) {} }, k * 70));
+        }
+        if (step.chain >= 2) showCombo(step.chain);
+        // SOUND — every detonating special speaks; a chain fires them in sequence (spectacular)
+        if (step.combo) { Sfx.comboFire(); }
+        else if (step.blast) {
+          const sps = (step.blasts && step.blasts.length) ? step.blasts.map(b => b.special).filter(Boolean) : (step.special ? [step.special] : []);
+          (sps.length ? sps : ['amp']).slice(0, 6).forEach((sp, k) => setTimeout(() => { try { Sfx.special(sp); } catch (_) {} }, k * 90));
+        } else { Sfx.match(step.chain); }
+        step.cells.forEach(c => { if (tiles[c]) tiles[c].classList.add('pop'); });
+        go(200);
+      } else if (step.kind === 'spawn') {
+        render();
+        if (step.list) step.list.forEach(s => celebrateSpecial(s.idx, s.type, false));
+        go(step.list && step.list.length ? 260 : 0);
+      } else if (step.kind === 'settle') {
+        render();
+        const tiles = boardEl.children;
+        step.moved.forEach(c => { if (tiles[c]) { tiles[c].classList.remove('pop'); tiles[c].classList.add('drop'); } });
+        advanced = true;
+        setTimeout(() => { try { for (const el of boardEl.children) el.classList.remove('drop'); } catch (_) {} next(); }, 200);
+      } else { go(0); }
+    } catch (e) {
+      // a decorative effect blew up — recover instantly, never freeze the board
+      try { render(); } catch (_) {}
+      go(0);
+    }
   };
   next();
 }
@@ -1869,6 +1903,7 @@ function runEncore(done) {
 }
 
 function showOverlay(won) {
+  hideTitle();   // the popup must never sit under the title curtain (which would eat its buttons)
   const ov = document.getElementById('overlay');
   const lv = LEVELS[(Game.level - 1) % LEVELS.length];
   const stars = won ? Math.max(1, starsFor(Game.score, Game.target)) : 0;
@@ -2743,7 +2778,9 @@ Game.showHelp = function() { showTutorial(); };
 /* =====================================================================
    START — title screen → (first-time tutorial) → play
    ===================================================================== */
+function hideTitle() { const t = document.getElementById('titleScreen'); if (t) t.classList.add('hide'); }
 Game.start = function() {
+  hideTitle();                                 // lift the title curtain FIRST — before anything that could error
   Sfx.enable();
   if (!Sfx.muted) Sfx.startBGM();
   syncMuteBtn();
@@ -2891,6 +2928,7 @@ function newJourney(btn) {
 
 function startLevel(n) {
   const advancing = n > Game.level;
+  hideTitle();
   hideMap();
   document.getElementById('bandScreen').classList.remove('show');
   Game.level = n;
