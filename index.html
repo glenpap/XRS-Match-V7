@@ -619,18 +619,29 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
 .featured-link{background:linear-gradient(160deg,var(--surface-hi),var(--surface-low)); border:1px solid var(--gold-deep); border-radius:99px; padding:7px 16px; color:var(--gold-hi)!important; font-weight:700;}
 
 /* =====================================================================
-   PERFORMANCE — stop the *continuous* glow loops on special tiles.
-   Animating box-shadow / filter / a spinning conic-gradient forever is
-   cheap on a phone's GPU but hammers a desktop CPU; once a couple of
-   specials sat on the board it could peg the processor and freeze a
-   slide mid-animation. The specials keep their distinct look (static),
-   and the brief one-shot blast effects when they fire are untouched.
-   Bonus: fully static idle glows are even safer for photosensitivity.
+   ADAPTIVE SPARKLE — the continuous glow loops on specials are gorgeous on
+   any device with a working graphics chip (phones, tablets, modern PCs), but
+   on a CPU-only machine (no hardware acceleration) they peg the processor and
+   freeze the page. So we keep the FULL sparkle by default and only strip these
+   loops on devices flagged .lowgfx (detected at load). prefers-reduced-motion
+   is handled separately above. The brief one-shot blast effects always stay.
    ===================================================================== */
-.tile-inner.amp, .tile-inner.pyro, .tile-inner.rockstar, .tile-inner.bassdrop { animation:none !important; }
-.tile-inner.amp::before, .tile-inner.rockstar::before { animation:none !important; }
-.tile.sel .tile-inner { animation:none !important; }
-.tile.hint .tile-inner { animation:none !important; }
+.lowgfx .tile-inner.amp, .lowgfx .tile-inner.pyro, .lowgfx .tile-inner.rockstar, .lowgfx .tile-inner.bassdrop { animation:none !important; }
+.lowgfx .tile-inner.amp::before, .lowgfx .tile-inner.rockstar::before { animation:none !important; }
+.lowgfx .tile.sel .tile-inner { animation:none !important; }
+.lowgfx .tile.hint .tile-inner { animation:none !important; }
+/* On CPU-only machines also drop the most expensive paint work entirely. */
+.lowgfx .tile-svg { filter:none !important; }
+.lowgfx .drift { display:none !important; }
+.lowgfx .board-wrap::before { display:none !important; }
+.lowgfx .stage-bg, .lowgfx .stage-bg::before { animation:none !important; transition:none !important; }
+
+/* TABLET / LARGE SCREENS — give the board real room. The old cap left it tiny
+   on iPads (especially landscape). Size it by available height so tiles are big
+   and clearly visible in both orientations, without overflowing. */
+@media (min-width:700px){
+  .board-wrap{ max-width:min(620px, calc(100vh - 200px)) !important; }
+}
 </style>
 </head>
 <body>
@@ -691,7 +702,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
     <div class="title-card">
       <div class="bigmark">X-RAY <span class="star">★</span> STAR<span class="mark-sub">Match to Stardom</span></div>
       <div class="title-tag">From basement dreamers to <em>superstars</em></div>
-      <button class="primary play-btn" onclick="Game.start()">▶ Play</button>
+      <button class="primary play-btn" onclick="this.closest('.titlescreen').style.display='none';Game.start()">▶ Play</button>
       <button class="title-newgame" onclick="newJourney(this)">⟲ New Game</button>
       <div class="links">
         <a class="link" href="https://open.spotify.com/artist/7kuG094aXgRmkgIOH9Tpdi" target="_blank" rel="noopener">🎵 Spotify</a>
@@ -830,6 +841,36 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
 
 <script>
 "use strict";
+/* =====================================================================
+   ADAPTIVE GRAPHICS — decide once, at load, whether this device has a real
+   graphics chip. If not (CPU-only / software rendering, like an old PC with
+   no working GPU driver), flag <html> as .lowgfx so the heavy continuous
+   effects switch off and the game stays smooth. Everyone else gets full
+   sparkle. Manual override for testing: add ?lite or ?full to the URL.
+   ===================================================================== */
+(function () {
+  try {
+    var q = (location.search || '').toLowerCase();
+    var low;
+    if (q.indexOf('lite') > -1) low = true;
+    else if (q.indexOf('full') > -1) low = false;
+    else {
+      low = false;
+      var c = document.createElement('canvas');
+      var gl = c.getContext('webgl') || c.getContext('experimental-webgl');
+      if (!gl) { low = true; }
+      else {
+        var dbg = gl.getExtension('WEBGL_debug_renderer_info');
+        var r = dbg ? ('' + gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL)).toLowerCase() : '';
+        // these renderer names mean Chrome fell back to CPU rendering
+        if (/swiftshader|software|basic render|llvmpipe|microsoft basic|warp/.test(r)) low = true;
+      }
+    }
+    if (low) document.documentElement.classList.add('lowgfx');
+    window.__XRS_LOWGFX__ = !!low;
+  } catch (e) { /* if detection fails, default to full sparkle */ }
+})();
+
 /* =====================================================================
    ENGINE — pure data model + synchronous resolve + render-from-data
    (IDENTICAL to the proven Phase 1 core — logic untouched.)
@@ -1065,7 +1106,7 @@ const SVG = {
 
 const Game = {
   board: [], level: 1, score: 0, moves: 25, target: 14000, combo: 0,
-  busy: false, selected: null, ended: false,
+  busy: false, selected: null, ended: false, atTitle: true,
 };
 
 const rc = i => [Math.floor(i / SIZE), i % SIZE];
@@ -1661,6 +1702,13 @@ function startHintLoop() {
     // finished board, and hand control back. The game can never stay frozen.
     const ov = document.getElementById('overlay');
     const overlayShown = ov && ov.classList.contains('show');
+    // SELF-HEAL: once the player has left the title screen, it must never sit on top again.
+    // If anything ever leaves it visible, force it back down. (This kills the whole class of
+    // "title curtain silently blocks every click" bugs, whatever the cause.)
+    if (!Game.atTitle) {
+      const t = document.getElementById('titleScreen');
+      if (t && getComputedStyle(t).display !== 'none') hideTitle();
+    }
     if (Game.busy && !Game.ended && !overlayShown) {
       if (++busyTicks >= 6) { busyTicks = 0; try { render(); } catch (_) {} Game.busy = false; clearHint(); try { checkEnd(); } catch (_) {} }
     } else busyTicks = 0;
@@ -2778,7 +2826,16 @@ Game.showHelp = function() { showTutorial(); };
 /* =====================================================================
    START — title screen → (first-time tutorial) → play
    ===================================================================== */
-function hideTitle() { const t = document.getElementById('titleScreen'); if (t) t.classList.add('hide'); }
+function hideTitle() {
+  const t = document.getElementById('titleScreen');
+  if (t) { t.classList.add('hide'); t.style.display = 'none'; t.style.pointerEvents = 'none'; }
+  Game.atTitle = false;
+}
+function showTitle() {
+  const t = document.getElementById('titleScreen');
+  if (t) { t.classList.remove('hide'); t.style.display = ''; t.style.pointerEvents = ''; }
+  Game.atTitle = true;
+}
 Game.start = function() {
   hideTitle();                                 // lift the title curtain FIRST — before anything that could error
   Sfx.enable();
@@ -2895,7 +2952,7 @@ function showMap() {
   hideOverlay();
   document.getElementById('bandScreen').classList.remove('show');
   document.getElementById('bsideScreen').classList.remove('show');
-  document.getElementById('titleScreen').classList.add('hide');
+  hideTitle();
   buildMap();
   document.getElementById('mapScreen').classList.add('show');
   const btn = document.getElementById('bsideBtn');
@@ -2903,7 +2960,7 @@ function showMap() {
   if (Game.pendingBside) { Game.pendingBside = false; setTimeout(bsideToast, 360); }
 }
 function hideMap() { document.getElementById('mapScreen').classList.remove('show'); }
-function backToTitle() { hideMap(); document.getElementById('bandScreen').classList.remove('show'); document.getElementById('titleScreen').classList.remove('hide'); }
+function backToTitle() { hideMap(); document.getElementById('bandScreen').classList.remove('show'); showTitle(); }
 
 let _resetArm = 0;
 function newJourney(btn) {
@@ -3058,7 +3115,7 @@ function buyLifestyle(key) {
 }
 function showBand() {
   hideOverlay();
-  document.getElementById('titleScreen').classList.add('hide');
+  hideTitle();
   buildBand();
   document.getElementById('bandScreen').classList.add('show');
 }
@@ -3078,7 +3135,7 @@ function buildBsides() {
 }
 function showBsides() {
   hideOverlay();
-  document.getElementById('titleScreen').classList.add('hide');
+  hideTitle();
   document.getElementById('mapScreen').classList.remove('show');
   Save.markBsidesSeen();
   const btn = document.getElementById('bsideBtn'); if (btn) btn.classList.remove('has-new');
