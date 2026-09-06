@@ -107,6 +107,19 @@ body.v-arena .stage-bg{background:
 .cell .lab{font-family:var(--mono); font-size:.5rem; letter-spacing:.14em; text-transform:uppercase; color:var(--cream-low);}
 .cell .val{font-family:var(--serif); font-size:1.15rem; font-weight:700; color:var(--gold); margin-top:1px;}
 .cell .val.plain{color:var(--cream);}
+/* LOW MOVES — amber and a slow breath. Opacity only: no flashing, no color cycling. */
+.cell .val.low{color:#ffb347; animation:low-breathe 1.8s ease-in-out infinite;}
+@keyframes low-breathe{0%,100%{opacity:1;}50%{opacity:.72;}}
+/* NEAR MISS — on a loss, say exactly how close it was */
+.near-miss{font-family:var(--serif); font-weight:700; font-size:1rem; color:#ffb347; margin-top:8px;}
+.near-miss.close{color:var(--gold-hi);}
+/* THE BOW — a 3-star set earns a bow from the whole band on the win card */
+.bow-row{display:flex; justify-content:center; gap:4px; margin:2px 0 8px;}
+.bow-row .bow-m{display:inline-block; width:54px; height:54px; animation:bow .9s var(--bounce) both;}
+.bow-row .bow-m svg{width:100%; height:100%; display:block;}
+@keyframes bow{0%{opacity:0; transform:translateY(14px);}55%{opacity:1; transform:translateY(-5px) rotate(-7deg);}100%{opacity:1; transform:translateY(0) rotate(0);}}
+@media (prefers-reduced-motion:reduce){ .cell .val.low{animation:none;} .bow-row .bow-m{animation:none; opacity:1;} }
+.lowgfx .cell .val.low{animation:none !important;}
 
 /* ===== Objective bar ===== */
 .bar-wrap{width:100%; margin-bottom:12px;}
@@ -161,6 +174,9 @@ body.v-arena .stage-bg{background:
   box-shadow:inset 0 1px 0 rgba(255,240,200,.08), 0 0 0 2px var(--gold), 0 10px 24px -6px rgba(201,161,74,.5);
   transform:scale(1.05);}
 @media (hover:hover){ .tile:hover .tile-inner{border-color:var(--gold-deep); transform:translateY(-2px) scale(1.02);} }
+/* SWAP HINT — neighbours that would actually make a move get a soft gold rim (no motion at all) */
+.tile.can .tile-inner{border-color:rgba(255,224,138,.75);
+  box-shadow:inset 0 1px 0 rgba(255,240,200,.10), inset 0 0 14px rgba(255,224,138,.16), 0 0 0 1px rgba(255,224,138,.4);}
 
 /* clear + drop animate the INNER (scale/translate), leaving grid position alone */
 .tile.pop .tile-inner{animation:pop .3s var(--ease) forwards;}
@@ -231,7 +247,12 @@ button.primary{background:linear-gradient(160deg,var(--gold),var(--gold-deep)); 
 /* ===== WIN / LOSE OVERLAY ===== */
 .overlay{position:fixed; inset:0; z-index:50; display:none; align-items:center; justify-content:center; padding:24px;
   overflow-y:auto;   /* short desktop windows: scroll the popup instead of clipping its buttons off the bottom */
-  background:radial-gradient(ellipse at center, rgba(26,18,38,.86), rgba(13,10,20,.94)); backdrop-filter:blur(3px);}
+  /* PERFORMANCE: this used to carry `backdrop-filter:blur(3px)`. A full-screen backdrop blur has
+     to be recomputed EVERY FRAME for whatever sits behind it — and when this card appears, that's
+     42 falling confetti, the drifting motes and the board's special tiles, all animating at once.
+     That is what locked the tab up the moment a set was won. The gradient is slightly deepened to
+     keep the same "the room dims" feel, with no per-frame cost at all. */
+  background:radial-gradient(ellipse at center, rgba(26,18,38,.93), rgba(13,10,20,.97));}
 .overlay.show{display:flex;}
 .panel{position:relative; width:100%; max-width:360px; text-align:center;
   max-height:calc(100vh - 32px); overflow-y:auto;   /* never taller than the window — buttons always reachable */
@@ -252,7 +273,7 @@ button.primary{background:linear-gradient(160deg,var(--gold),var(--gold-deep)); 
 @media (prefers-reduced-motion:reduce){ .panel,.star-big.slam{animation:none;} .star-big{transform:scale(1);} }
 
 /* gentle confetti (falls + rotates, never flashes) */
-.confetti{position:fixed; top:-12px; width:9px; height:14px; border-radius:2px; z-index:49; pointer-events:none; opacity:.9;}
+.confetti{position:fixed; top:-12px; width:9px; height:14px; border-radius:2px; z-index:51; pointer-events:none; opacity:.9;}
 @keyframes confetti-fall{0%{transform:translateY(-20px) rotate(0);}100%{transform:translateY(102vh) rotate(540deg);}}
 
 /* ===== JUICE (all decoration — engine never depends on it) ===== */
@@ -369,6 +390,12 @@ button.primary{background:linear-gradient(160deg,var(--gold),var(--gold-deep)); 
 .bc-zoom{position:absolute; right:6px; bottom:6px; font-size:.7rem; color:var(--cream); background:rgba(16,16,30,.6); border-radius:6px; padding:1px 4px; line-height:1; opacity:.7;}
 .zoom-panel{text-align:center;}
 #zoomCard{z-index:100;}   /* must sit above the Band screen (80) and its back bar (90) */
+#backupCard{z-index:100;}
+.backup-lab{font-family:var(--mono); font-size:.6rem; letter-spacing:.16em; text-transform:uppercase; color:var(--gold-warm); text-align:left; margin:12px 0 5px;}
+.backup-ta{width:100%; min-height:72px; font-family:var(--mono); font-size:.66rem; line-height:1.45; background:var(--surface-low); color:var(--cream);
+  border:1px solid var(--line); border-radius:10px; padding:8px; resize:vertical; word-break:break-all;}
+.backup-status{font-size:.78rem; color:#ffb347; min-height:1.2em; margin:8px 0 4px;}
+.backup-help{font-size:.8rem; color:var(--cream-mute); line-height:1.45; margin-bottom:6px;}
 .zoom-portrait{width:min(72vw,280px); height:min(72vw,280px); margin:4px auto 14px; background:radial-gradient(circle at 50% 40%, rgba(255,255,255,.06), transparent 70%); border-radius:18px;}
 .zoom-portrait svg{width:100%; height:100%; display:block;}
 .zoom-name{font-family:var(--serif); font-weight:700; font-size:1.25rem; color:var(--gold-hi); margin-bottom:8px;}
@@ -491,7 +518,7 @@ button.arm{border-color:var(--gold-hi) !important; color:var(--gold-hi) !importa
 .j-foot{display:flex; gap:10px; justify-content:center; margin-top:26px; flex-wrap:wrap;}
 .band-topbar{position:fixed; top:0; left:0; right:0; z-index:90; display:flex; align-items:center; justify-content:space-between; gap:12px;
   padding:12px 16px; background:linear-gradient(180deg, var(--bg-deep) 76%, rgba(20,16,28,0));
-  backdrop-filter:blur(5px); -webkit-backdrop-filter:blur(5px);}
+  /* same reason as .overlay above — a blurred bar re-blurs its backdrop every frame */}
 .band-topbar .j-coins{margin:0;}
 .bandscreen .band-inner{padding-top:46px;}   /* clear the fixed back bar */
 .band-back-btn{font-family:var(--serif); font-weight:700; font-size:.95rem; color:#10131c; background:linear-gradient(160deg,var(--gold-hi),var(--gold));
@@ -522,6 +549,15 @@ button.arm{border-color:var(--gold-hi) !important; color:var(--gold-hi) !importa
 .j-node.current .j-dot{cursor:pointer; color:var(--gold-hi); border-color:var(--gold-hi);
   box-shadow:0 0 0 0 rgba(255,224,138,.6); animation:node-pulse 1.8s ease-in-out infinite;}
 @keyframes node-pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,224,138,.5);}50%{box-shadow:0 0 0 8px rgba(255,224,138,0);}}
+/* PATH REVEAL — a freshly unlocked set draws its connector, then the node pops in */
+.j-node.reveal .j-connect{transform-origin:top; animation:connect-grow .5s var(--ease) both;}
+.j-node.reveal .j-dot{animation:node-reveal .65s var(--bounce) .35s both, node-pulse 1.8s ease-in-out 1s infinite;}
+.j-node.reveal .j-meta{animation:meta-in .5s var(--ease) .6s both;}
+@keyframes connect-grow{0%{transform:scaleY(0);}100%{transform:scaleY(1);}}
+@keyframes node-reveal{0%{transform:scale(0) rotate(-20deg); opacity:0;}70%{transform:scale(1.18) rotate(4deg); opacity:1;}100%{transform:scale(1) rotate(0); opacity:1;}}
+@keyframes meta-in{0%{opacity:0; transform:translateY(6px);}100%{opacity:1; transform:translateY(0);}}
+@media (prefers-reduced-motion:reduce){ .j-node.reveal .j-connect,.j-node.reveal .j-dot,.j-node.reveal .j-meta{animation:none;} }
+.lowgfx .j-node.reveal .j-connect,.lowgfx .j-node.reveal .j-dot,.lowgfx .j-node.reveal .j-meta{animation:none !important;}
 .j-stars{font-size:.62rem; letter-spacing:1px; margin-top:3px; height:.8em;}
 .j-stars .on{color:var(--gold-hi);} .j-stars .off{color:var(--surface-hi);}
 .j-lock{font-size:.9rem; opacity:.7;}
@@ -578,9 +614,24 @@ button.arm{border-color:var(--gold-hi) !important; color:var(--gold-hi) !importa
 /* ===== specials feel like treasure: a slow idle halo + a forge pop ===== */
 .tile-inner.amp, .tile-inner.pyro, .tile-inner.rockstar{
   box-shadow:inset 0 1px 0 rgba(255,255,255,.25), 0 0 0 1.5px rgba(255,240,200,.5), 0 6px 18px -6px rgba(255,224,138,.6);
-  animation:treasure-halo 2.4s ease-in-out infinite;}
-@keyframes treasure-halo{0%,100%{filter:drop-shadow(0 0 2px rgba(255,224,138,.35));}50%{filter:drop-shadow(0 0 8px rgba(255,224,138,.85));}}
+  /* PERFORMANCE: this used to run `animation:treasure-halo` — an infinite `filter:drop-shadow`
+     pulse on EVERY special tile. Animating `filter` forces a full main-thread repaint each frame,
+     and .tile-inner wraps an SVG that already carries two static drop-shadow filters, so every
+     frame re-rendered a nested filter chain. With 10+ specials on the board (retries and band
+     upgrades push it there) that pegged the main thread and locked the tab up solid.
+     The glow is now a STATIC drop-shadow: visually near-identical, costs nothing per frame. */
+  filter:drop-shadow(0 0 5px rgba(255,224,138,.6));}
 .tile.spawned{z-index:8;}
+/* CALM MODE — set by calmBoard() when the board is crowded with specials. Kills the per-frame
+   repaints (box-shadow pulses, the rotating conic gradient, the amp sweep) while leaving all
+   the static colour and shape intact, so a busy board still reads clearly but stops thrashing. */
+.board.calm .tile-inner.pyro,
+.board.calm .tile-inner.rockstar,
+.board.calm .tile-inner.bassdrop,
+.board.calm .tile-inner.amp{animation:none !important;}
+.board.calm .tile-inner.rockstar::before,
+.board.calm .tile-inner.amp::before{animation:none !important;}
+.board.calm .tile-svg{filter:none !important;}
 .tile.spawned .tile-inner{animation:spawn-pop .56s var(--bounce);}
 @keyframes spawn-pop{0%{transform:scale(.4) rotate(-12deg); filter:brightness(2.2);}55%{transform:scale(1.22) rotate(4deg); filter:brightness(1.5);}100%{transform:scale(1.03); filter:brightness(1);}}
 .float-label{position:fixed; transform:translate(-50%,-50%); z-index:120; pointer-events:none;
@@ -647,6 +698,15 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
 .lowgfx .tile.hint .tile-inner { animation:none !important; transform:scale(1.05) !important; box-shadow:0 0 0 2px var(--gold-hi), 0 0 14px 2px rgba(255,224,138,.6) !important; }
 /* On CPU-only machines also drop the most expensive paint work entirely. */
 .lowgfx .tile-svg { filter:none !important; }
+/* `mix-blend-mode` forces the browser to build a separate compositing layer and re-blend it
+   whenever anything nearby repaints. With 36 of these on the board, a single animating glow
+   could trigger a full-board re-composite every frame. The gloss is a subtle shine, so on a
+   struggling machine it is the first thing to go. */
+.lowgfx .gloss { display:none !important; }
+.lowgfx .tile-inner { box-shadow:none !important; }
+.lowgfx .board-wrap { box-shadow:none !important; }
+.lowgfx .overlay { background:rgba(13,10,20,.96) !important; }
+.lowgfx .confetti { display:none !important; }
 .lowgfx .drift { display:none !important; }
 .lowgfx .board-wrap::before { display:none !important; }
 .lowgfx .stage-bg, .lowgfx .stage-bg::before { animation:none !important; transition:none !important; }
@@ -695,7 +755,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
     <div class="controls">
       <button onclick="showMap()">☰ Menu</button>
       <button class="band-cta" onclick="showBand()">★ The Band</button>
-      <button onclick="Game.newGame()">↻ Replay</button>
+      <button onclick="confirmReplay(this)">↻ Replay</button>
     </div>
   </div>
 
@@ -744,6 +804,22 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
     </div>
   </div>
 
+  <!-- BACKUP CODE — progress as text, so it survives a browser wipe and moves between devices -->
+  <div class="overlay" id="backupCard" onclick="if(event.target.id==='backupCard')hideBackup()">
+    <div class="panel">
+      <div class="eyebrow">Your progress</div>
+      <h3>Backup code</h3>
+      <div class="backup-help">Copy this code somewhere safe — a note to yourself, or a text. Paste it back in on any phone or computer to pick up right where you left off.</div>
+      <div class="backup-lab">Your code</div>
+      <textarea class="backup-ta" id="backupOut" readonly></textarea>
+      <div class="row" style="margin-top:8px"><button class="primary" onclick="copyBackup(this)">Copy code</button></div>
+      <div class="backup-lab">Restore from a code</div>
+      <textarea class="backup-ta" id="backupIn" placeholder="Paste a code here"></textarea>
+      <div class="backup-status" id="backupStatus"></div>
+      <div class="row"><button onclick="restoreBackup()">Restore</button><button class="relic-close" style="width:auto" onclick="hideBackup()">Close ★</button></div>
+    </div>
+  </div>
+
   <!-- ONE-TIME relic drop: the Plasma Cathedral merch Easter egg, fired at the rename -->
   <div class="overlay" id="relicCard" onclick="if(event.target.id==='relicCard')hideRelic()">
     <div class="panel relic-panel">
@@ -789,6 +865,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
       <div class="j-foot j-menu">
         <button class="primary band-cta" onclick="showBand()">★ The Band</button>
         <button onclick="showBsides()" id="bsideBtn">♫ B-Sides</button>
+        <button onclick="showBackup()">⇅ Backup</button>
         <button onclick="newJourney(this)">⟲ New Game</button>
         <button onclick="backToTitle()">Title</button>
       </div>
@@ -857,33 +934,68 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
 <script>
 "use strict";
 /* =====================================================================
-   ADAPTIVE GRAPHICS — decide once, at load, whether this device has a real
-   graphics chip. If not (CPU-only / software rendering, like an old PC with
-   no working GPU driver), flag <html> as .lowgfx so the heavy continuous
-   effects switch off and the game stays smooth. Everyone else gets full
-   sparkle. Manual override for testing: add ?lite or ?full to the URL.
+   ADAPTIVE GRAPHICS — start LEAN, then earn the sparkle.
+
+   Earlier versions did this backwards: assume the machine is capable, hand it
+   every effect, and switch things off if it struggled. That can't work, because
+   when a page truly locks up the frame timer stops too — so the check meant to
+   catch trouble is itself frozen, and the first lock-up always lands. Worse, the
+   only test was "did Chrome fall back to software rendering?", which an old GPU
+   (or one forced on via chrome://flags) happily passes while being far too slow.
+
+   So the logic is inverted. Every machine starts in lite mode, which is fast
+   everywhere. We then measure the REAL frame rate for a few seconds, and only
+   turn the full effects on for machines that have demonstrably earned them.
+   Nobody can freeze on the way to finding out. The verdict is remembered, so a
+   capable machine gets full sparkle instantly on every later visit.
+
+   Overrides: ?full forces the effects on, ?lite pins it lean, and either clears
+   whatever was remembered.
    ===================================================================== */
 (function () {
-  try {
-    var q = (location.search || '').toLowerCase();
-    var low;
-    if (q.indexOf('lite') > -1) low = true;
-    else if (q.indexOf('full') > -1) low = false;
-    else {
-      low = false;
-      var c = document.createElement('canvas');
-      var gl = c.getContext('webgl') || c.getContext('experimental-webgl');
-      if (!gl) { low = true; }
-      else {
-        var dbg = gl.getExtension('WEBGL_debug_renderer_info');
-        var r = dbg ? ('' + gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL)).toLowerCase() : '';
-        // these renderer names mean Chrome fell back to CPU rendering
-        if (/swiftshader|software|basic render|llvmpipe|microsoft basic|warp/.test(r)) low = true;
+  var html = document.documentElement;
+  var setLean = function (on) {
+    if (on) html.classList.add('lowgfx'); else html.classList.remove('lowgfx');
+    window.__XRS_LOWGFX__ = !!on;
+  };
+  var remember = function (v) { try { localStorage.setItem('xrs_gfx', v); } catch (_) {} };
+
+  setLean(true);   // ALWAYS start safe — nothing heavy runs until it's been earned
+
+  var q = '';
+  try { q = (location.search || '').toLowerCase(); } catch (_) {}
+  if (q.indexOf('full') > -1) { setLean(false); remember('full'); return; }
+  if (q.indexOf('lite') > -1) { remember('lite'); return; }
+
+  var saved = null;
+  try { saved = localStorage.getItem('xrs_gfx'); } catch (_) {}
+  if (saved === 'lite') return;                    // known to struggle — stay lean, don't re-test
+  if (saved === 'full') { setLean(false); return; } // known good — full sparkle immediately
+
+  // First visit: watch the real frame rate and decide.
+  if (!window.requestAnimationFrame) return;       // no way to measure — stay safe
+  var frames = 0, mark = 0, last = 0, goodRuns = 0;
+  var tick = function (ts) {
+    if (!mark) { mark = ts; last = ts; requestAnimationFrame(tick); return; }
+    var gap = ts - last; last = ts;
+    // any real stall settles it immediately — this machine stays lean for good
+    if (!document.hidden && gap > 400) { remember('lite'); return; }
+    frames++;
+    var dt = ts - mark;
+    if (dt >= 1000) {
+      var fps = frames * 1000 / dt;
+      if (document.hidden) { frames = 0; mark = ts; requestAnimationFrame(tick); return; }
+      if (fps >= 50) goodRuns++; else { remember('lite'); return; }
+      if (goodRuns >= 3) {                         // 3 solid seconds = it has earned the sparkle
+        setLean(false); remember('full');
+        try { console.log('X-Ray Star: hardware looks strong — full effects enabled.'); } catch (_) {}
+        return;
       }
+      frames = 0; mark = ts;
     }
-    if (low) document.documentElement.classList.add('lowgfx');
-    window.__XRS_LOWGFX__ = !!low;
-  } catch (e) { /* if detection fails, default to full sparkle */ }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
 })();
 
 /* =====================================================================
@@ -903,7 +1015,7 @@ const LEVELS = [
   {s:1,n:13,m:22,t:29000},{s:1,n:14,m:22,t:31000},{s:1,n:15,m:24,t:34000},
   {s:2,n:16,m:24,t:36000},{s:2,n:17,m:24,t:39000},{s:2,n:18,m:22,t:42000},{s:2,n:19,m:22,t:45000},
   {s:2,n:20,m:22,t:48000},{s:2,n:21,m:24,t:52000},{s:2,n:22,m:22,t:56000},{s:2,n:23,m:22,t:60000},
-  {s:2,n:24,m:24,t:58000},{s:2,n:25,m:26,t:60000},{s:2,n:26,m:24,t:66000},{s:2,n:27,m:24,t:70000},
+  {s:2,n:24,m:24,t:62000},{s:2,n:25,m:26,t:64000},{s:2,n:26,m:24,t:68000},{s:2,n:27,m:24,t:72000},
   {s:2,n:28,m:24,t:76000},{s:2,n:29,m:24,t:82000},{s:2,n:30,m:28,t:88000}
 ];
 const STAGE_NAME = {1:'Basement Dreamers', 2:'Coffee Shop Circuit'};
@@ -1122,6 +1234,10 @@ const SVG = {
 const Game = {
   board: [], level: 1, score: 0, moves: 25, target: 14000, combo: 0,
   busy: false, selected: null, ended: false, atTitle: true,
+  // Phase 2B state: startMoves/movesAtWin drive stars on collect & case sets,
+  // lowWarned fires the five-moves heads-up once, resultShown guarantees one result
+  // card per set, justUnlocked tells the map which node to draw in.
+  startMoves: 25, movesAtWin: 0, lowWarned: false, resultShown: false, justUnlocked: 0,
 };
 
 const rc = i => [Math.floor(i / SIZE), i % SIZE];
@@ -1430,7 +1546,18 @@ function fireComboAndResolve(ia, ib) {
    ===================================================================== */
 const boardEl = document.getElementById('board');
 
+/* PERFORMANCE — this used to rewrite innerHTML for EVERY tile on EVERY render. Each instrument
+   is ~1.5KB of SVG with gradients and filters, so a full repaint tore down and rebuilt roughly
+   1,400 DOM nodes (~59KB of markup). render() runs on every clear, spawn and settle step, so a
+   cascade did that many times a second, continuously — which is what pegged the main thread and
+   froze the tab mid-encore.
+   A tile's artwork only depends on its type, special and direction, so we stamp that signature on
+   the element and skip the rebuild when nothing has actually changed. In a typical cascade most
+   tiles are untouched, so the DOM churn drops by roughly 90%. Identical output, far less work. */
 function paintTile(inner, t) {
+  const sig = !t ? 'empty' : t.crate ? 'crate' : (t.type + '|' + (t.special || '') + '|' + (t.dir || ''));
+  if (inner._sig === sig) return;          // already showing exactly this — nothing to redraw
+  inner._sig = sig;
   if (!t) { inner.className = 'tile-inner'; inner.removeAttribute('data-type'); inner.innerHTML = ''; return; }
   if (t.crate) { inner.className = 'tile-inner crate'; inner.setAttribute('data-type', 'crate'); inner.innerHTML = CRATE_SVG; return; }
   let cls = 'tile-inner';
@@ -1470,17 +1597,36 @@ function render() {
   for (let i = 0; i < CELLS; i++) {
     const el = tiles[i];
     if (!el) continue;
-    el.className = 'tile';                 // drop pop/drop/sel from the positioner
+    el.className = 'tile';                 // drop pop/drop/sel/can from the positioner
     let inner = el.firstChild;
     if (!inner) { inner = document.createElement('div'); el.appendChild(inner); }
     paintTile(inner, Game.board[i]);
   }
+  calmBoard();
   updateHUD();
+}
+/* PERFORMANCE GOVERNOR — each special tile runs an infinite box-shadow glow, which repaints on
+   the main thread. One or two is lovely; ten at once (which retries and band upgrades routinely
+   produce) is enough to stall a weak renderer. Past a threshold we switch the glows off and keep
+   the static styling, so a board full of specials stays smooth. Purely cosmetic — the specials
+   still look and behave exactly the same, they just stop pulsing. */
+const CALM_AT = 5;
+function calmBoard() {
+  let n = 0;
+  for (let i = 0; i < CELLS; i++) if (Game.board[i] && Game.board[i].special) n++;
+  // While a full-screen card is up, the board is behind it and completely irrelevant —
+  // there is no reason to keep repainting it, so calm it regardless of the special count.
+  const ov = document.getElementById('overlay');
+  const modalUp = !!(ov && ov.classList.contains('show'));
+  if (boardEl) boardEl.classList.toggle('calm', modalUp || n >= CALM_AT);
 }
 
 function updateHUD() {
   document.getElementById('hScore').textContent = Game.score.toLocaleString();
-  document.getElementById('hMoves').textContent = Game.moves;
+  const mv = document.getElementById('hMoves');
+  mv.textContent = Game.moves;
+  // LOW MOVES — the counter warms to amber and breathes slowly (opacity only, never a flash)
+  mv.classList.toggle('low', !Game.ended && Game.moves > 0 && Game.moves <= 5 && !objectiveMet());
   document.getElementById('hCombo').textContent = Game.combo;
   const o = levelObj();
   const tgt = document.getElementById('hTarget'), lab = document.getElementById('hTargetLab');
@@ -1557,10 +1703,23 @@ function celebrateSpecial(cell, type, dropped) {
   if (Sfx.spawnSpecial) Sfx.spawnSpecial(type);
 }
 const SPARK_TINT = { guitar: '#ff7a5c', drums: '#3fd0b8', mic: '#7db4ff', piano: '#a78bfa', sax: '#ffd86b', bass: '#5fe0a0' };
+/* PARTICLE BUDGET — a hard ceiling on how many animated particles can be alive at once.
+   Every one of these is an element with an animated box-shadow, which is expensive to
+   composite. A big encore could previously stack over a thousand of them and lock the tab
+   up solid ("Page Unresponsive"). The budget makes that impossible: once we're at the cap,
+   further particles are simply skipped. Purely cosmetic — no game logic depends on them. */
+let _fxLive = 0;
+const FX_BUDGET = () => (window.__XRS_LOWGFX__ ? 90 : 260);
+function fxSpawn(el, ttl) {
+  _fxLive++;
+  document.body.appendChild(el);
+  setTimeout(() => { el.remove(); _fxLive = Math.max(0, _fxLive - 1); }, ttl);
+}
 function spawnSparks(cells, tint) {
   if (reducedMotion()) return;
   const sample = cells.length > 10 ? cells.filter((_, k) => k % 2 === 0) : cells;
   for (const c of sample) {
+    if (_fxLive >= FX_BUDGET()) return;
     const p = cellCenter(c); if (!p) continue;
     const color = tint || (Game.board[c] && SPARK_TINT[Game.board[c].type]) || '#ffe08a';
     for (let s = 0; s < 3; s++) {
@@ -1570,8 +1729,7 @@ function spawnSparks(cells, tint) {
       sp.style.left = p.x + 'px'; sp.style.top = p.y + 'px'; sp.style.color = color;
       sp.style.setProperty('--dx', (Math.cos(ang) * dist).toFixed(1) + 'px');
       sp.style.setProperty('--dy', (Math.sin(ang) * dist).toFixed(1) + 'px');
-      document.body.appendChild(sp);
-      setTimeout(() => sp.remove(), 560);
+      fxSpawn(sp, 560);
     }
   }
 }
@@ -1579,7 +1737,9 @@ const FW_COLORS = ['#ffd34d', '#ff7a3c', '#ff4d8a', '#4dd2ff', '#b388ff', '#ffff
 function fireworks(cell, opts) {
   if (reducedMotion()) return;
   const p = cellCenter(cell); if (!p) return;
-  const o = opts || {}, n = o.count || 18, reach = o.reach || 60, cols = o.colors || FW_COLORS;
+  const o = opts || {}, reach = o.reach || 60, cols = o.colors || FW_COLORS;
+  // trim the burst to whatever budget is left rather than blowing straight past it
+  const n = Math.max(0, Math.min(o.count || 18, FX_BUDGET() - _fxLive));
   for (let i = 0; i < n; i++) {
     const fw = document.createElement('div'); fw.className = 'fw';
     const ang = Math.PI * 2 * (i / n) + Math.random() * 0.35;
@@ -1591,8 +1751,7 @@ function fireworks(cell, opts) {
     fw.style.setProperty('--dy', (Math.sin(ang) * dist).toFixed(1) + 'px');
     fw.style.setProperty('--g', (30 + Math.random() * 45).toFixed(0) + 'px');
     fw.style.setProperty('--d', (0.7 + Math.random() * 0.45).toFixed(2) + 's');
-    document.body.appendChild(fw);
-    setTimeout(() => fw.remove(), 1300);
+    fxSpawn(fw, 1300);
   }
 }
 function shakeBoard() {
@@ -1618,7 +1777,7 @@ let _lastPulse = 0;
 function screenPulse() {
   if (!screenPulseEl || reducedMotion()) return;
   const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-  if (now - _lastPulse < 520) return;   // cooldown: at most ~2/sec, never a flicker rate
+  if (now - _lastPulse < 1000) return;   // PHOTOSENSITIVITY: at most ONE soft swell per second, even in a long encore
   _lastPulse = now;
   screenPulseEl.classList.remove('go'); void screenPulseEl.offsetWidth; screenPulseEl.classList.add('go');
 }
@@ -1709,7 +1868,10 @@ function showHintNow() {
 function startHintLoop() {
   if (hintStarted) return;
   hintStarted = true;
-  let busyTicks = 0;
+  let busyTicks = 0, endTicks = 0;
+  const hubShown = () => ['mapScreen','bandScreen','bsideScreen'].some(id => {
+    const el = document.getElementById(id); return el && el.classList.contains('show');
+  });
   setInterval(() => {
     // WATCHDOG: after a move the board data is already in its final state (the engine
     // resolves synchronously; the slides are just decoration). So if 'busy' ever sticks
@@ -1727,6 +1889,12 @@ function startHintLoop() {
     if (Game.busy && !Game.ended && !overlayShown) {
       if (++busyTicks >= 6) { busyTicks = 0; try { render(); } catch (_) {} Game.busy = false; clearHint(); try { checkEnd(); } catch (_) {} }
     } else busyTicks = 0;
+    // ENCORE WATCHDOG: the set is over but the result card never arrived — a stalled encore on a
+    // slow machine. The normal watchdog above skips this case (it ignores anything with ended=true),
+    // so after ~10s we cut the fireworks short and show the result rather than strand the player.
+    if (Game.ended && Game.busy && !overlayShown && !Game.atTitle && !hubShown() && !Game.resultShown) {
+      if (++endTicks >= 10) { endTicks = 0; try { Game.moves = 0; showOverlay(objectiveMet()); } catch (_) {} }
+    } else endTicks = 0;
     if (!inPlay()) { hintIdle = 0; return; }
     if (hintCells.length) return;
     if (++hintIdle >= HINT_SECONDS) showHintNow();
@@ -1788,14 +1956,31 @@ function playSteps(steps, done) {
 const SWIPE_MIN = 14;
 let ptr = null;
 function tileAt(x, y) { const el = document.elementFromPoint(x, y); const tile = el && el.closest && el.closest('.tile'); if (!tile || !boardEl.contains(tile)) return null; return +tile.dataset.i; }
-function clearSel() { if (Game.selected != null) { const el = boardEl.children[Game.selected]; if (el) el.classList.remove('sel'); Game.selected = null; } }
+// SWAP HINT — when a tile is picked, softly rim the neighbours that would actually do something.
+// Teaches beginners without a tutorial, and stops wasted moves.
+let candCells = [];
+function clearCandidates() { candCells.forEach(j => { const el = boardEl.children[j]; if (el) el.classList.remove('can'); }); candCells = []; }
+function markCandidates(i) {
+  clearCandidates();
+  const me = Game.board[i]; if (!me) return;
+  const [r, c] = rc(i);
+  [[r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]].forEach(([nr, nc]) => {
+    if (nr < 0 || nc < 0 || nr >= SIZE || nc >= SIZE) return;
+    const j = idx(nr, nc), tj = Game.board[j];
+    if (!tj || tj.crate) return;
+    if (isSpecial(me) || isSpecial(tj) || swapMakesMatch(Game.board, i, j)) {
+      const el = boardEl.children[j]; if (el) { el.classList.add('can'); candCells.push(j); }
+    }
+  });
+}
+function clearSel() { clearCandidates(); if (Game.selected != null) { const el = boardEl.children[Game.selected]; if (el) el.classList.remove('sel'); Game.selected = null; } }
 function onTap(i) {
   if (Game.busy) return;
   if (Game.board[i] && Game.board[i].crate) { clearSel(); return; }   // can't pick up a road case
-  if (Game.selected == null) { Game.selected = i; boardEl.children[i].classList.add('sel'); }
+  if (Game.selected == null) { Game.selected = i; boardEl.children[i].classList.add('sel'); markCandidates(i); }
   else if (Game.selected === i) { clearSel(); }
   else if (isAdjacent(Game.selected, i)) { const a = Game.selected; clearSel(); attemptSwap(a, i); }
-  else { clearSel(); Game.selected = i; boardEl.children[i].classList.add('sel'); }
+  else { clearSel(); Game.selected = i; boardEl.children[i].classList.add('sel'); markCandidates(i); }
 }
 function onSwipe(i, dx, dy) {
   if (Game.busy) return;
@@ -1877,9 +2062,12 @@ function attemptSwap(a, b) {
     playSteps(steps, () => { render(); Game.busy = false; afterPlayerMove(); });
   });
 }
+// which special fires when one is swapped with a plain tile (or a lesser special)?
+// PHASE 2B FIX: Bass Drop was missing from this ranking, so swiping a Bass Drop into a plain
+// tile scored it 0, picked the plain tile, and fired nothing — while still spending the move.
 function chooseSpecial(a, b) {
   const ta = Game.board[a], tb = Game.board[b];
-  const rank = sp => sp === 'rockstar' ? 3 : sp === 'pyro' ? 2 : sp === 'amp' ? 1 : 0;
+  const rank = sp => sp === 'rockstar' ? 4 : sp === 'bassdrop' ? 3 : sp === 'pyro' ? 2 : sp === 'amp' ? 1 : 0;
   const ra = isSpecial(ta) ? rank(ta.special) : 0;
   const rb = isSpecial(tb) ? rank(tb.special) : 0;
   if (ra >= rb && ra > 0) return { idx: a, swappedWithType: tb ? tb.type : null };
@@ -1903,12 +2091,25 @@ function starsFor(score, target) {
   if (score >= target) return 1;
   return 0;
 }
+// PHASE 2B: collect / road-case sets end the moment the goal is met — usually well under the
+// score target — so they were stuck at 1 star no matter how well you played. Those 12 sets are
+// now rated on how many moves you had left instead, which is what "played it well" means there.
+function starsForLevel(lv) {
+  if (levelObj(lv).k === 'score') return starsFor(Game.score, Game.target);
+  const ratio = (Game.movesAtWin || 0) / Math.max(1, Game.startMoves || lv.m);
+  return ratio >= 0.35 ? 3 : ratio >= 0.15 ? 2 : 1;
+}
 
 function checkEnd() {
   updateHUD();
   if (Game.ended) return;
   if (objectiveMet()) { endLevel(); return; }               // goal reached (score / collect / cases)
   if (Game.moves <= 0) { endLevel(); return; }              // out of moves → set ends
+  if (Game.moves <= 5 && !Game.lowWarned) {                 // LOW MOVES — one gentle heads-up, once per set
+    Game.lowWarned = true;
+    setMsg('Five moves left — make them count ★');
+    if (Sfx.lowMoves) Sfx.lowMoves();
+  }
   if (!hasAnyMove(Game.board)) {
     clearHint();
     setMsg('No moves — fresh setlist! 🔀');
@@ -1936,6 +2137,7 @@ function endLevel() {
   Game.ended = true;
   Game.busy = true;
   const won = objectiveMet();
+  Game.movesAtWin = won ? Game.moves : 0;   // captured BEFORE the encore spends them — this drives stars on collect/case sets
   Game.failsByLevel = Game.failsByLevel || {};
   if (won) delete Game.failsByLevel[Game.level];                 // cleared it — reset the safety net
   else Game.failsByLevel[Game.level] = (Game.failsByLevel[Game.level] || 0) + 1;
@@ -1946,39 +2148,56 @@ function endLevel() {
 // ENCORE — leftover moves erupt into a cascade of detonations (the big finish)
 function runEncore(done) {
   setMsg('★   E N C O R E   ★');
-  let bursts = Math.min(Game.moves, 8);                 // up to 8 fired visibly
+  // fewer visible bursts on CPU-only machines — the leftovers are still banked, so the
+  // score is identical either way; only the fireworks budget changes.
+  let bursts = Math.min(Game.moves, window.__XRS_LOWGFX__ ? 4 : 8);
   const leftover = Game.moves - bursts;
   if (leftover > 0) Game.score += leftover * 400;       // bank the rest instantly
   const fireOne = () => {
-    Game.busy = true;
-    if (bursts <= 0 || Game.moves <= 0) { Game.moves = 0; updateHUD(); setTimeout(done, 350); return; }
-    bursts--; Game.moves--; updateHUD();
-    const cell = (Math.random() * CELLS) | 0;
-    const sp = ['amp', 'pyro', 'rockstar'][(Math.random() * 3) | 0];
-    const base = Game.board[cell];
-    Game.board[cell] = { type: base ? base.type : randType(), special: sp, dir: sp === 'amp' ? (Math.random() < 0.5 ? 'row' : 'col') : null };
-    render();
-    screenPulse(); blastFx(cell, sp, Game.board[cell].dir);   // sound plays in playSteps
-    const { steps } = fireAndResolve(cell, sp === 'rockstar' ? TYPES[(Math.random() * TYPES.length) | 0] : null);
-    playSteps(steps, () => setTimeout(fireOne, 160));
+    try {
+      Game.busy = true;
+      if (bursts <= 0 || Game.moves <= 0) { Game.moves = 0; updateHUD(); setTimeout(done, 350); return; }
+      bursts--; Game.moves--; updateHUD();
+      const cell = (Math.random() * CELLS) | 0;
+      // Only fire specials the player has actually unlocked. The encore used to roll
+      // rockstars at every level — including level 2, where they aren't earned yet — which
+      // both broke the progression and threw the game's heaviest effect 8 times in a row.
+      const pool = unlockedSpecials();
+      const sp = pool[(Math.random() * pool.length) | 0];
+      const base = Game.board[cell];
+      // never inherit a crate's type — that would quietly turn a road case into a special
+      Game.board[cell] = { type: (base && !base.crate) ? base.type : randType(), special: sp, dir: sp === 'amp' ? (Math.random() < 0.5 ? 'row' : 'col') : null };
+      render();
+      screenPulse(); blastFx(cell, sp, Game.board[cell].dir);   // sound plays in playSteps
+      const { steps } = fireAndResolve(cell, sp === 'rockstar' ? TYPES[(Math.random() * TYPES.length) | 0] : null);
+      playSteps(steps, () => setTimeout(fireOne, 160));
+    } catch (e) {
+      // if anything goes wrong in the fireworks, skip straight to the result card — never strand the player
+      try { render(); } catch (_) {}
+      Game.moves = 0; done();
+    }
   };
   setTimeout(fireOne, 450);
 }
 
 function showOverlay(won) {
+  if (Game.resultShown) return;   // exactly one result card per set
+  Game.resultShown = true;
   hideTitle();   // the popup must never sit under the title curtain (which would eat its buttons)
   const ov = document.getElementById('overlay');
   const lv = LEVELS[(Game.level - 1) % LEVELS.length];
-  const stars = won ? Math.max(1, starsFor(Game.score, Game.target)) : 0;
+  const stars = won ? Math.max(1, starsForLevel(lv)) : 0;
 
   // award coins + persist progress (reduced payout on replays so it's not farmable)
   let coins = 0;
   if (won) {
     const prevStars = Save.starsFor(lv.n);
     const prevBsides = Save.bsidesUnlocked();
+    const prevUnlocked = Save.data.unlocked;
     coins = coinsForWin(lv.n, stars, Game.score, Game.target);
     if (stars <= prevStars && Save.isUnlocked(lv.n + 1)) coins = Math.round(coins * 0.4);
     Save.recordWin(lv.n, stars, coins);
+    if (Save.data.unlocked > prevUnlocked) Game.justUnlocked = Save.data.unlocked;   // the map will draw the new node in
     if (Save.bsidesUnlocked() > prevBsides) Game.pendingBside = true;   // a new scrap was dug up
     updateCoinDisplays(true);
   }
@@ -1991,10 +2210,33 @@ function showOverlay(won) {
   let _objLine = '';
   if (won && _o.k === 'collect') _objLine = `Collected all ${_o.need} ${instrMini(_o.tile)} ${TYPE_LABEL[_o.tile] || _o.tile}!`;
   else if (won && _o.k === 'crates') _objLine = `All ${_o.need} road cases cleared! 📦`;
+  // NEAR MISS — on a loss, say exactly how close it was. This is what makes people hit Try Again.
+  let _miss = '', _close = false;
+  if (!won) {
+    if (_o.k === 'collect') {
+      const d = _o.need - Math.min(Game.collected[_o.tile] || 0, _o.need);
+      _close = d <= 3;
+      _miss = (_close ? 'So close — just ' : 'Only ') + d + ' more ' + (TYPE_LABEL[_o.tile] || _o.tile) + ' to go';
+    } else if (_o.k === 'crates') {
+      const d = Game.cratesLeft || 0;
+      _close = d <= 2;
+      _miss = (_close ? 'So close — ' : '') + d + ' road case' + (d === 1 ? '' : 's') + ' left';
+    } else {
+      const d = Math.max(0, Game.target - Game.score);
+      _close = d <= Game.target * 0.15;
+      _miss = (_close ? 'So close — only ' : '') + d.toLocaleString() + ' points short';
+    }
+  }
+  // THE BOW — a 3-star set earns a bow from the whole band
+  const _bow = (won && stars === 3)
+    ? `<div class="bow-row">${BAND.map((m, i) => `<span class="bow-m" style="animation-delay:${180 + i * 130}ms">${memberPortrait(m.key, Save.memberTier(m.key))}</span>`).join('')}</div>`
+    : '';
   document.getElementById('ovScore').innerHTML =
-    (_objLine ? `<div class="obj-done">${_objLine}</div>` : '')
+    _bow
+    + (_objLine ? `<div class="obj-done">${_objLine}</div>` : '')
     + `Final score &nbsp; <b>${Game.score.toLocaleString()}</b> &nbsp;/&nbsp; ${lv.t.toLocaleString()}`
-    + (won ? `<div class="coin-earn">+ ${coins.toLocaleString()} 🪙 &nbsp;earned</div>` : '');
+    + (won ? `<div class="coin-earn">+ ${coins.toLocaleString()} 🪙 &nbsp;earned</div>` : '')
+    + (_miss ? `<div class="near-miss${_close ? ' close' : ''}">${_miss}</div>` : '');
 
   // stars (slam in, staggered)
   const starEls = document.getElementById('ovStars').children;
@@ -2027,9 +2269,10 @@ function showOverlay(won) {
     : '');
 
   ov.classList.add('show');
+  calmBoard();   // stop repainting the board the instant it goes behind the card
   if (won) { Sfx.win(); launchConfetti(); } else { Sfx.lose(); }
 }
-function hideOverlay() { document.getElementById('overlay').classList.remove('show'); }
+function hideOverlay() { document.getElementById('overlay').classList.remove('show'); calmBoard(); }
 
 function launchConfetti() {
   if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -2058,6 +2301,7 @@ Game.newGame = function() {
   Game.failsByLevel = Game.failsByLevel || {};
   const assist = Math.min(Game.failsByLevel[lv.n] || 0, 4);
   Game.moves = lv.m + assist * 2; Game.target = lv.t; Game.score = 0; Game.combo = 0;
+  Game.startMoves = Game.moves; Game.movesAtWin = 0; Game.lowWarned = false; Game.resultShown = false;
   Game.selected = null; Game.busy = false; Game.ended = false;
   Game.dropCounter = 0;
   Game.board = generateBoard();
@@ -2165,7 +2409,9 @@ function maybeDropSpecial() {
   if (Game.dropCounter < every) return;
   Game.dropCounter = 0;
   const cells = [];
-  for (let i = 0; i < CELLS; i++) if (Game.board[i] && !isSpecial(Game.board[i])) cells.push(i);
+  // MUST skip crates: turning a road case into a special erases the crate flag, so the
+  // "cases left" counter could never reach 0 and the level became unwinnable.
+  for (let i = 0; i < CELLS; i++) if (Game.board[i] && !isSpecial(Game.board[i]) && !Game.board[i].crate) cells.push(i);
   if (!cells.length) return;
   const cell = cells[(Math.random() * cells.length) | 0];
   const sp = unlockedSpecials()[(Math.random() * unlockedSpecials().length) | 0];
@@ -2214,6 +2460,16 @@ Game.runSelfTest = function() {
   assert(blast.length === 6 && blast.every(c => c%SIZE === 3), 'amp(col) clears its 6-cell column');
   bd = mkBoard(); bd[idx(2,2)] = {type:'guitar',special:'bassdrop',dir:null};
   assert(specialBlastCells(bd, idx(2,2), null).length === 11, 'bass drop clears full row + column = 11');
+  // PHASE 2B REGRESSION — a Bass Drop swapped with a plain tile must be the one that fires, either direction.
+  // This is the bug that made Bass Drops silently waste a move from level 12 onward.
+  (function(){
+    const keep = Game.board;
+    Game.board = mkBoard(); Game.board[idx(2,2)] = {type:'guitar',special:'bassdrop',dir:null};
+    assert(chooseSpecial(idx(2,2), idx(2,3)).idx === idx(2,2) && chooseSpecial(idx(2,3), idx(2,2)).idx === idx(2,2), 'bass drop fires whichever way it is swiped');
+    Game.board[idx(2,3)] = {type:'guitar',special:'rockstar',dir:null};
+    assert(chooseSpecial(idx(2,2), idx(2,3)).idx === idx(2,3), 'rockstar still outranks a bass drop');
+    Game.board = keep;
+  })();
   assert(ROAD_QUIPS.length >= 20, 'road-quip pool has plenty of lines');
   { const a = nextQuip(), b = nextQuip(); assert(a !== b && ROAD_QUIPS.indexOf(a) >= 0, 'nextQuip rotates through the pool'); }
   bd = mkBoard(); bd[idx(2,2)] = {type:'guitar',special:'pyro',dir:null};
@@ -2256,7 +2512,7 @@ Game.runSelfTest = function() {
   }
   assert(!holeFound, `match stress: ${movesMade} real moves, ZERO holes & always stable`);
 
-  let specHole = false, fired = 0; const specials = ['amp','pyro','rockstar'];
+  let specHole = false, fired = 0; const specials = ['amp','pyro','rockstar','bassdrop'];   // bassdrop included so it can never drift untested again
   Game.level = 10; Game.board = generateBoard();
   for (let iter = 0; iter < 1500 && !specHole; iter++) {
     const cell = (Math.random() * CELLS) | 0;
@@ -2343,6 +2599,15 @@ Game.runSelfTest = function() {
     Game.board[idx(4,5)] = {type:'crate',crate:true,special:null,dir:null};
     reshuffleBoard();
     assert(Game.board[idx(2,2)] && Game.board[idx(2,2)].crate && Game.board[idx(4,5)] && Game.board[idx(4,5)].crate, 'reshuffle preserves the road cases');
+    // PHASE 2B REGRESSION — a dropped special must never land on a road case. Overwriting one
+    // erased the crate flag while the counter still expected it, soft-locking every case level.
+    Game.board = []; for (let i=0;i<CELLS;i++) Game.board[i] = {type:'crate',crate:true,special:null,dir:null};
+    Game.board[idx(0,0)] = {type:'guitar',special:null,dir:null};
+    Game.ended = false; Game.moves = 10; Game.cratesLeft = 35; Game.cratesTotal = 35;
+    Game.dropCounter = 99; Game.collected = {};
+    maybeDropSpecial();
+    let stillCrates = 0; for (let i=0;i<CELLS;i++) if (Game.board[i] && Game.board[i].crate) stillCrates++;
+    assert(stillCrates === 35, 'a dropped special never consumes a road case');
     Game.level=lvl; Game.collected=col; Game.cratesLeft=cl; Game.score=sc; Game.board=bd;
   })();
 
@@ -2352,6 +2617,7 @@ Game.runSelfTest = function() {
   const passes = results.filter(r => r.startsWith('PASS')).length;
   setMsg(`Self-test: ${passes}/${results.length} passed. ` + (passes === results.length ? '✅ all green' : '⚠ see console'));
   console.log('=== SELF-TEST ===\n' + results.join('\n'));
+  return results;
 };
 
 /* =====================================================================
@@ -2466,6 +2732,37 @@ function coinsForWin(levelN, stars, score, target) {
 }
 function totalStars() { return Object.values(Save.data.stars).reduce((a, b) => a + b, 0); }
 
+/* ===== BACKUP CODES — progress as plain text, so it survives a browser clear-out
+   (Safari wipes site data after ~7 days unused) and moves between devices. ===== */
+function backupCode() { try { return 'XRS1.' + btoa(unescape(encodeURIComponent(JSON.stringify(Save.data)))); } catch (_) { return ''; } }
+function showBackup() {
+  const out = document.getElementById('backupOut'); if (out) out.value = backupCode();
+  const inp = document.getElementById('backupIn'); if (inp) inp.value = '';
+  const st = document.getElementById('backupStatus'); if (st) st.textContent = '';
+  document.getElementById('backupCard').classList.add('show');
+}
+function hideBackup() { document.getElementById('backupCard').classList.remove('show'); }
+function copyBackup(btn) {
+  const ta = document.getElementById('backupOut'); if (!ta) return;
+  try { ta.focus(); ta.select(); ta.setSelectionRange(0, 99999); } catch (_) {}
+  let ok = false;
+  try { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(ta.value); ok = true; } } catch (_) {}
+  if (!ok) { try { ok = document.execCommand('copy'); } catch (_) {} }
+  if (btn) { const old = btn.textContent; btn.textContent = ok ? 'Copied ✓' : 'Select & copy above'; setTimeout(() => { btn.textContent = old; }, 1800); }
+}
+function restoreBackup() {
+  const st = document.getElementById('backupStatus');
+  const raw = ((document.getElementById('backupIn') || {}).value || '').trim();
+  const code = raw.indexOf('XRS1.') === 0 ? raw.slice(5) : raw;
+  try {
+    const d = JSON.parse(decodeURIComponent(escape(atob(code))));
+    if (!d || typeof d !== 'object' || typeof d.unlocked !== 'number') throw new Error('bad');
+    Prefs.set('save', d); Save.load();
+    Game.level = Math.max(1, Math.min(LEVELS.length, Save.data.unlocked));
+    updateCoinDisplays(); hideBackup(); showMap();
+  } catch (_) { if (st) st.textContent = 'That code didn\u2019t work — check the whole thing was pasted, then try again.'; }
+}
+
 /* =====================================================================
    SFX — self-contained Web Audio synth (Gary Numan-ish). No files.
    Lazily created on the first user gesture (the Play button).
@@ -2511,6 +2808,8 @@ const Sfx = {
   },
   swap() { this.tone(180, 0.08, 'square', 0.12, 0, 150); },
   nope() { this.tone(140, 0.12, 'square', 0.10, 0, 110); },
+  // LOW MOVES — two soft descending notes. A heads-up, not an alarm.
+  lowMoves() { if (!this.ctx || this.muted) return; const t = this.ctx.currentTime; this.tone(392, 0.18, 'triangle', 0.11, t); this.tone(330, 0.26, 'triangle', 0.11, t + 0.16); },
   match(chain) {
     const scale = [0, 3, 5, 7, 10, 12, 15, 17];
     const f = 330 * Math.pow(2, scale[Math.min((chain || 1) - 1, scale.length - 1)] / 12);
@@ -2594,7 +2893,27 @@ const Sfx = {
     const seq = type === 'rockstar' ? [72, 76, 79, 84] : type === 'pyro' ? [67, 72, 76] : [64, 71, 76];
     seq.forEach((m, i) => this.tone(440 * Math.pow(2, (m - 69) / 12), 0.22, 'triangle', 0.12, t + i * 0.05, 4000));
   },
-  win() { if (!this.ctx || this.muted) return; const t = this.ctx.currentTime; [0, 4, 7, 12, 16].forEach((s, i) => this.tone(330 * Math.pow(2, s / 12), 0.6, 'triangle', 0.18, t + i * 0.1)); },
+  // THE ROOM REACTS — a synthesised crowd swell sized to the venue.
+  // Silent in the basement (nobody's there), a roar in the arena.
+  cheer() {
+    if (!this.ctx || this.muted) return;
+    const lv = (typeof Game !== 'undefined' && Game.level) ? Game.level : 1;
+    const tier = (typeof venueIndex === 'function') ? venueIndex(lv) : 0;
+    if (tier <= 0) return;
+    const t = this.ctx.currentTime, sr = this.ctx.sampleRate;
+    const dur = 1.4 + tier * 0.25, peak = 0.05 + tier * 0.035;
+    const n = Math.floor(sr * dur), buf = this.ctx.createBuffer(1, n, sr), d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1);
+    const src = this.ctx.createBufferSource(); src.buffer = buf;
+    const bp = this.ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1100; bp.Q.value = 0.5;
+    const g = this.ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(peak, t + 0.35);
+    g.gain.setValueAtTime(peak, t + dur * 0.55);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(bp); bp.connect(g); g.connect(this.master); src.start(t); src.stop(t + dur + 0.05);
+  },
+  win() { if (!this.ctx || this.muted) return; const t = this.ctx.currentTime; [0, 4, 7, 12, 16].forEach((s, i) => this.tone(330 * Math.pow(2, s / 12), 0.6, 'triangle', 0.18, t + i * 0.1)); this.cheer(); },
   comboFire() {
     if (!this.ctx || this.muted) return;
     const t = this.ctx.currentTime;
@@ -2627,6 +2946,10 @@ const Sfx = {
     const loopLen = 64 * step;
     const scheduleLoop = (base) => {
       if (!this.bgmOn || !this.ctx) return;
+      // TAB-SWITCH SAFETY: browsers throttle timers in a background tab, so this callback can arrive
+      // late with a 'base' time already in the past. Scheduling a whole loop back there made every
+      // bar fire at once on return — a jumbled clump. If we've fallen behind, restart from now.
+      if (base < this.ctx.currentTime - 0.05) base = this.ctx.currentTime + 0.08;
       // haunting + pulsating: a relentless dark throb with a hypnotic sequencer marching forward.
       // the venue deepens it — more drive and shimmer per tier — but it never turns bouncy.
       const lv = (typeof Game !== 'undefined' && Game.level) ? Game.level : 1;
@@ -2811,6 +3134,15 @@ Game.toggleMute = function() {
   if (!Sfx.muted && !Sfx.bgmOn) Sfx.startBGM();
   syncMuteBtn();
 };
+// TAB / APP SWITCH — stop the music cleanly when the game is hidden and pick it back up on return.
+// Saves battery, and stops a backgrounded tab piling up audio it will dump all at once later.
+document.addEventListener('visibilitychange', () => {
+  try {
+    if (!Sfx.ctx) return;
+    if (document.hidden) { Sfx.stopBGM(); if (Sfx.ctx.suspend) Sfx.ctx.suspend(); }
+    else { if (Sfx.ctx.resume) Sfx.ctx.resume(); if (!Sfx.muted && !Sfx.bgmOn && !Game.atTitle) Sfx.startBGM(); }
+  } catch (_) {}
+});
 
 /* =====================================================================
    TUTORIAL — your real copy, trimmed to what the game teaches today
@@ -2946,7 +3278,9 @@ function buildMap() {
     const current = !done && lv.n === Save.data.unlocked;
     const playable = Save.isUnlocked(lv.n);
     const st = Save.starsFor(lv.n);
-    const stateCls = !playable ? 'locked' : done ? 'done' : current ? 'current' : 'playable';
+    let stateCls = !playable ? 'locked' : done ? 'done' : current ? 'current' : 'playable';
+    // PATH REVEAL — a set that was just unlocked draws its connector and pops onto the map
+    if (playable && lv.n === Game.justUnlocked) stateCls += ' reveal';
     const stars = playable ? `<div class="j-stars">${[1,2,3].map(k => `<span class="${k <= st ? 'on' : 'off'}">★</span>`).join('')}</div>` : '';
     const dotInner = !playable ? '<span class="j-lock">🔒</span>' : lv.n;
     const onclick = playable ? ` onclick="startLevel(${lv.n})"` : '';
@@ -2956,6 +3290,7 @@ function buildMap() {
       <div class="j-tgt">${playable ? objectiveText(lv) : 'Win the previous set'}</div>${stars}</div></div>`;
   });
   path.innerHTML = html;
+  Game.justUnlocked = 0;   // the reveal plays once, then the node settles into place
 }
 function anyUpgradeAffordable() { return BAND.some(m => Save.canUpgrade(m.key)); }
 function refreshUpgradeCues() {
@@ -2976,6 +3311,27 @@ function showMap() {
 }
 function hideMap() { document.getElementById('mapScreen').classList.remove('show'); }
 function backToTitle() { hideMap(); document.getElementById('bandScreen').classList.remove('show'); showTitle(); }
+
+// In-game Replay: instant if the set hasn't really started or is already over,
+// otherwise ask first — a mid-set mis-tap used to wipe the whole set with no warning.
+let _replayArm = 0;
+function confirmReplay(btn) {
+  if (Game.ended || Game.moves >= (Game.startMoves || 0)) { Game.newGame(); return; }
+  const now = Date.now();
+  if (now - _replayArm > 3000) {
+    _replayArm = now;
+    if (btn) {
+      if (!btn.dataset.label) btn.dataset.label = btn.textContent;
+      btn.textContent = 'Restart set? Tap again';
+      btn.classList.add('arm');
+      setTimeout(() => { if (btn.classList.contains('arm')) { btn.textContent = btn.dataset.label; btn.classList.remove('arm'); _replayArm = 0; } }, 3000);
+    }
+    return;
+  }
+  _replayArm = 0;
+  if (btn) { btn.textContent = btn.dataset.label || '↻ Replay'; btn.classList.remove('arm'); }
+  Game.newGame();
+}
 
 let _resetArm = 0;
 function newJourney(btn) {
