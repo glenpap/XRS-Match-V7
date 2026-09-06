@@ -93,6 +93,23 @@ body.v-arena .stage-bg{background:
 @keyframes vt-pop{0%{opacity:0; transform:translateX(-50%) translateY(-14px);}12%{opacity:1; transform:translateX(-50%) translateY(0);}80%{opacity:1;}100%{opacity:0; transform:translateX(-50%) translateY(-10px);}}
 @media (prefers-reduced-motion:reduce){ .venue-toast.show{animation:none; opacity:1;} .stage-bg{transition:none;} }
 
+/* ===== VENUE ARTWORK =====
+   One static illustration per room, painted once and never repainted. No animation at all,
+   so it costs nothing per frame and looks identical on a 2011 GPU and a new phone — which is
+   why the detail lives here rather than in effects that lite mode would strip out.
+   The board covers the middle of the screen, so every deliberate detail sits in the outer
+   thirds where it can actually be seen. */
+.venue-art{position:absolute; inset:0; overflow:hidden;}
+.venue-art svg{position:absolute; inset:0; width:100%; height:100%; display:block;}
+/* the backdrop never steals a tap meant for a tile — only these two things are clickable */
+.venue-art a{pointer-events:auto; cursor:pointer;}
+.venue-art a .poster-frame{transition:stroke .18s ease, stroke-opacity .18s ease;}
+.venue-art a:hover .poster-frame,
+.venue-art a:focus-visible .poster-frame{stroke:#ffe08a; stroke-opacity:1; stroke-width:3;}
+.venue-art a .josh-hit{cursor:pointer;}
+.venue-art a:hover .josh-hit ellipse[fill="#c3e04f"],
+.venue-art a:focus-visible .josh-hit ellipse[fill="#c3e04f"]{fill:#eaff7a;}
+@media (prefers-reduced-motion:reduce){ .venue-art a .poster-frame{transition:none;} }
 .title{font-family:var(--serif); font-weight:700; font-size:1.5rem; letter-spacing:.01em; color:var(--cream); text-align:center; line-height:1.05;}
 .title .star{color:var(--gold-hi);}
 .sub{font-family:var(--mono); font-size:.66rem; letter-spacing:.16em; text-transform:uppercase; color:var(--cream-low); margin:4px 0 14px;}
@@ -592,6 +609,33 @@ button.arm{border-color:var(--gold-hi) !important; color:var(--gold-hi) !importa
 .bc-btn.maxed{background:transparent; border-color:var(--gold-deep); color:var(--gold-hi);}
 .band-bonus{text-align:center; font-family:var(--mono); font-size:.62rem; letter-spacing:.1em; text-transform:uppercase;
   color:var(--gold-warm); margin:16px 0 0;}
+.josh-card{display:flex; gap:14px; align-items:center; text-align:left; margin-top:14px;
+  background:linear-gradient(160deg,var(--surface),var(--surface-low)); border:1px dashed var(--line);
+  border-radius:16px; padding:13px 15px;}
+.josh-art{flex:none; width:96px; height:76px; display:block; border-radius:12px; cursor:pointer;
+  text-decoration:none; box-shadow:0 0 0 0 rgba(255,224,138,0);
+  transition:box-shadow .2s var(--ease), transform .2s var(--bounce);}
+.josh-art svg{width:100%; height:100%; display:block;}
+.josh-art:hover, .josh-art:focus-visible{transform:translateY(-2px) scale(1.04);
+  box-shadow:0 0 0 2px rgba(255,224,138,.55), 0 10px 22px -10px rgba(255,224,138,.5);}
+/* He was never asleep. Hover him and one eye opens, the closed lid on that side goes,
+   and the sleep z's evaporate — caught in the act, entirely unbothered about it. */
+.josh-art .jz-open{opacity:0;}
+.josh-art .jz-open, .josh-art .jz-l, .josh-art .jz-z{transition:opacity .22s ease;}
+.josh-art:hover .jz-open, .josh-art:focus-visible .jz-open{opacity:1;}
+.josh-art:hover .jz-l, .josh-art:focus-visible .jz-l{opacity:0;}
+.josh-art:hover .jz-z, .josh-art:focus-visible .jz-z{opacity:0;}
+.josh-art:focus-visible{outline:none;}
+@media (prefers-reduced-motion:reduce){ .josh-art{transition:none;} .josh-art:hover{transform:none;} }
+.lowgfx .josh-art{transition:none !important;}
+.lowgfx .josh-art:hover{transform:none !important;}
+.josh-bd{flex:1; min-width:0;}
+.josh-name{font-family:var(--serif); font-weight:700; font-size:1.08rem; color:var(--cream);}
+.josh-name span{font-family:var(--mono); font-size:.55rem; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--cream-low); margin-left:8px; vertical-align:middle;}
+.josh-role{font-size:.78rem; color:var(--cream-mute); font-style:italic; margin:3px 0 7px;}
+.josh-crime{font-size:.78rem; line-height:1.45; color:var(--cream-low);}
+.josh-crime b{color:var(--gold-warm); font-weight:600;}
 .lifestyle-head{font-family:var(--serif); font-weight:700; font-size:1.25rem; color:var(--gold-hi); margin:30px 0 2px; text-align:center;}
 .fame-badge{display:inline-block; font-family:var(--mono); font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; color:#10131c;
   background:linear-gradient(160deg,var(--gold-hi),var(--gold)); padding:3px 9px; border-radius:999px; vertical-align:middle; margin-left:6px;}
@@ -720,7 +764,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
 </style>
 </head>
 <body>
-  <div class="stage-bg"></div>
+  <div class="stage-bg"><div class="venue-art" id="venueArt"></div></div>
   <div class="drift" id="drift" aria-hidden="true"></div>
   <div class="screen-pulse" id="screenPulse"></div>
   <div class="combo-banner" id="comboBanner"></div>
@@ -1090,6 +1134,334 @@ const VENUES = [
   { from:21, to:25, name:'The Theater',     cls:'v-theater',  blurb:'Velvet seats! A balcony! A man in row G who insists he discovered you.' },
   { from:26, to:30, name:'The Arena',       cls:'v-arena',    blurb:'Twenty thousand people. A drum riser that rises. The amps go to eleven, then keep going.' },
 ];
+
+/* Venue artwork. One entry per room; rooms without art fall back to the colour wash alone. */
+const VENUE_ART = {
+  'v-basement': `<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <radialGradient id="bulbGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#ffdc94" stop-opacity=".46"/>
+      <stop offset="40%"  stop-color="#e8a94e" stop-opacity=".2"/>
+      <stop offset="100%" stop-color="#e8a94e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bulbCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff8e2"/><stop offset="60%" stop-color="#ffdc94"/><stop offset="100%" stop-color="#dda03f"/>
+    </radialGradient>
+    <linearGradient id="windowLight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7b96c4" stop-opacity=".6"/>
+      <stop offset="100%" stop-color="#41537c" stop-opacity=".3"/>
+    </linearGradient>
+    <linearGradient id="wallFall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#000" stop-opacity=".34"/>
+      <stop offset="48%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity=".3"/>
+    </linearGradient>
+    <linearGradient id="boilerBody" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#2e2a26"/><stop offset="36%" stop-color="#4b463f"/><stop offset="100%" stop-color="#241f1b"/>
+    </linearGradient>
+    <linearGradient id="ductMetal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#39404a"/><stop offset="45%" stop-color="#5d6673"/><stop offset="100%" stop-color="#2b3038"/>
+    </linearGradient>
+    <linearGradient id="boxFace" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#634c33"/><stop offset="100%" stop-color="#453422"/>
+    </linearGradient>
+    <linearGradient id="bagBody" x1="0.2" y1="0" x2="0.9" y2="1">
+      <stop offset="0%" stop-color="#4a4363"/><stop offset="55%" stop-color="#383150"/><stop offset="100%" stop-color="#241f36"/>
+    </linearGradient>
+    <pattern id="blocks" width="150" height="88" patternUnits="userSpaceOnUse">
+      <path d="M0 43.5 H150 M0 87.5 H150" stroke="#100d18" stroke-width="2" opacity=".4"/>
+      <path d="M75 0 V44" stroke="#100d18" stroke-width="2" opacity=".28"/>
+      <path d="M0 44 V88 M150 44 V88" stroke="#100d18" stroke-width="2" opacity=".28"/>
+    </pattern>
+
+    <!-- ===== PLASMA CATHEDRAL — "Feel the PlaZZ '77" tour poster ===== -->
+    <linearGradient id="pcSky" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0%" stop-color="#241046"/><stop offset="55%" stop-color="#4a1550"/><stop offset="100%" stop-color="#120a26"/>
+    </linearGradient>
+    <radialGradient id="pcNebula" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff7a3c" stop-opacity=".55"/><stop offset="100%" stop-color="#ff7a3c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="pcNebula2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#5b8bff" stop-opacity=".45"/><stop offset="100%" stop-color="#5b8bff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="pcBeam" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#fff3c4"/><stop offset="35%" stop-color="#ffb03a"/><stop offset="100%" stop-color="#ff5a1e" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="pcHeart" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fffbe8" stop-opacity=".95"/>
+      <stop offset="45%" stop-color="#ffb03a" stop-opacity=".5"/>
+      <stop offset="100%" stop-color="#ff5a1e" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="pcType" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffe9a8"/><stop offset="50%" stop-color="#ffa62e"/><stop offset="100%" stop-color="#e5541a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ============ WALL ============ -->
+  <rect x="0" y="0" width="1200" height="800" fill="#272134"/>
+  <rect x="0" y="120" width="1200" height="530" fill="url(#blocks)"/>
+  <ellipse cx="300" cy="330" rx="520" ry="470" fill="url(#bulbGlow)"/>
+  <rect x="0" y="0" width="1200" height="800" fill="url(#wallFall)"/>
+
+  <!-- damp creeping up from the floor -->
+  <path d="M470 646 q28-58 74-34 t70-18 q40-24 66 18 t74 26 q34 26 8 46 H452 q-14-24 18-38Z" fill="#1d2524" opacity=".55"/>
+  <path d="M900 630 q40-40 92-14 t86 8 q22 22-6 34 H902Z" fill="#1d2524" opacity=".4"/>
+
+  <!-- ============ HOPPER WINDOW ============ -->
+  <g>
+    <rect x="52" y="150" width="132" height="74" rx="3" fill="#161320"/>
+    <rect x="60" y="158" width="116" height="58" rx="2" fill="url(#windowLight)"/>
+    <path d="M118 158 V216 M60 187 H176" stroke="#161320" stroke-width="5"/>
+    <rect x="52" y="150" width="132" height="74" rx="3" fill="none" stroke="#39344a" stroke-width="4"/>
+    <path d="M60 224 L176 224 L206 306 L36 306 Z" fill="#7b96c4" opacity=".08"/>
+  </g>
+
+  <!-- ============ CEILING ============ -->
+  <rect x="0" y="0" width="1200" height="126" fill="#181322"/>
+  <g fill="#4a3c2d">
+    <rect x="0" y="6"  width="1200" height="26"/>
+    <rect x="0" y="52" width="1200" height="26"/>
+    <rect x="0" y="98" width="1200" height="26"/>
+  </g>
+  <g fill="#2e241a" opacity=".85">
+    <rect x="0" y="26" width="1200" height="7"/>
+    <rect x="0" y="72" width="1200" height="7"/>
+    <rect x="0" y="118" width="1200" height="7"/>
+  </g>
+  <g fill="#352a1f" opacity=".9">
+    <rect x="150" y="0" width="20" height="126"/><rect x="420" y="0" width="20" height="126"/>
+    <rect x="690" y="0" width="20" height="126"/><rect x="960" y="0" width="20" height="126"/>
+  </g>
+  <g>
+    <rect x="0" y="88" width="1200" height="54" fill="url(#ductMetal)"/>
+    <g stroke="#232830" stroke-width="4" opacity=".8">
+      <path d="M120 88 V142"/><path d="M330 88 V142"/><path d="M540 88 V142"/>
+      <path d="M750 88 V142"/><path d="M960 88 V142"/><path d="M1150 88 V142"/>
+    </g>
+    <path d="M0 96 H1200" stroke="#8b95a3" stroke-width="3" opacity=".5"/>
+  </g>
+  <path d="M0 158 H236 q14 0 14 14 V196" stroke="#3b3648" stroke-width="7" fill="none"/>
+  <rect x="236" y="192" width="34" height="30" rx="3" fill="#37324a" stroke="#4b4560" stroke-width="2"/>
+  <path d="M270 210 q180 92 372 34" stroke="#2e2839" stroke-width="5" fill="none"/>
+
+  <!-- ============ BARE BULB ============ -->
+  <g>
+    <path d="M304 142 V236" stroke="#332d40" stroke-width="4"/>
+    <ellipse cx="304" cy="252" rx="19" ry="23" fill="url(#bulbCore)"/>
+    <rect x="295" y="230" width="18" height="12" rx="2" fill="#8a7a5f"/>
+    <ellipse cx="298" cy="246" rx="5" ry="8" fill="#fffdf4" opacity=".8"/>
+  </g>
+
+  <!-- ============ THE TOUR POSTER ============ -->
+  <a href="https://www.redbubble.com/shop/ap/181765220?asc=u" target="_blank" rel="noopener"
+     aria-label="Plasma Cathedral — Feel the PlaZZ '77 tour poster">
+  <g transform="rotate(-2.6 855 268)">
+    <rect class="poster-frame" x="783" y="178" width="144" height="180" fill="#0a0616"
+          stroke="#6a5f7d" stroke-opacity=".9" stroke-width="2"/>
+    <svg x="787" y="182" width="136" height="172" viewBox="0 0 100 126" preserveAspectRatio="xMidYMid meet">
+      <rect width="100" height="126" fill="url(#pcSky)"/>
+      <ellipse cx="52" cy="60" rx="52" ry="42" fill="url(#pcNebula)"/>
+      <ellipse cx="20" cy="34" rx="30" ry="24" fill="url(#pcNebula2)"/>
+      <g fill="#fff6de">
+        <circle cx="9" cy="12" r=".9"/><circle cx="27" cy="7" r=".7"/><circle cx="46" cy="14" r=".6"/>
+        <circle cx="66" cy="9" r=".9"/><circle cx="88" cy="19" r=".8"/><circle cx="94" cy="46" r=".7"/>
+        <circle cx="6" cy="52" r=".7"/><circle cx="15" cy="76" r=".6"/><circle cx="90" cy="74" r=".8"/>
+        <circle cx="76" cy="30" r=".6"/><circle cx="35" cy="24" r=".5"/>
+      </g>
+      <!-- planets -->
+      <circle cx="17" cy="20" r="9" fill="#7a4bd8"/>
+      <path d="M17 20 a9 9 0 0 1 8-8.9 a9 9 0 0 0-8 8.9Z" fill="#a074ef" opacity=".7"/>
+      <ellipse cx="17" cy="20" rx="15" ry="4" fill="none" stroke="#d9b8ff" stroke-width="1.2" opacity=".8"/>
+      <circle cx="84" cy="16" r="5.5" fill="#c8563a"/>
+      <circle cx="82.4" cy="14.4" r="2.4" fill="#e88a63" opacity=".75"/>
+      <!-- the plasma column -->
+      <path d="M44 118 L50 34 L56 118 Z" fill="url(#pcBeam)" opacity=".95"/>
+      <ellipse cx="50" cy="74" rx="22" ry="22" fill="url(#pcHeart)"/>
+      <!-- the cathedral: organ-pipe spires in silhouette -->
+      <g fill="#180d24">
+        <path d="M32 104 V70 l4-9 4 9 v34Z"/>
+        <path d="M40 104 V60 l5-12 5 12 v44Z"/>
+        <path d="M50 104 V60 l5-12 5 12 v44Z"/>
+        <path d="M60 104 V70 l4-9 4 9 v34Z"/>
+        <path d="M24 104 V80 l3.5-8 3.5 8 v24Z"/>
+        <path d="M69 104 V80 l3.5-8 3.5 8 v24Z"/>
+        <path d="M18 104 V88 l3-7 3 7 v16Z"/>
+        <path d="M76 104 V88 l3-7 3 7 v16Z"/>
+        <rect x="18" y="100" width="64" height="10" rx="2"/>
+      </g>
+      <!-- rim light from the column -->
+      <g stroke="#ffb03a" stroke-width="1" opacity=".85" fill="none">
+        <path d="M45 104 V60 l5-12"/><path d="M55 104 V60 l-5-12"/>
+        <path d="M36 104 V70 l4-9"/><path d="M64 104 V70 l-4-9"/>
+      </g>
+      <!-- orbital arcs -->
+      <ellipse cx="50" cy="78" rx="43" ry="15" fill="none" stroke="#63d7ff" stroke-width="1.4" opacity=".65"
+               transform="rotate(-16 50 78)"/>
+      <ellipse cx="50" cy="70" rx="38" ry="12" fill="none" stroke="#9ee8ff" stroke-width="1" opacity=".45"
+               transform="rotate(14 50 70)"/>
+      <!-- asteroid debris -->
+      <g fill="#241634">
+        <path d="M8 106 l6-3 5 4-4 4-6-1Z"/><path d="M86 100 l6-2 4 4-5 4-5-2Z"/><path d="M70 116 l7-2 4 4-6 3-5-2Z"/>
+      </g>
+      <!-- the wordmark -->
+      <text x="50" y="122" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-weight="700"
+            font-size="19" fill="url(#pcType)" stroke="#3d1208" stroke-width=".7">PlaZZ</text>
+    </svg>
+    <!-- tape, and a caption that has not aged well -->
+    <rect x="770" y="171" width="34" height="14" fill="#d8cdae" opacity=".22" transform="rotate(-18 787 178)"/>
+    <rect x="906" y="171" width="34" height="14" fill="#d8cdae" opacity=".22" transform="rotate(16 923 178)"/>
+    <text x="855" y="374" text-anchor="middle" font-family="'JetBrains Mono',monospace"
+          font-size="11" fill="#c9a14a" opacity=".55">FEEL THE PlaZZ · &#8217;77</text>
+  </g>
+  </a>
+
+  <!-- ============ FLOOR ============ -->
+  <rect x="0" y="646" width="1200" height="154" fill="#1c1826"/>
+  <path d="M0 646 H1200" stroke="#100d18" stroke-width="6"/>
+  <rect x="0" y="652" width="1200" height="26" fill="#272134" opacity=".8"/>
+  <g opacity=".8">
+    <circle cx="742" cy="742" r="26" fill="#141119"/>
+    <circle cx="742" cy="742" r="18" fill="#221d2c"/>
+    <g stroke="#141119" stroke-width="3"><path d="M726 736 H758 M726 744 H758 M726 752 H758"/></g>
+  </g>
+  <ellipse cx="308" cy="728" rx="124" ry="25" fill="#332c42" opacity=".8"/>
+  <ellipse cx="296" cy="724" rx="54" ry="10" fill="#ffdc94" opacity=".14"/>
+
+  <!-- ============ BOILER ============ -->
+  <g>
+    <rect x="196" y="368" width="150" height="278" rx="12" fill="url(#boilerBody)"/>
+    <ellipse cx="271" cy="368" rx="75" ry="16" fill="#565148"/>
+    <rect x="196" y="368" width="150" height="278" rx="12" fill="none" stroke="#171512" stroke-width="3"/>
+    <path d="M208 482 q22-16 40 4 t34 2 q-6 26-40 22 t-34-28Z" fill="#7d5738" opacity=".5"/>
+    <path d="M288 570 q20-12 34 6 t-6 28 q-26 2-32-16Z" fill="#7d5738" opacity=".38"/>
+    <circle cx="271" cy="432" r="21" fill="#171512" stroke="#6d675c" stroke-width="3"/>
+    <circle cx="271" cy="432" r="13" fill="#2b2721"/>
+    <path d="M271 432 L280 422" stroke="#ffdc94" stroke-width="3" stroke-linecap="round" opacity=".9"/>
+    <rect x="229" y="512" width="84" height="60" rx="5" fill="#211e19" stroke="#5a554c" stroke-width="3"/>
+    <circle cx="301" cy="542" r="5" fill="#837c6e"/>
+    <g stroke="#4b525f" stroke-width="13" fill="none" stroke-linecap="round">
+      <path d="M228 368 V150 q0-22 22-22 H286"/>
+      <path d="M312 368 V232 q0-20 20-20 H372"/>
+    </g>
+    <g stroke="#6b7482" stroke-width="4" fill="none" opacity=".5">
+      <path d="M224 356 V160"/><path d="M308 356 V240"/>
+    </g>
+  </g>
+
+  <!-- left-hand clutter: records nobody has played in years -->
+  <g>
+    <rect x="40" y="520" width="120" height="126" rx="4" fill="#3c2f20" stroke="#1d160e" stroke-width="3"/>
+    <g fill="#2a2334" stroke="#171320" stroke-width="1.5">
+      <rect x="52" y="504" width="96" height="118" rx="2"/>
+      <rect x="58" y="500" width="96" height="118" rx="2"/>
+      <rect x="64" y="496" width="96" height="118" rx="2"/>
+    </g>
+    <circle cx="112" cy="552" r="17" fill="#161320" stroke="#4a4260" stroke-width="2"/>
+    <circle cx="112" cy="552" r="4" fill="#c9a14a" opacity=".7"/>
+  </g>
+
+  <!-- ============ THE BOXES, and the band cat ============ -->
+  <g>
+    <rect x="792" y="560" width="128" height="100" rx="4" fill="url(#boxFace)" stroke="#2d2115" stroke-width="3"/>
+    <path d="M856 560 V660" stroke="#2d2115" stroke-width="3" opacity=".7"/>
+    <rect x="830" y="560" width="50" height="14" fill="#7d6446" opacity=".7"/>
+    <text x="856" y="622" text-anchor="middle" font-family="'JetBrains Mono',monospace"
+          font-size="14" fill="#33260f" opacity=".8">XMAS</text>
+    <rect x="806" y="486" width="104" height="74" rx="4" fill="#5a462f" stroke="#2d2115" stroke-width="3"/>
+  </g>
+
+  <!-- ============ THE AMP ============ -->
+  <g>
+    <rect x="962" y="536" width="150" height="110" rx="7" fill="#3a2d21" stroke="#181310" stroke-width="3"/>
+    <rect x="974" y="568" width="126" height="66" rx="4" fill="#201a15"/>
+    <g stroke="#4c4034" stroke-width="2" opacity=".85">
+      <path d="M974 576 H1100 M974 586 H1100 M974 596 H1100 M974 606 H1100 M974 616 H1100 M974 626 H1100"/>
+      <path d="M984 568 V634 M1004 568 V634 M1024 568 V634 M1044 568 V634 M1064 568 V634 M1084 568 V634"/>
+    </g>
+    <rect x="974" y="544" width="126" height="16" rx="3" fill="#16120f"/>
+    <g fill="#837769"><circle cx="990" cy="552" r="4"/><circle cx="1006" cy="552" r="4"/><circle cx="1022" cy="552" r="4"/></g>
+    <circle cx="1088" cy="552" r="10" fill="#ffb347" opacity=".22"/>
+    <circle cx="1088" cy="552" r="4" fill="#ffdc94" opacity=".9"/>
+  </g>
+
+  <!-- ============ THE BEANBAG ============ -->
+  <g>
+    <ellipse cx="524" cy="762" rx="96" ry="14" fill="#100d18" opacity=".55"/>
+    <path d="M440 760 q-14-48 20-78 q30-27 74-25 q46 2 68 34 q22 32 6 69 q-84 20-168 0Z"
+          fill="url(#bagBody)" stroke="#171420" stroke-width="3"/>
+    <!-- panel seams: what actually makes it read as a beanbag -->
+    <g stroke="#241f36" stroke-width="2.5" fill="none" opacity=".9">
+      <path d="M492 658 q-16 48-14 104"/>
+      <path d="M540 656 q14 48 12 105"/>
+    </g>
+    <!-- the slump where somebody sits -->
+    <ellipse cx="516" cy="686" rx="42" ry="15" fill="#1e1a2e" opacity=".55"/>
+    <path d="M452 700 q34-30 78-30 q46 0 72 28" stroke="#5a5378" stroke-width="3" fill="none" opacity=".55"/>
+    <!-- top seam and a worn highlight -->
+    <path d="M446 742 q78 17 158 1" stroke="#171420" stroke-width="3" fill="none"/>
+    <ellipse cx="482" cy="704" rx="24" ry="9" fill="#6b6390" opacity=".22" transform="rotate(-24 482 704)"/>
+  </g>
+
+  <!-- The boa goes under him. He is sitting on it, which is the only correct
+       relationship between a cat and something that was expensive. -->
+  <g>
+    <path d="M432 676 q34-22 74-16 t70 4 q34 2 56-14" stroke="#c62a6b" stroke-width="10"
+          fill="none" stroke-linecap="round"/>
+    <g stroke="#ff7ab0" stroke-width="1.6" opacity=".5" stroke-linecap="round">
+      <path d="M438 668 l-6-9"/><path d="M456 660 l-3-10"/><path d="M478 658 l2-10"/>
+      <path d="M596 654 l6-8"/><path d="M614 650 l4-9"/>
+      <path d="M442 688 l-6 9"/><path d="M462 682 l-2 10"/>
+      <path d="M594 672 l3 10"/><path d="M616 666 l6 8"/>
+    </g>
+    <g fill="#ff4d8f">
+      <circle cx="436" cy="676" r="9"/><circle cx="454" cy="668" r="10"/><circle cx="474" cy="663" r="9.5"/>
+      <circle cx="496" cy="660" r="9"/>
+      <circle cx="580" cy="662" r="9"/><circle cx="600" cy="660" r="9.5"/><circle cx="618" cy="654" r="8.5"/>
+      <circle cx="632" cy="648" r="7"/>
+    </g>
+    <g fill="#ff9ac6" opacity=".8">
+      <circle cx="450" cy="664" r="4"/><circle cx="471" cy="659" r="3.6"/>
+      <circle cx="598" cy="656" r="3.8"/><circle cx="617" cy="650" r="3.4"/>
+    </g>
+  </g>
+
+  <!-- ===== JOSH, on the beanbag ===== -->
+  <!-- He sits here rather than on the boxes because the bulb's pool still reaches this far,
+       and a black cat needs light behind him or he is just a hole in the picture. -->
+  <a href="https://www.redbubble.com/shop/ap/134520091?asc=u" target="_blank" rel="noopener"
+     aria-label="Josh’s merch shop">
+  <g class="josh-hit" transform="translate(470 584) scale(1.16)">
+    <ellipse cx="56" cy="44" rx="62" ry="42" fill="transparent"/>
+    <path d="M92 64 q24-6 22-26 q-2-18-20-16 q-13 2-11 14 q2 9 11 7"
+          fill="none" stroke="#16131d" stroke-width="9" stroke-linecap="round"/>
+    <ellipse cx="56" cy="50" rx="44" ry="22" fill="#16131d"/>
+    <path d="M14 70 q-6-30 16-42 q22-12 46-6 q28 6 30 30 q2 12-4 18Z" fill="#16131d"/>
+    <circle cx="28" cy="30" r="21" fill="#1d1926"/>
+    <path d="M10 18 l2-18 17 10Z" fill="#1d1926"/>
+    <path d="M34 10 l17-8 -3 18Z" fill="#1d1926"/>
+    <path d="M13 16 l1-11 9 6Z" fill="#b0707f" opacity=".8"/>
+    <path d="M37 11 l10-5 -2 11Z" fill="#b0707f" opacity=".8"/>
+    <path d="M9 27 q2-17 15-23" stroke="#7c748d" stroke-width="2.8" fill="none" opacity=".9"/>
+    <path d="M14 66 q-8-26 11-38" stroke="#5f5872" stroke-width="2.6" fill="none" opacity=".7"/>
+    <path d="M96 44 q10 6 12 18" stroke="#5f5872" stroke-width="2.2" fill="none" opacity=".5"/>
+    <ellipse cx="20" cy="29" rx="5.6" ry="6.4" fill="#c3e04f"/>
+    <ellipse cx="37" cy="29" rx="5.6" ry="6.4" fill="#c3e04f"/>
+    <ellipse cx="20" cy="29" rx="1.7" ry="5.4" fill="#161306"/>
+    <ellipse cx="37" cy="29" rx="1.7" ry="5.4" fill="#161306"/>
+    <circle cx="18" cy="26" r="1.4" fill="#f6ffdc" opacity=".95"/>
+    <circle cx="35" cy="26" r="1.4" fill="#f6ffdc" opacity=".95"/>
+    <path d="M25 39 l6 0 -3 4.5Z" fill="#e096ab"/>
+    <path d="M28 44 q-4 4-9 1 M28 44 q4 4 9 1" stroke="#4e4759" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    <g stroke="#9c95a8" stroke-width="1.3" opacity=".65" stroke-linecap="round">
+      <path d="M17 41 q-14 1-18 7"/><path d="M17 44 q-14 6-16 12"/>
+      <path d="M39 41 q14 1 18 7"/><path d="M39 44 q14 6 16 12"/>
+    </g>
+  </g>
+  </a>
+
+  <rect x="1000" y="0" width="200" height="800" fill="#100d18" opacity=".16"/>
+</svg>`,
+};
 function venueFor(n) { return VENUES.find(v => n >= v.from && n <= v.to) || VENUES[VENUES.length - 1]; }
 function venueIndex(n) { const v = venueFor(n); return VENUES.indexOf(v); }
 
@@ -1099,7 +1471,7 @@ const STORY = [
   'Jake, Maya, Dave and Kat meet in a basement. Dave brought one drum and three sticks. They play a single chord. The cat leaves the room.',
   'Maya hauls an amp home from behind the Chinese place. Unplugged, it hums. Jake calls this "characterful."',
   'Dave breaks his first stick of the night. (Sticks broken: 1.) Mom\u2019s electric bill arrives: $87.40. "How," says Jake.',
-  'The name comes down to "Black Velvet Funeral," "The Hot Dogs," and "Refrigerator." Jake settles it: they are Plasma Cathedral. Maya hates it privately and says nothing. Geoff the possum, unbothered, applauds the loud parts.',
+  'The name comes down to "Black Velvet Funeral," "The Hot Dogs," and "Refrigerator." Jake settles it: they are Plasma Cathedral. Maya hates it privately and says nothing. Josh the cat, who was here first, leaves during the chorus and returns for the pizza crusts.',
   // THE COFFEE SHOP
   'First real gig: the Crooked Knee. Trevor the sound guy has heard everything since 1987. He listens, pauses, and says: "I\u2019ll get the second mic."',
   'A lone internet review: "The bassist seemed angry. The drummer has potential. Would see again, maybe." The band frames a screenshot.',
@@ -1111,14 +1483,14 @@ const STORY = [
   'Maya quits to study accounting. Kat says, "You\u2019ll be back by Thursday." Wednesday, Maya texts: "Accounting is awful."',
   'Maya returns with a spreadsheet proving the garage loses $40 a month. Dave: "Is this what numbers look like."',
   'Dave switches to a wooden spoon. It sounds, somehow, better. (Sticks broken: 14. Spoons: 1.)',
-  'The amp says a single word \u2014 "Soon" \u2014 and Maya is alone when it happens. Geoff declines to comment.',
+  'The amp says a single word \u2014 "Soon" \u2014 and Maya is alone when it happens. Josh, who was also there, declines to corroborate \u2014 then pushes a full mug off the amp and leaves the room.',
   // THE CLUB
   'The Club. So much fog the fog now has a rider. Trevor reappears: older, wiser, still unimpressed, secretly proud.',
   'A man in a wrinkled suit takes notes and does not clap. His card says only "Verdant." He smells faintly of tuna.',
   'They record the album in a basement studio. A cat walks across the soundboard during the only good take. They keep it.',
   'Mom\u2019s bill: $284.91. "We weren\u2019t even home," says Jake. The amp glows, briefly, a color with no name.',
   'Mournful Plumbing release a twenty-minute prog epic. It is called, with no irony whatsoever, "Plasma Cathedral." Brian calls it "an homage." Watching their discarded name become a twenty-minute Brian solo, the band feel something settle \u2014 not anger, relief. They strip the sound back, leaner and louder, and never look back.',
-  'Dave takes a four-minute drum solo. The room drops twelve degrees. Geoff stands and applauds with both paws.',
+  'Dave takes a four-minute drum solo. The room drops twelve degrees. Josh, who has never once looked up, looks up.',
   // THE THEATER
   'The Theater. Velvet seats, a balcony, and a man in row G who insists he discovered you. He sells churros.',
   'A critic writes "too many notes." You add more, purely out of spite. Mrs. Krenshaw, inexplicably, attends.',
@@ -1145,8 +1517,13 @@ const ROAD_QUIPS = [
   'Mom opens the bill: $612.47. "We don\u2019t own a 600-dollar appliance," she says.',
   'Dave breaks his fourth stick in twenty minutes. (Sticks broken: 7.)',
   'Dave switches to wooden spoons and has to relearn his grip \u2014 hold them like a baby bird, not a hammer. He gets there. It sounds, somehow, better.',
-  'Geoff the possum sleeps through every rehearsal except the loud parts, during which he applauds.',
-  'Geoff stands on his hind legs and applauds with both paws. Kat takes notes.',
+  'Josh the cat sleeps through every rehearsal, including the loud parts, as a statement.',
+  'Josh purrs during the bridge. He denies it. Kat takes notes.',
+  'Josh ignores an entire rehearsal from inside an open guitar case. Kat: "Someday that cat\u2019s gonna have his own merch." Nobody laughs. Nobody disagrees.',
+  'Josh walks to the edge of the amp, locates a guitar pick, and pushes it off. He does not look at it. He looks at Jake.',
+  'Three picks, a capo and a half-full mug go over the edge in one afternoon. Maya starts calling it "the set list."',
+  'Josh knocks the metronome off the shelf mid-rehearsal. Dave insists this improved his timing. It did.',
+  'A cymbal stand goes over at 2 AM. Josh is discovered sitting beside it, entirely composed, having clearly just done that.',
   'Kat says, "The walls will not always be this strong." Nobody knows what she means.',
   'The amp says a single word \u2014 "Soon" \u2014 and only Maya is there to hear it.',
   'The amp says "Welcome back." Maya goes pale. Dave was eating chips and missed it.',
@@ -1176,11 +1553,13 @@ function nextQuip() { const q = ROAD_QUIPS[_quipIx % ROAD_QUIPS.length]; _quipIx
 // Fires once, at the rename moment (level 19), then lives quietly on the Band screen.
 // NOTE: confirm this is the public fan link (the "Share" link on the product page). Studio/promote links are seller-only.
 const PLASMA_MERCH_URL = 'https://www.redbubble.com/shop/ap/181765220?asc=u';
+// Josh has his own product line, which he has never been consulted about.
+const JOSH_SHOP_URL = 'https://www.redbubble.com/shop/ap/134520091?asc=u';
 const RENAME_LEVEL = 7;
 const WIN_FLAVORS = [
-  'The crowd wants one more. Geoff applauds with both paws.',
+  'The crowd wants one more. Josh opens one eye, which from Josh is a riot.',
   'Trevor the sound guy nods once. From Trevor, that is a standing ovation.',
-  'Somebody films it on a flip phone. By Tuesday it has reached three countries and one possum.',
+  'Somebody films it on a flip phone. By Tuesday it has reached three countries and one deeply unimpressed cat.',
   'The amp hums in approval. You decide not to think about that too hard.',
   'Mom\u2019s bill goes up $40. Worth every cent, she does not say.',
   'Mrs. Krenshaw, against her own clearly stated wishes, is on her feet.',
@@ -1189,7 +1568,7 @@ const LOSE_FLAVORS = [
   'Last call. Trevor cuts the second mic. "Next time," he says \u2014 the nicest thing he has ever said.',
   'Good set. The room needed one more cowbell. It always does.',
   'Brian offers a four-minute explanation of where you went wrong. You leave during minute two.',
-  'Geoff did not stand. Geoff stands for no half-measures. Run it back.',
+  'Josh did not open an eye. Josh opens an eye for very little, but he opens it for better than that. Run it back.',
 ];
 const UNLOCK = { amp:1, pyro:3, rockstar:5, bassdrop:12 };   // toys unlock as you climb, so the kit keeps growing
 const UNLOCK_INFO = {
@@ -1200,20 +1579,20 @@ const UNLOCK_INFO = {
 };
 // ===== B-SIDES — collectible lore vignettes, revealed as you climb the Journey =====
 const BSIDES = [
-  { i:'\uD83D\uDC3E', t:'Geoff\u2019s Diary \u2014 Entry One',
-    x:'Day 847 in the garage. The loud ones have returned. They bring noise and, occasionally, pizza crusts. The small angry one plays the long instrument with four ropes. Her rhythm pleases me. I applaud only the loud parts. Standards matter.' },
+  { i:'\uD83D\uDC3E', t:'Josh\u2019s Diary \u2014 Entry One',
+    x:'Day 847. The loud ones have returned to my basement. I say mine because I was here first and because I have never once been asked to leave. They bring noise and, occasionally, pizza crusts. The small angry one plays the long instrument with four ropes. Her rhythm is acceptable. I have not told her this and I will not.' },
   { i:'\u2709\uFE0F', t:'Mrs. Krenshaw\u2019s First Letter',
     x:'To the Homeowners\u2019 Association: I write again regarding the noise at number 12. It occurs Tuesdays and Thursdays and most other days. Yesterday they played something in a minor key for forty minutes. I made tea and listened against my will. It was not entirely without merit. Please advise. \u2014 E. Krenshaw' },
   { i:'\uD83D\uDEB0', t:'Brian Explains \u201CFaucet\u201D',
     x:'People ask me what \u201CFaucet\u201D is about. On the surface, yes, it is about a faucet. But the faucet is also a metaphor for the faucet within all of us. The drip represents time. The handle represents choice. The aerator \u2014 well, that one is literal. It aerates. Thank you for coming to the show. \u2014 Brian, Mournful Plumbing' },
   { i:'\uD83D\uDD0C', t:'The Amp \u2014 Fragment I',
     x:'A receipt found taped inside the amp, dated 1974: \u201CSOLD AS-IS. NO REFUNDS. NOT RESPONSIBLE FOR WHAT IT LEARNS.\u201D The shop named on the receipt burned down in 1975. The fire marshal\u2019s report uses the word \u201Cinconclusive\u201D eleven times.' },
-  { i:'\uD83D\uDC3E', t:'Geoff\u2019s Diary \u2014 Entry Two',
-    x:'Day 902. The drummer has done something. The temperature dropped and I stood and I applauded with both paws, which I have never done, which possums do not do. I do not know what came over me. The spoon era continues. I respect the spoon.' },
+  { i:'\uD83D\uDC3E', t:'Josh\u2019s Diary \u2014 Entry Two',
+    x:'Day 902. The drummer did something and the room went cold and I stood up. Of my own accord. Nobody made me. I wish to be clear that cats do not do this, that I have spent nine hundred days establishing that I do not do this, and that I have told no one. The spoon era continues. I have decided the spoon is fine. In compensation for standing up I have this week put four picks, one capo and a mug of tea onto the floor. Not from malice. Things belong on the floor and somebody has to say so.' },
   { i:'\u2709\uFE0F', t:'Mrs. Krenshaw\u2019s Second Letter',
     x:'To the Association: Withdraw my previous complaints. I attended their concert. I sat in the second row. I do not wish to discuss it. The matter is closed. P.S. If anyone knows where one purchases a \u201Cband shirt,\u201D contact me privately. \u2014 E.K.' },
-  { i:'\uD83D\uDC3E', t:'Geoff\u2019s Diary \u2014 Entry Three',
-    x:'Day 961. They put me on the album cover. I am told this is an honor. I sleep on the amp because it is warm, not because it speaks to me. We have an understanding, the amp and I. I keep its secrets. It keeps mine.' },
+  { i:'\uD83D\uDC3E', t:'Josh\u2019s Diary \u2014 Entry Three',
+    x:'Day 961. They have put me on the album cover. I am told this is an honour. It is a photograph of me asleep, taken without my consent, and I intend to do nothing about it. I sleep on the amp because it is warm. Not because it talks. It talks. We have an arrangement: I keep its secrets, it keeps mine, and neither of us mentions the humming.' },
   { i:'\uD83D\uDD0C', t:'The Amp \u2014 Fragment II',
     x:'Maya checked the serial number once. The maker confirmed the model \u2014 ordinary, built 1968 to 1979. Then they asked her to read the number again. Then they asked where she got it. Then they hung up. The number, they said before the line went dead, was never assigned.' },
 ];
@@ -2347,6 +2726,13 @@ function applyVenue(n) {
   const v = venueFor(n);
   VENUES.forEach(x => document.body.classList.remove(x.cls));
   document.body.classList.add(v.cls);
+  // Swap the illustration only when the room actually changes — re-injecting identical
+  // markup every level would throw away and rebuild a few hundred nodes for nothing.
+  const host = document.getElementById('venueArt');
+  if (!host) return;
+  if (host.dataset.venue === v.cls) return;
+  host.dataset.venue = v.cls;
+  host.innerHTML = VENUE_ART[v.cls] || '';
 }
 function showVenueToast(v) {
   const n = document.getElementById('vtN'), s = document.getElementById('vtS'), t = document.getElementById('venueToast');
@@ -2639,6 +3025,33 @@ const BAND = [
   { key: 'drums',  name: 'Dave',  role: 'Drums' },
   { key: 'bass',   name: 'Kat',   role: 'Bass' },
 ];
+// Josh, asleep. Curled, tail wrapped, eyes shut — two closed arcs do the whole job.
+const JOSH_SVG = '<svg viewBox="0 0 120 96" xmlns="http://www.w3.org/2000/svg">'
+  + '<ellipse cx="60" cy="86" rx="46" ry="7" fill="#000" opacity=".3"/>'
+  + '<path d="M96 74 q22-8 18-28 q-4-19-22-15 q-13 3-10 15 q3 9 12 6" fill="none" stroke="#1b1826" stroke-width="10" stroke-linecap="round"/>'
+  + '<ellipse cx="60" cy="62" rx="45" ry="22" fill="#1b1826"/>'
+  + '<path d="M18 80 q-8-32 16-46 q24-14 50-7 q30 8 32 33 q2 13-5 20Z" fill="#1b1826"/>'
+  + '<circle cx="34" cy="46" r="21" fill="#241f31"/>'
+  + '<path d="M16 34 l2-18 17 10Z" fill="#241f31"/>'
+  + '<path d="M40 26 l17-8 -3 18Z" fill="#241f31"/>'
+  + '<path d="M19 32 l1-11 9 6Z" fill="#b0707f" opacity=".8"/>'
+  + '<path d="M43 27 l10-5 -2 11Z" fill="#b0707f" opacity=".8"/>'
+  + '<path d="M15 43 q2-17 15-23" stroke="#6b6480" stroke-width="2.6" fill="none" opacity=".85"/>'
+  + '<path d="M20 78 q-8-26 11-38" stroke="#544d66" stroke-width="2.4" fill="none" opacity=".6"/>'
+  + '<path class="jz-shut jz-l" d="M22 45 q6 5 12 0" stroke="#8e87a0" stroke-width="2.2" fill="none" stroke-linecap="round"/>'
+  + '<path class="jz-shut" d="M39 45 q6 5 12 0" stroke="#8e87a0" stroke-width="2.2" fill="none" stroke-linecap="round"/>'
+  + '<g class="jz-open">'
+  +   '<ellipse cx="28" cy="44" rx="5.6" ry="6.4" fill="#c3e04f"/>'
+  +   '<ellipse cx="28" cy="44" rx="1.7" ry="5.4" fill="#161306"/>'
+  +   '<circle cx="26" cy="41" r="1.4" fill="#f6ffdc"/>'
+  + '</g>'
+  + '<path d="M31 55 l6 0 -3 4.5Z" fill="#e096ab"/>'
+  + '<g stroke="#9c95a8" stroke-width="1.3" opacity=".55" stroke-linecap="round">'
+  +   '<path d="M23 57 q-14 1-18 7"/><path d="M45 57 q14 1 18 7"/>'
+  + '</g>'
+  + '<text class="jz-z" x="86" y="26" font-family="Fraunces,Georgia,serif" font-size="13" fill="#6b6480" opacity=".75">z</text>'
+  + '<text class="jz-z" x="96" y="16" font-family="Fraunces,Georgia,serif" font-size="10" fill="#6b6480" opacity=".55">z</text>'
+  + '</svg>';
 const BAND_TIERS = ['Rookie', 'Rising', 'Headliner', 'Superstar'];   // 0..3
 // Each band upgrade buys better GEAR — and better instruments make the band sound better (= more specials on the board).
 const GEAR = {
@@ -2664,7 +3077,7 @@ const LIFESTYLE = [
   ] },
   { key: 'crib', label: 'The Crib', icon: '🏠', tiers: [
     { name: "Mom's Basement", flavor: 'Rent: free. Electric bill: catastrophic.' },
-    { name: 'Shared Apartment', flavor: 'Four people, one bathroom, one possum named Geoff.' },
+    { name: 'Shared Apartment', flavor: 'Four people, one bathroom, one cat named Josh who considers all four of them staff.' },
     { name: 'House with a Studio', flavor: 'Soundproofed. Mrs. Krenshaw moves in next door anyway.' },
     { name: 'Hilltop Mansion', flavor: 'Gold records on the wall. The amp has its own wing.' },
   ] },
@@ -3447,7 +3860,40 @@ function buildBand() {
   } else {
     bb.textContent = 'Level up the band for bonus coins — and more specials right when sets get tough.';
   }
+  buildJosh();
   buildLifestyle();
+}
+/* Josh gets a card of his own under the roster. He is not in the band and has never
+   auditioned, but he attends every rehearsal and is listed here on merit. */
+function buildJosh() {
+  let card = document.getElementById('joshCard');
+  const grid = document.getElementById('bandGrid');
+  const anchor = document.getElementById('bandBonusLine') || grid;
+  if (!card) {
+    card = document.createElement('div');
+    card.id = 'joshCard';
+    card.className = 'josh-card';
+    anchor.parentNode.insertBefore(card, anchor.nextSibling);
+  }
+  const cleared = Save.maxCleared();
+  // his rap sheet grows as the band rises
+  const CRIMES = [
+    'Knocked one (1) pick off the amp. Watched it fall. Made eye contact throughout.',
+    'Knocked a full mug of tea onto the setlist. The setlist was improved.',
+    'Knocked Dave\u2019s spare sticks off the shelf, one at a time, over four minutes.',
+    'Knocked the tip jar off the counter at the Crooked Knee. Recovered $1.40 and a pickle.',
+    'Knocked a fog machine remote into the fog. It has not been seen since.',
+    'Knocked a platinum record off a wall in a house with eleven bathrooms. Regrets nothing.',
+  ];
+  const crime = CRIMES[Math.min(CRIMES.length - 1, Math.floor(cleared / 5))];
+  card.innerHTML =
+      '<a class="josh-art" href="' + JOSH_SHOP_URL + '" target="_blank" rel="noopener"'
+    + ' aria-label="Josh\u2019s merch shop" title="Josh">' + JOSH_SVG + '</a>'
+    + '<div class="josh-bd">'
+    +   '<div class="josh-name">Josh <span>Not in the band</span></div>'
+    +   '<div class="josh-role">Attends every rehearsal. Has never once been asked to.</div>'
+    +   '<div class="josh-crime"><b>Latest incident:</b> ' + crime + '</div>'
+    + '</div>';
 }
 function buildLifestyle() {
   const grid = document.getElementById('lifestyleGrid');
