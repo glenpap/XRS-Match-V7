@@ -883,6 +883,16 @@ body.v-club .club-smoke{display:block;}
 @keyframes cta-pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,224,138,.5);}50%{box-shadow:0 0 0 6px rgba(255,224,138,0);}}
 .ov-band-note{margin-top:10px; font-family:var(--sans); font-size:.82rem; color:var(--gold-hi); font-weight:600;}
 /* link rows on the hubs + in-game */
+/* the engagement strip on the Journey map */
+.gauge{margin-top:20px; padding-top:16px; border-top:1px solid var(--line); text-align:center;}
+.gauge-stats{font-family:var(--mono); font-size:.62rem; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--cream-low); line-height:1.7;}
+.gauge-stats b{color:var(--gold-hi); font-weight:700;}
+.like-btn{margin-top:12px; background:linear-gradient(160deg,var(--surface-hi),var(--surface-low));
+  border:1px solid var(--gold-deep); border-radius:99px; padding:9px 20px; color:var(--gold-hi);
+  font-family:var(--sans); font-size:.82rem; font-weight:700; cursor:pointer; transition:transform .15s ease;}
+.like-btn:hover{transform:translateY(-1px);}
+.like-btn.done{border-color:var(--line); color:var(--cream-low); cursor:default; transform:none;}
 .hub-links{margin-top:24px; padding-top:18px; border-top:1px solid var(--line); text-align:center;}
 .hub-links .links{margin-top:10px;}
 .hub-links-note{font-family:var(--mono); font-size:.58rem; letter-spacing:.14em; text-transform:uppercase; color:var(--gold-warm);}
@@ -1244,6 +1254,10 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
         <button onclick="backToTitle()">Title</button>
       </div>
       <div class="j-path" id="mapPath"></div>
+      <div class="gauge">
+        <div class="gauge-stats" id="gaugeStats"></div>
+        <button class="like-btn" id="likeBtn" onclick="Game.like()">♥ Like this game</button>
+      </div>
       <div class="hub-links">
         <div class="hub-links-note">Hear the real X-Ray Star ★</div>
         <div class="links">
@@ -4279,6 +4293,7 @@ Game.newGame = function() {
   Game.startMoves = Game.moves; Game.movesAtWin = 0; Game.lowWarned = false; Game.resultShown = false;
   Game.selected = null; Game.busy = false; Game.ended = false;
   Game.dropCounter = 0;
+  Tally.bump('started');
   Game.board = generateBoard();
   seedStartingSpecials(2 + assist * 2 + Save.startSpecialBonus());   // 2 base + backup on retries + the band's investment payoff
   Game.collected = {};                                       // COLLECT objective tally
@@ -4714,6 +4729,81 @@ const LIFESTYLE = [
   ] },
 ];
 const LIFESTYLE_COST = [500, 1400, 3200];   // cost to reach tier 1, 2, 3
+/* =====================================================================
+   THE ENGAGEMENT METER
+   A page on GitHub Pages cannot count its own players — there is no server to count with.
+   So counting needs one outside service, and the choice of service is a real one because
+   it means this game stops being purely offline and starts making a network call.
+
+   GoatCounter was chosen because it is free for non-commercial use, sets no cookies,
+   stores no unique identifier, and therefore needs no consent banner. It also counts
+   custom events, so the same single script gives BOTH plays and likes.
+
+   IT IS OFF UNTIL GLEN TURNS IT ON. With GC_SITE empty, no script loads, no request is
+   made, and nothing leaves the device — the game is exactly as offline as it was. To
+   enable: make a free account at goatcounter.com, then put the subdomain below.
+       const GC_SITE = 'xraystar';     ->  loads xraystar.goatcounter.com
+   ===================================================================== */
+const GC_SITE = '';            // <-- your GoatCounter subdomain goes here, nothing else
+
+const Metrics = {
+  on() { return !!GC_SITE; },
+  boot() {
+    if (!this.on()) return;
+    try {
+      const sc = document.createElement('script');
+      sc.async = true;
+      sc.src = 'https://gc.zgo.at/count.js';
+      sc.setAttribute('data-goatcounter', 'https://' + GC_SITE + '.goatcounter.com/count');
+      document.head.appendChild(sc);
+    } catch (_) {}
+  },
+  // a named thing happened. Never sends anything about the person, only the event name.
+  event(name) {
+    if (!this.on()) return;
+    try {
+      if (window.goatcounter && window.goatcounter.count) {
+        window.goatcounter.count({ path: name, title: name, event: true });
+      }
+    } catch (_) {}
+  },
+};
+
+/* The player's own numbers. These are local, always kept, and shown on the Journey map
+   whether or not the counter above is switched on — they exist for the player, not for us. */
+const Tally = {
+  read() {
+    const d = Prefs.get('tally', null) || {};
+    return { started: d.started || 0, cleared: d.cleared || 0, best: d.best || 0, liked: !!d.liked };
+  },
+  write(t) { try { Prefs.set('tally', t); } catch (_) {} },
+  bump(key) { const t = this.read(); t[key] = (t[key] || 0) + 1; this.write(t); return t; },
+  recordScore(n) { const t = this.read(); if (n > t.best) { t.best = n; this.write(t); } },
+};
+
+function paintGauge() {
+  const el = document.getElementById('gaugeStats');
+  if (!el) return;
+  const t = Tally.read();
+  const cleared = Save.maxCleared();
+  el.innerHTML = 'Sets played <b>' + t.started + '</b> \u00b7 cleared <b>' + t.cleared + '</b><br>'
+    + 'Best set <b>' + (t.best || 0).toLocaleString() + '</b> \u00b7 furthest <b>Set ' + (cleared || 0) + '</b>';
+  const btn = document.getElementById('likeBtn');
+  if (btn) {
+    if (t.liked) { btn.textContent = '\u2665 Thanks for the love'; btn.classList.add('done'); }
+    else { btn.textContent = '\u2665 Like this game'; btn.classList.remove('done'); }
+  }
+}
+
+Game.like = function() {
+  const t = Tally.read();
+  if (t.liked) return;
+  t.liked = true; Tally.write(t);
+  Metrics.event('like');
+  paintGauge();
+  try { Sfx.levelUpSting && Sfx.levelUpSting(); } catch (_) {}
+};
+
 const Save = {
   data: null,
   load() {
@@ -4741,6 +4831,12 @@ const Save = {
   starsFor(n) { return this.data.stars[n] || 0; },
   isUnlocked(n) { return n <= this.data.unlocked; },
   recordWin(n, stars, coins) {
+    Tally.bump('cleared');
+    Tally.recordScore(Game.score);
+    // one event per venue rather than per set: enough to see how far people get,
+    // few enough that it is never a firehose
+    Metrics.event('cleared-' + (venueFor(n) || {}).cls);
+    if (n >= LEVELS.length) Metrics.event('finished-the-game');
     this.data.stars[n] = Math.max(this.data.stars[n] || 0, stars);
     this.data.unlocked = Math.min(LEVELS.length, Math.max(this.data.unlocked, n + 1));
     this.data.coins += coins;
@@ -5450,6 +5546,7 @@ function refreshUpgradeCues() {
 }
 function showMap() {
   Peek.cancel();
+  paintGauge();
   hideOverlay();
   document.getElementById('bandScreen').classList.remove('show');
   document.getElementById('bsideScreen').classList.remove('show');
@@ -5806,6 +5903,9 @@ function previewSet() {
     return true;
   } catch (_) { return false; }
 }
+
+Metrics.boot();
+Metrics.event('play');
 
 Game.newGame();   // Level 1 is set up behind the title screen
 // A ?set= preview wins; otherwise, if they were part-way through a set when the page went
