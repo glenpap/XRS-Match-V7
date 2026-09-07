@@ -598,6 +598,54 @@ button.primary{background:linear-gradient(160deg,var(--gold),var(--gold-deep)); 
 button.arm{border-color:var(--gold-hi) !important; color:var(--gold-hi) !important; background:rgba(120,40,40,.25) !important;}
 .title-newgame{margin-top:10px; background:transparent; border:1px solid var(--cream-low); color:var(--cream-low);
   font-family:var(--mono); font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; padding:9px 16px; border-radius:99px;}
+/* ===== THE FOG (The Club only) =====
+   A club normally sells itself on flashing lights, which is the one thing this game will
+   never do. So the fog does the work instead: the beams are painted dead still in the
+   artwork, and these three enormous, very faint banks drift across them.
+
+   SAFETY: the slowest thing in the game. The banks take 74, 96 and 112 seconds to cross,
+   they only ever move (transform, no opacity change at all once faded in), and none of
+   them exceeds 13% opacity. There is no flash, no pulse and no colour cycling anywhere in
+   here. Off entirely under reduced-motion and on lowgfx machines, which still get the
+   static fog painted into the artwork — a foggy room, just not a moving one.
+   COST: transform-only animation on three elements, which the compositor handles without
+   repainting. Nothing here touches the board or the per-frame cost of a match. */
+.club-fog{position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; display:none;}
+body.v-club .club-fog{display:block;}
+.club-fog i{position:absolute; display:block;
+  background:radial-gradient(ellipse at center, rgba(207,214,255,.13) 0%, rgba(207,214,255,.055) 46%, rgba(207,214,255,0) 72%);}
+.club-fog .fog-a{width:150vw; height:54vh; left:-28vw; top:22vh; animation:fog-a 74s ease-in-out infinite alternate;}
+.club-fog .fog-b{width:132vw; height:46vh; left:-16vw; top:44vh; animation:fog-b 96s ease-in-out infinite alternate;}
+.club-fog .fog-c{width:174vw; height:40vh; left:-38vw; top:60vh; animation:fog-c 112s ease-in-out infinite alternate;}
+@keyframes fog-a{from{transform:translate3d(-5vw,1vh,0);}to{transform:translate3d(9vw,-2vh,0);}}
+@keyframes fog-b{from{transform:translate3d(7vw,-1vh,0);}to{transform:translate3d(-7vw,2vh,0);}}
+@keyframes fog-c{from{transform:translate3d(-8vw,0,0);}to{transform:translate3d(6vw,-1vh,0);}}
+
+/* ===== THE SMOKE MACHINE =====
+   Fires on a big cascade, in The Club and nowhere else — it is funny precisely because
+   this band cannot yet afford it, and it would stop being funny once they can.
+   It lives BEHIND the interface (z-index 0, the board is z-index 1), so it physically
+   cannot cover a tile or interrupt a move: play carries straight on through it. Puffs
+   rise and are gone inside 2.4 seconds, and the whole layer is emptied afterwards.
+   SAFETY: a slow rise and a fade. No flash, no strobe, capped well below half opacity. */
+.club-smoke{position:fixed; left:0; right:0; bottom:0; height:70vh; z-index:0;
+  pointer-events:none; overflow:hidden; display:none;}
+body.v-club .club-smoke{display:block;}
+.club-smoke .puff{position:absolute; bottom:-16vh; border-radius:50%; opacity:0;
+  background:radial-gradient(circle, rgba(228,233,255,.42) 0%, rgba(210,218,255,.18) 44%, rgba(210,218,255,0) 70%);}
+.club-smoke.fire .puff{animation:puff-rise 2.4s ease-out forwards;}
+@keyframes puff-rise{
+  0%{opacity:0; transform:translateY(0) scale(.55);}
+  20%{opacity:.5;}
+  60%{opacity:.3;}
+  100%{opacity:0; transform:translateY(-44vh) scale(1.85);}
+}
+.lowgfx .club-fog, .lowgfx .club-smoke{display:none !important;}
+@media (prefers-reduced-motion:reduce){
+  .club-fog i{animation:none !important;}
+  .club-smoke{display:none !important;}
+}
+
 /* ===== living backdrop — slow drifting motes (photosensitivity-safe: slow, faint, no flashing) ===== */
 .drift{position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;}
 .mote{position:absolute; bottom:-12px; border-radius:50%;
@@ -952,6 +1000,8 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
       </g>
     </svg>
   </a>
+  <div class="club-fog" id="clubFog" aria-hidden="true"><i class="fog-a"></i><i class="fog-b"></i><i class="fog-c"></i></div>
+  <div class="club-smoke" id="clubSmoke" aria-hidden="true"></div>
   <div class="drift" id="drift" aria-hidden="true"></div>
   <div class="screen-pulse" id="screenPulse"></div>
   <div class="combo-banner" id="comboBanner"></div>
@@ -2156,6 +2206,203 @@ const VENUE_ART = {
 
   <rect width="1200" height="800" fill="url(#dbFall)"/>
 </svg>`,
+  'v-club': `<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="clRoom" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1d1738"/><stop offset="52%" stop-color="#181233"/><stop offset="100%" stop-color="#0a0818"/>
+    </linearGradient>
+    <linearGradient id="clBeamP" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a97bff" stop-opacity=".40"/><stop offset="70%" stop-color="#8b5cf6" stop-opacity=".12"/>
+      <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="clBeamT" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6ff0d6" stop-opacity=".36"/><stop offset="70%" stop-color="#3fd0b8" stop-opacity=".11"/>
+      <stop offset="100%" stop-color="#3fd0b8" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="clBeamB" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8fbcff" stop-opacity=".38"/><stop offset="70%" stop-color="#5b9bff" stop-opacity=".12"/>
+      <stop offset="100%" stop-color="#5b9bff" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="clFogBank" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#cfd6ff" stop-opacity=".16"/><stop offset="100%" stop-color="#cfd6ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="clCan" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff6e2"/><stop offset="100%" stop-color="#c9b0ff" stop-opacity=".3"/>
+    </radialGradient>
+    <linearGradient id="clStage" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2a2450"/><stop offset="100%" stop-color="#15112c"/>
+    </linearGradient>
+    <linearGradient id="clTable" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6a5030"/><stop offset="100%" stop-color="#332514"/>
+    </linearGradient>
+    <linearGradient id="clCloth" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2f2a52"/><stop offset="100%" stop-color="#181430"/>
+    </linearGradient>
+    <linearGradient id="clFall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#000" stop-opacity=".34"/>
+      <stop offset="48%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity=".44"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="800" fill="url(#clRoom)"/>
+
+  <!-- THE TRUSS. Five cans, five beams, and not one of them moves.
+       A club is the one room whose whole look is normally flashing lights, so the light
+       here is completely still and the FOG does the work instead. -->
+  <g stroke="#2c2750" stroke-width="7" fill="none">
+    <path d="M180 82 H1020 M180 106 H1020"/>
+  </g>
+  <g stroke="#231f42" stroke-width="4" fill="none">
+    <path d="M180 106 L228 82 M228 106 L276 82 M276 106 L324 82 M324 106 L372 82 M372 106 L420 82
+             M420 106 L468 82 M468 106 L516 82 M516 106 L564 82 M564 106 L612 82 M612 106 L660 82
+             M660 106 L708 82 M708 106 L756 82 M756 106 L804 82 M804 106 L852 82 M852 106 L900 82
+             M900 106 L948 82 M948 106 L996 82"/>
+  </g>
+  <g fill="#211c3e">
+    <rect x="322" y="106" width="36" height="30" rx="4"/><rect x="452" y="106" width="36" height="30" rx="4"/>
+    <rect x="582" y="106" width="36" height="30" rx="4"/><rect x="712" y="106" width="36" height="30" rx="4"/>
+    <rect x="842" y="106" width="36" height="30" rx="4"/>
+  </g>
+  <g>
+    <ellipse cx="340" cy="138" rx="15" ry="5" fill="url(#clCan)"/><ellipse cx="470" cy="138" rx="15" ry="5" fill="url(#clCan)"/>
+    <ellipse cx="600" cy="138" rx="15" ry="5" fill="url(#clCan)"/><ellipse cx="730" cy="138" rx="15" ry="5" fill="url(#clCan)"/>
+    <ellipse cx="860" cy="138" rx="15" ry="5" fill="url(#clCan)"/>
+  </g>
+  <g>
+    <path d="M326 140 L354 140 L452 560 L228 560Z" fill="url(#clBeamP)"/>
+    <path d="M456 140 L484 140 L566 560 L374 560Z" fill="url(#clBeamT)"/>
+    <path d="M586 140 L614 140 L684 560 L516 560Z" fill="url(#clBeamB)"/>
+    <path d="M716 140 L744 140 L826 560 L634 560Z" fill="url(#clBeamP)"/>
+    <path d="M846 140 L874 140 L972 560 L748 560Z" fill="url(#clBeamT)"/>
+  </g>
+
+  <!-- THE STAGE, seen from the room for the first time. That is the band up there. -->
+  <rect x="260" y="516" width="680" height="52" fill="url(#clStage)"/>
+  <rect x="260" y="568" width="680" height="34" fill="#100d22"/>
+  <g stroke="#0b0918" stroke-width="3" opacity=".7"><path d="M260 568 H940"/></g>
+  <g fill="#0d0b1c">
+    <g><circle cx="392" cy="450" r="17"/><path d="M368 516 q4-46 24-46 q20 0 24 46Z"/>
+       <path d="M356 486 q40-16 62-4" stroke="#0d0b1c" stroke-width="7" fill="none" stroke-linecap="round"/>
+       <ellipse cx="352" cy="490" rx="21" ry="13" transform="rotate(-22 352 490)"/></g>
+    <g><circle cx="512" cy="436" r="17"/><path d="M488 516 q4-52 24-52 q20 0 24 52Z"/>
+       <rect x="506" y="452" width="8" height="12" rx="3"/>
+       <path d="M510 400 V430" stroke="#0d0b1c" stroke-width="5"/><ellipse cx="510" cy="396" rx="8" ry="10"/></g>
+    <g><circle cx="640" cy="456" r="16"/><path d="M618 516 q4-44 22-44 q18 0 22 44Z"/>
+       <ellipse cx="676" cy="500" rx="30" ry="18" fill="#151132"/><ellipse cx="676" cy="500" rx="21" ry="12" fill="#0d0b1c"/>
+       <path d="M652 470 l24 18 M700 470 l-24 18" stroke="#2a2450" stroke-width="4"/></g>
+    <g><circle cx="790" cy="448" r="17"/><path d="M766 516 q4-48 24-48 q20 0 24 48Z"/>
+       <path d="M754 484 q40-16 62-4" stroke="#0d0b1c" stroke-width="7" fill="none" stroke-linecap="round"/>
+       <ellipse cx="750" cy="488" rx="23" ry="11" transform="rotate(-16 750 488)"/></g>
+  </g>
+  <g fill="#241d46">
+    <rect x="292" y="470" width="54" height="46" rx="4"/><rect x="848" y="466" width="60" height="50" rx="4"/>
+  </g>
+
+  <!-- static fog banks. The moving fog is a separate layer, so machines that cannot
+       afford animation still get a foggy room rather than an empty one. -->
+  <g>
+    <ellipse cx="420" cy="470" rx="330" ry="120" fill="url(#clFogBank)"/>
+    <ellipse cx="820" cy="500" rx="360" ry="130" fill="url(#clFogBank)"/>
+    <ellipse cx="600" cy="586" rx="520" ry="110" fill="url(#clFogBank)"/>
+  </g>
+
+  <!-- THE CROWD, backs to us, facing the band. They are having a much better time than
+       the man in the wrinkled suit. -->
+  <g fill="#08060f">
+    <g><circle cx="52" cy="642" r="26"/><path d="M4 800 q6-124 48-124 q42 0 48 124Z"/><path d="M18 690 q-16-46-6-64" stroke="#08060f" stroke-width="13" fill="none" stroke-linecap="round"/></g>
+    <g><circle cx="140" cy="666" r="24"/><path d="M96 800 q6-114 44-114 q38 0 44 114Z"/></g>
+    <g><circle cx="336" cy="656" r="25"/><path d="M290 800 q6-118 46-118 q40 0 46 118Z"/><path d="M378 704 q18-44 10-66" stroke="#08060f" stroke-width="13" fill="none" stroke-linecap="round"/></g>
+    <g><circle cx="404" cy="678" r="23"/><path d="M362 800 q6-110 42-110 q36 0 42 110Z"/></g>
+    <g><circle cx="852" cy="660" r="25"/><path d="M806 800 q6-118 46-118 q40 0 46 118Z"/><path d="M812 706 q-18-44-10-66" stroke="#08060f" stroke-width="13" fill="none" stroke-linecap="round"/></g>
+    <g><circle cx="946" cy="682" r="23"/><path d="M904 800 q6-110 42-110 q36 0 42 110Z"/></g>
+    <g><circle cx="1046" cy="650" r="26"/><path d="M998 800 q6-122 48-122 q42 0 48 122Z"/><path d="M1092 698 q18-46 8-68" stroke="#08060f" stroke-width="13" fill="none" stroke-linecap="round"/></g>
+    <g><circle cx="1148" cy="674" r="24"/><path d="M1104 800 q6-114 44-114 q38 0 44 114Z"/></g>
+  </g>
+  <g stroke="#7d6bd6" stroke-width="3" opacity=".32" fill="none" stroke-linecap="round">
+    <path d="M78 630 q10 20 8 42"/><path d="M361 644 q10 20 8 42"/><path d="M877 648 q10 20 8 42"/><path d="M1072 638 q10 20 8 42"/>
+  </g>
+
+  <!-- The man in the wrinkled suit. He is taking notes. He is not clapping.
+       His card says only "Verdant." He smells faintly of tuna. -->
+  <g>
+    <circle cx="222" cy="620" r="25" fill="#120e1e"/>
+    <path d="M176 800 q6-126 46-126 q40 0 46 126Z" fill="#1b1626"/>
+    <g stroke="#2c2438" stroke-width="2" opacity=".9" fill="none">
+      <path d="M196 712 q14 8 8 22"/><path d="M240 706 q-12 10-6 24"/><path d="M204 752 q18 6 34 0"/>
+    </g>
+    <path d="M212 674 l10 34 10-34Z" fill="#3a2f4a"/>
+    <rect x="236" y="694" width="42" height="34" rx="2" fill="#d9d2c2" transform="rotate(-9 257 711)"/>
+    <g stroke="#7d7566" stroke-width="1.6" transform="rotate(-9 257 711)">
+      <path d="M242 704 H272 M242 712 H268 M242 720 H272"/>
+    </g>
+    <path d="M232 700 l-12 8" stroke="#0e0b16" stroke-width="5" stroke-linecap="round"/>
+  </g>
+
+  <!-- THE MERCH TABLE. Their first. Josh is sitting on it and will not be moved.
+       Two separate links live here, deliberately kept apart: the shirts and the price
+       card go to the band's shop, Josh goes to his own. Josh sits to the right with a
+       clear gap between his body and the shirts, so a thumb can never land on both. -->
+  <rect x="424" y="690" width="376" height="18" rx="3" fill="url(#clTable)"/>
+  <rect x="432" y="708" width="360" height="92" fill="url(#clCloth)"/>
+  <g stroke="#0f0c1e" stroke-width="4" opacity=".6"><path d="M432 708 H792"/></g>
+  <!-- cash box: a shoebox. It is doing the job of a cash box. -->
+  <rect x="726" y="654" width="66" height="36" rx="3" fill="#8a7350"/>
+  <rect x="722" y="646" width="74" height="12" rx="3" fill="#a08a63"/>
+  <path d="M746 646 h26 v-8 h-26Z" fill="#6d5a3e"/>
+
+  <a href="__BANDHREF__" target="_blank" rel="noopener" aria-label="__BAND__ &#8212; merch">
+  <g class="merch-g">
+    <rect class="poster-frame" x="440" y="618" width="150" height="76" fill="transparent" stroke="transparent" stroke-width="0"/>
+    <g>
+      <rect x="448" y="672" width="132" height="18" rx="3" fill="#2b2646"/>
+      <rect x="452" y="656" width="126" height="18" rx="3" fill="#37305a"/>
+      <rect x="456" y="640" width="118" height="18" rx="3" fill="#443b6d"/>
+      <rect x="462" y="626" width="106" height="16" rx="3" fill="#524780"/>
+      <path d="M486 626 q29 14 58 0" fill="none" stroke="#6e60a8" stroke-width="2.4"/>
+      <text x="515" y="640" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="13" fill="#ffd58c">&#9733;</text>
+    </g>
+    <!-- the price card, written by hand, taped to the front -->
+    <g transform="rotate(-2 520 722)">
+      <rect x="446" y="700" width="148" height="44" rx="2" fill="#efe6cf" stroke="#a8987a" stroke-width="1.6"/>
+      <text class="gig-name" x="520" y="718" text-anchor="middle" textLength="122" lengthAdjust="spacingAndGlyphs"
+            font-family="Fraunces,Georgia,serif" font-weight="700" font-size="15" fill="#2a2118">__BAND__</text>
+      <text x="520" y="736" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#2a2118" opacity=".75">SHIRTS $15 &#183; TAPE $5</text>
+    </g>
+  </g>
+  </a>
+
+  <!-- JOSH, on the merchandise, as is his right. -->
+  <g transform="translate(672 690) scale(.68) translate(-470 -690)">
+  <a href="https://www.redbubble.com/shop/ap/134520091?asc=u" target="_blank" rel="noopener"
+     aria-label="Josh&#8217;s merch shop">
+  <g class="josh-hit">
+    <ellipse cx="470" cy="648" rx="64" ry="60" fill="transparent"/>
+    <path d="M424 690 q-8-54 46-62 q54-8 60 44 q3 18-2 18Z" fill="#141119"/>
+    <path d="M492 690 q34-8 44-30 q6-14-6-18 q-12-4-14 8" fill="none" stroke="#141119" stroke-width="11" stroke-linecap="round"/>
+    <circle cx="470" cy="634" r="36" fill="#191521"/>
+    <path d="M440 606 l-4-30 28 14Z" fill="#191521"/>
+    <path d="M500 606 l6-30 -27 15Z" fill="#191521"/>
+    <path d="M441 604 l-2-17 15 8Z" fill="#a9707c" opacity=".75"/>
+    <path d="M498 604 l4-17 -15 9Z" fill="#a9707c" opacity=".75"/>
+    <ellipse cx="456" cy="630" rx="8" ry="9" fill="#c3e04f"/>
+    <ellipse cx="486" cy="630" rx="8" ry="9" fill="#c3e04f"/>
+    <ellipse cx="456" cy="630" rx="2.6" ry="8" fill="#141119"/>
+    <ellipse cx="486" cy="630" rx="2.6" ry="8" fill="#141119"/>
+    <path d="M466 648 l8 0 -4 5Z" fill="#a9707c"/>
+    <path d="M470 653 q-6 6-13 3 M470 653 q6 6 13 3" stroke="#2b2634" stroke-width="2" fill="none"/>
+    <g stroke="#8a8397" stroke-width="2.2" opacity=".8" fill="none">
+      <path d="M436 640 q-24 2-34 10"/><path d="M436 648 q-24 8-32 18"/>
+      <path d="M506 640 q24 2 34 10"/><path d="M506 648 q24 8 32 18"/>
+    </g>
+  </g>
+  </a>
+  </g>
+  <!-- one shirt he has comprehensively sat on -->
+  <path d="M624 686 q22 8 44 2 l-2 6 q-22 6-44-2Z" fill="#3a3260" opacity=".9"/>
+
+  <rect width="1200" height="800" fill="url(#clFall)"/>
+</svg>`,
 };
 function venueFor(n) { return VENUES.find(v => n >= v.from && n <= v.to) || VENUES[VENUES.length - 1]; }
 function venueIndex(n) { const v = venueFor(n); return VENUES.indexOf(v); }
@@ -2834,11 +3081,42 @@ function shakeBoard() {
   setTimeout(() => boardWrap.classList.remove('shake'), 360);
 }
 const COMBO_WORDS = ['', '', 'Nice!', 'Groovy!', 'On fire!', 'Encore!', 'Legendary!'];
+/* The smoke machine. It goes off on a proper cascade, in The Club only.
+   Everything about it is arranged so play is never interrupted: the puffs render behind
+   the board rather than over it, they clear themselves in well under three seconds, and a
+   four-second cooldown stops a long chain of cascades from turning the room into soup. */
+let _lastSmoke = 0;
+function clubSmoke() {
+  const el = document.getElementById('clubSmoke');
+  if (!el || !document.body.classList.contains('v-club')) return;
+  if (document.documentElement.classList.contains('lowgfx') || reducedMotion()) return;
+  const now = Date.now();
+  if (now - _lastSmoke < 4000) return;                 // the machine needs a moment
+  _lastSmoke = now;
+  try {
+    el.innerHTML = '';
+    for (let i = 0; i < 5; i++) {
+      const puff = document.createElement('span');
+      puff.className = 'puff';
+      const w = 26 + Math.random() * 26;
+      puff.style.width = w.toFixed(0) + 'vw';
+      puff.style.height = (w * 0.82).toFixed(0) + 'vw';
+      puff.style.left = (Math.random() * 104 - 18).toFixed(0) + 'vw';
+      puff.style.animationDelay = (Math.random() * 0.34).toFixed(2) + 's';
+      el.appendChild(puff);
+    }
+    el.classList.remove('fire'); void el.offsetWidth; el.classList.add('fire');
+    clearTimeout(el._smokeTimer);
+    el._smokeTimer = setTimeout(() => { el.classList.remove('fire'); el.innerHTML = ''; }, 3000);
+  } catch (e) {}
+}
+
 function showCombo(chain) {
   if (!comboTag || chain < 2) return;
   comboTag.textContent = `${COMBO_WORDS[Math.min(chain, COMBO_WORDS.length - 1)] || 'Unreal!'}  ×${chain}`;
   comboTag.classList.remove('show'); void comboTag.offsetWidth; comboTag.classList.add('show');
   if (chain >= 3) screenPulse();
+  if (chain >= 4) clubSmoke();          // a proper cascade earns the fog
 }
 const comboBannerEl = document.getElementById('comboBanner');
 const screenPulseEl = document.getElementById('screenPulse');
@@ -2846,6 +3124,7 @@ function showComboBanner(name) {
   if (!comboBannerEl) return;
   comboBannerEl.textContent = name || 'COMBO!';
   comboBannerEl.classList.remove('show'); void comboBannerEl.offsetWidth; comboBannerEl.classList.add('show');
+  clubSmoke();                            // two specials together is exactly the moment for it
 }
 let _lastPulse = 0;
 function screenPulse() {
