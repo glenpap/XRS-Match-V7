@@ -134,7 +134,7 @@ body.v-arena .stage-bg{background:
   body.v-basement .pc-corner{display:block;}
   body.v-coffee .gig-corner{display:block;}
   body.v-dive .sticker-corner{display:block;}
-  body.v-club .merch-corner{display:block;}
+  body.v-club .merch-corner, body.v-arena .merch-corner{display:block;}
   .venue-art .pc-poster-g{display:none;}
   .venue-art .gig-flyer-g{display:none;}
   .venue-art .sticker-g{display:none;}
@@ -623,12 +623,37 @@ button.arm{border-color:var(--gold-hi) !important; color:var(--gold-hi) !importa
 body.v-club .club-fog{display:block;}
 .club-fog i{position:absolute; display:block;
   background:radial-gradient(ellipse at center, rgba(207,214,255,.13) 0%, rgba(207,214,255,.055) 46%, rgba(207,214,255,0) 72%);}
-.club-fog .fog-a{width:150vw; height:54vh; left:-28vw; top:22vh; animation:fog-a 74s ease-in-out infinite alternate;}
-.club-fog .fog-b{width:132vw; height:46vh; left:-16vw; top:44vh; animation:fog-b 96s ease-in-out infinite alternate;}
-.club-fog .fog-c{width:174vw; height:40vh; left:-38vw; top:60vh; animation:fog-c 112s ease-in-out infinite alternate;}
-@keyframes fog-a{from{transform:translate3d(-5vw,1vh,0);}to{transform:translate3d(9vw,-2vh,0);}}
-@keyframes fog-b{from{transform:translate3d(7vw,-1vh,0);}to{transform:translate3d(-7vw,2vh,0);}}
-@keyframes fog-c{from{transform:translate3d(-8vw,0,0);}to{transform:translate3d(6vw,-1vh,0);}}
+/* First attempt at this had three enormous banks crossing over 74 to 112 seconds. It was
+   perfectly safe and completely invisible: a huge even blob moving that slowly changes
+   nothing you can actually see. Billowing needs SHAPE change, not travel — so these are
+   smaller, there are four of them, they drift at different speeds in different directions,
+   and each one slowly swells and shrinks so its edges keep re-forming.
+   Still nowhere near a flash: the fastest is a 24-second cycle, which is 0.04Hz. A flash
+   hazard starts at 3Hz — roughly seventy times faster than this. */
+.club-fog .fog-a{width:88vw; height:40vh; left:-14vw; top:20vh; animation:fog-a 24s ease-in-out infinite alternate;}
+.club-fog .fog-b{width:76vw; height:34vh; left:22vw;  top:38vh; animation:fog-b 31s ease-in-out infinite alternate;}
+.club-fog .fog-c{width:104vw; height:44vh; left:-24vw; top:52vh; animation:fog-c 27s ease-in-out infinite alternate;}
+.club-fog .fog-d{width:82vw; height:30vh; left:26vw;  top:66vh; animation:fog-d 36s ease-in-out infinite alternate;}
+@keyframes fog-a{from{transform:translate3d(-8vw,2vh,0) scale(1);}    to{transform:translate3d(16vw,-4vh,0) scale(1.35);}}
+@keyframes fog-b{from{transform:translate3d(14vw,-3vh,0) scale(1.25);} to{transform:translate3d(-13vw,4vh,0) scale(.9);}}
+@keyframes fog-c{from{transform:translate3d(-16vw,3vh,0) scale(.95);}  to{transform:translate3d(12vw,-3vh,0) scale(1.3);}}
+@keyframes fog-d{from{transform:translate3d(10vw,3vh,0) scale(1.2);}   to{transform:translate3d(-15vw,-2vh,0) scale(.92);}}
+
+/* ===== TWENTY THOUSAND PHONES (The Arena only) =====
+   Set 29: the crowd lifts their phones. This is the last and biggest of the per-room
+   reactions — basement had none, the club bought a smoke machine, and here the room
+   itself answers. Fires on a real cascade.
+   SAFETY: each light fades up over roughly a second, holds, and fades out. One rise and
+   one fall across five seconds, no repeat, no flicker, and they come on staggered rather
+   than together so there is never a step change in overall brightness. They are 5px dots.
+   Like the smoke, they render BEHIND the board and cannot cover a tile. */
+.arena-lights{position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; display:none;}
+body.v-arena .arena-lights{display:block;}
+.arena-lights i{position:absolute; width:5px; height:5px; border-radius:50%; opacity:0;
+  background:radial-gradient(circle, rgba(255,246,214,.95) 0%, rgba(255,224,138,.55) 44%, rgba(255,224,138,0) 72%);}
+.arena-lights.fire i{animation:phone-light 5.4s ease-in-out forwards;}
+@keyframes phone-light{0%{opacity:0;} 20%{opacity:.9;} 66%{opacity:.9;} 100%{opacity:0;}}
+@media (prefers-reduced-motion:reduce){ .arena-lights{display:none !important;} }
 
 /* ===== THE SMOKE MACHINE =====
    Fires on a big cascade, in The Club and nowhere else — it is funny precisely because
@@ -649,7 +674,7 @@ body.v-club .club-smoke{display:block;}
   60%{opacity:.3;}
   100%{opacity:0; transform:translateY(-44vh) scale(1.85);}
 }
-.lowgfx .club-fog, .lowgfx .club-smoke{display:none !important;}
+.lowgfx .club-fog{display:none !important;}   /* the endless fog is the expensive part, not the burst */
 @media (prefers-reduced-motion:reduce){
   .club-fog i{animation:none !important;}
   .club-smoke{display:none !important;}
@@ -1009,8 +1034,9 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
       </g>
     </svg>
   </a>
-  <div class="club-fog" id="clubFog" aria-hidden="true"><i class="fog-a"></i><i class="fog-b"></i><i class="fog-c"></i></div>
+  <div class="club-fog" id="clubFog" aria-hidden="true"><i class="fog-a"></i><i class="fog-b"></i><i class="fog-c"></i><i class="fog-d"></i></div>
   <div class="club-smoke" id="clubSmoke" aria-hidden="true"></div>
+  <div class="arena-lights" id="arenaLights" aria-hidden="true"></div>
   <div class="drift" id="drift" aria-hidden="true"></div>
   <div class="screen-pulse" id="screenPulse"></div>
   <div class="combo-banner" id="comboBanner"></div>
@@ -2429,6 +2455,193 @@ const VENUE_ART = {
 
   <rect width="1200" height="800" fill="url(#clFall)"/>
 </svg>`,
+  'v-arena': `<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="arRoom" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#171226"/><stop offset="40%" stop-color="#241a1e"/><stop offset="100%" stop-color="#0b0810"/>
+    </linearGradient>
+    <linearGradient id="arBeamG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffe08a" stop-opacity=".44"/><stop offset="70%" stop-color="#c9a14a" stop-opacity=".12"/>
+      <stop offset="100%" stop-color="#c9a14a" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="arBeamW" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity=".34"/><stop offset="70%" stop-color="#dfe6ff" stop-opacity=".10"/>
+      <stop offset="100%" stop-color="#dfe6ff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="arBeamR" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff8a6a" stop-opacity=".36"/><stop offset="70%" stop-color="#e8392e" stop-opacity=".10"/>
+      <stop offset="100%" stop-color="#e8392e" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="arHaze" cx="50%" cy="30%" r="62%">
+      <stop offset="0%" stop-color="#ffd9a0" stop-opacity=".16"/><stop offset="100%" stop-color="#ffd9a0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="arScreen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2a1c3a"/><stop offset="100%" stop-color="#120b1c"/>
+    </linearGradient>
+    <linearGradient id="arStage" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a2f44"/><stop offset="100%" stop-color="#140f1c"/>
+    </linearGradient>
+    <linearGradient id="arCase" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2e2a38"/><stop offset="100%" stop-color="#16131e"/>
+    </linearGradient>
+    <linearGradient id="arFall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#000" stop-opacity=".32"/>
+      <stop offset="46%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity=".46"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="800" fill="url(#arRoom)"/>
+  <ellipse cx="600" cy="240" rx="620" ry="380" fill="url(#arHaze)"/>
+
+  <!-- the roof. Somewhere up there is a scoreboard nobody is looking at. -->
+  <rect width="1200" height="46" fill="#0d0a14"/>
+  <g stroke="#1c1726" stroke-width="5" fill="none">
+    <path d="M0 46 H1200 M0 74 H1200"/>
+    <path d="M40 74 L100 46 M100 74 L160 46 M160 74 L220 46 M220 74 L280 46 M280 74 L340 46
+             M340 74 L400 46 M400 74 L460 46 M460 74 L520 46 M520 74 L580 46 M580 74 L640 46
+             M640 74 L700 46 M700 74 L760 46 M760 74 L820 46 M820 74 L880 46 M880 74 L940 46
+             M940 74 L1000 46 M1000 74 L1060 46 M1060 74 L1120 46"/>
+  </g>
+  <g stroke="#241e30" stroke-width="8" fill="none"><path d="M0 108 H1200 M0 132 H1200"/></g>
+  <g fill="#191426">
+    <rect x="222" y="132" width="34" height="28" rx="4"/><rect x="352" y="132" width="34" height="28" rx="4"/>
+    <rect x="482" y="132" width="34" height="28" rx="4"/><rect x="612" y="132" width="34" height="28" rx="4"/>
+    <rect x="742" y="132" width="34" height="28" rx="4"/><rect x="872" y="132" width="34" height="28" rx="4"/>
+    <rect x="1002" y="132" width="34" height="28" rx="4"/>
+  </g>
+  <g>
+    <path d="M226 162 L252 162 L338 520 L152 520Z" fill="url(#arBeamG)"/>
+    <path d="M356 162 L382 162 L452 520 L286 520Z" fill="url(#arBeamW)"/>
+    <path d="M486 162 L512 162 L566 520 L418 520Z" fill="url(#arBeamR)"/>
+    <path d="M616 162 L642 162 L706 520 L546 520Z" fill="url(#arBeamG)"/>
+    <path d="M746 162 L772 162 L846 520 L680 520Z" fill="url(#arBeamW)"/>
+    <path d="M876 162 L902 162 L982 520 L806 520Z" fill="url(#arBeamR)"/>
+    <path d="M1006 162 L1032 162 L1092 520 L926 520Z" fill="url(#arBeamG)"/>
+  </g>
+
+  <!-- the screens. Twenty thousand people, and the band is nine feet tall on each of them. -->
+  <g>
+    <rect x="46" y="150" width="272" height="184" rx="4" fill="url(#arScreen)" stroke="#0b0812" stroke-width="6"/>
+    <text x="182" y="252" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="62" fill="#ffe08a" opacity=".82">&#9733;</text>
+    <rect x="882" y="150" width="272" height="184" rx="4" fill="url(#arScreen)" stroke="#0b0812" stroke-width="6"/>
+    <text x="1018" y="252" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="62" fill="#ffe08a" opacity=".82">&#9733;</text>
+  </g>
+  <rect x="392" y="146" width="416" height="150" rx="4" fill="url(#arScreen)" stroke="#0b0812" stroke-width="7"/>
+  <text x="600" y="212" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="34" fill="#ffe08a" opacity=".9">&#9733;</text>
+  <text class="gig-name" x="600" y="262" text-anchor="middle" textLength="300" lengthAdjust="spacingAndGlyphs"
+        font-family="Fraunces,Georgia,serif" font-weight="700" font-size="42" fill="#fff3d0" opacity=".92">__BAND__</text>
+
+  <!-- the stage, and the band on it -->
+  <rect x="150" y="496" width="900" height="46" fill="url(#arStage)"/>
+  <rect x="150" y="542" width="900" height="30" fill="#0d0a14"/>
+  <g fill="#0b0813">
+    <g><circle cx="330" cy="428" r="16"/><path d="M308 496 q4-48 22-48 q18 0 22 48Z"/>
+       <path d="M296 466 q38-16 58-4" stroke="#0b0813" stroke-width="7" fill="none" stroke-linecap="round"/>
+       <ellipse cx="292" cy="470" rx="20" ry="12" transform="rotate(-22 292 470)"/></g>
+    <g><circle cx="452" cy="416" r="16"/><path d="M430 496 q4-54 22-54 q18 0 22 54Z"/>
+       <path d="M452 382 V410" stroke="#0b0813" stroke-width="5"/><ellipse cx="452" cy="378" rx="8" ry="10"/></g>
+    <g><circle cx="880" cy="430" r="16"/><path d="M858 496 q4-46 22-46 q18 0 22 46Z"/>
+       <path d="M846 468 q38-16 58-4" stroke="#0b0813" stroke-width="7" fill="none" stroke-linecap="round"/>
+       <ellipse cx="842" cy="472" rx="21" ry="11" transform="rotate(-16 842 472)"/></g>
+  </g>
+  <g fill="#1d1830">
+    <rect x="196" y="440" width="70" height="56" rx="4"/><rect x="962" y="436" width="76" height="60" rx="4"/>
+    <rect x="176" y="436" width="16" height="60" rx="3"/><rect x="1044" y="432" width="16" height="64" rx="3"/>
+  </g>
+
+  <!-- THE DRUM RISER. It goes up one notch every set and it does not come back down.
+       Nobody comments on this. Dave is fine. The group is moved by script, not drawn twice. -->
+  <g class="riser-g">
+    <g stroke="#141020" stroke-width="7" fill="none">
+      <path d="M572 496 V440 M756 496 V440 M572 470 H756"/>
+    </g>
+    <rect x="556" y="410" width="216" height="34" rx="4" fill="#2b2438"/>
+    <rect x="556" y="444" width="216" height="12" fill="#15111f"/>
+    <g fill="#0b0813">
+      <circle cx="664" cy="356" r="16"/><path d="M642 410 q4-40 22-40 q18 0 22 40Z"/>
+      <ellipse cx="700" cy="396" rx="28" ry="16" fill="#141028"/><ellipse cx="700" cy="396" rx="19" ry="10" fill="#0b0813"/>
+      <path d="M640 372 l24 16 M724 372 l-24 16" stroke="#241d3a" stroke-width="4"/>
+      <ellipse cx="618" cy="382" rx="20" ry="6" fill="#241d3a"/><ellipse cx="712" cy="366" rx="18" ry="5" fill="#241d3a"/>
+    </g>
+  </g>
+
+  <!-- twenty thousand people. The lights they are holding are a separate layer. -->
+  <g fill="#070510">
+    <g><circle cx="40" cy="596" r="20"/><path d="M4 720 q4-104 36-104 q32 0 36 104Z"/><path d="M12 634 q-14-38-6-54" stroke="#070510" stroke-width="11" fill="none" stroke-linecap="round"/></g>
+    <g><circle cx="118" cy="616" r="19"/><path d="M84 730 q4-100 34-100 q30 0 34 100Z"/></g>
+    <g><circle cx="196" cy="600" r="20"/><path d="M160 722 q4-104 36-104 q32 0 36 104Z"/><path d="M230 640 q14-38 6-56" stroke="#070510" stroke-width="11" fill="none" stroke-linecap="round"/></g>
+    <g><circle cx="272" cy="622" r="19"/><path d="M238 736 q4-100 34-100 q30 0 34 100Z"/></g>
+    <g><circle cx="350" cy="604" r="20"/><path d="M314 726 q4-104 36-104 q32 0 36 104Z"/><path d="M312 644 q-14-38-6-56" stroke="#070510" stroke-width="11" fill="none" stroke-linecap="round"/></g>
+    <g><circle cx="640" cy="610" r="19"/><path d="M606 728 q4-100 34-100 q30 0 34 100Z"/></g>
+    <g><circle cx="716" cy="596" r="20"/><path d="M680 720 q4-104 36-104 q32 0 36 104Z"/><path d="M750 636 q14-38 6-56" stroke="#070510" stroke-width="11" fill="none" stroke-linecap="round"/></g>
+    <g><circle cx="796" cy="618" r="19"/><path d="M762 732 q4-100 34-100 q30 0 34 100Z"/></g>
+    <g><circle cx="874" cy="602" r="20"/><path d="M838 724 q4-104 36-104 q32 0 36 104Z"/><path d="M836 642 q-14-38-6-56" stroke="#070510" stroke-width="11" fill="none" stroke-linecap="round"/></g>
+    <g><circle cx="952" cy="620" r="19"/><path d="M918 734 q4-100 34-100 q30 0 34 100Z"/></g>
+    <g><circle cx="1032" cy="598" r="20"/><path d="M996 722 q4-104 36-104 q32 0 36 104Z"/><path d="M1066 638 q14-38 6-56" stroke="#070510" stroke-width="11" fill="none" stroke-linecap="round"/></g>
+    <g><circle cx="1114" cy="616" r="19"/><path d="M1080 730 q4-100 34-100 q30 0 34 100Z"/></g>
+    <g><circle cx="1176" cy="602" r="20"/><path d="M1140 724 q4-104 36-104 q32 0 36 104Z"/></g>
+  </g>
+
+  <!-- front of house. A road case, and a cat on top of it. -->
+  <rect x="424" y="688" width="152" height="94" rx="5" fill="url(#arCase)" stroke="#0a0810" stroke-width="4"/>
+  <g stroke="#4a4358" stroke-width="4" fill="none"><path d="M424 706 H576 M424 764 H576"/></g>
+  <g fill="#5a5268"><rect x="436" y="716" width="16" height="14" rx="2"/><rect x="548" y="716" width="16" height="14" rx="2"/></g>
+  <text x="500" y="750" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="13"
+        letter-spacing="2" fill="#7b7290">FRAGILE</text>
+
+  <!-- JOSH, who has never once looked up, looking up. -->
+  <g transform="translate(500 688) scale(.72) translate(-470 -690)">
+  <a href="https://www.redbubble.com/shop/ap/134520091?asc=u" target="_blank" rel="noopener"
+     aria-label="Josh&#8217;s merch shop">
+  <g class="josh-hit">
+    <ellipse cx="470" cy="648" rx="64" ry="60" fill="transparent"/>
+    <path d="M424 690 q-8-54 46-62 q54-8 60 44 q3 18-2 18Z" fill="#141119"/>
+    <path d="M492 690 q34-8 44-30 q6-14-6-18 q-12-4-14 8" fill="none" stroke="#141119" stroke-width="11" stroke-linecap="round"/>
+    <circle cx="470" cy="634" r="36" fill="#191521"/>
+    <path d="M440 606 l-4-30 28 14Z" fill="#191521"/>
+    <path d="M500 606 l6-30 -27 15Z" fill="#191521"/>
+    <path d="M441 604 l-2-17 15 8Z" fill="#a9707c" opacity=".75"/>
+    <path d="M498 604 l4-17 -15 9Z" fill="#a9707c" opacity=".75"/>
+    <ellipse cx="456" cy="628" rx="8" ry="9" fill="#c3e04f"/>
+    <ellipse cx="486" cy="628" rx="8" ry="9" fill="#c3e04f"/>
+    <ellipse cx="456" cy="624" rx="2.6" ry="7" fill="#141119"/>
+    <ellipse cx="486" cy="624" rx="2.6" ry="7" fill="#141119"/>
+    <path d="M466 648 l8 0 -4 5Z" fill="#a9707c"/>
+    <path d="M470 653 q-6 6-13 3 M470 653 q6 6 13 3" stroke="#2b2634" stroke-width="2" fill="none"/>
+    <g stroke="#8a8397" stroke-width="2.2" opacity=".8" fill="none">
+      <path d="M436 640 q-24 2-34 10"/><path d="M436 648 q-24 8-32 18"/>
+      <path d="M506 640 q24 2 34 10"/><path d="M506 648 q24 8 32 18"/>
+    </g>
+  </g>
+  </a>
+  </g>
+
+  <!-- the merch wall. It started as a folding table and a shoebox. -->
+  <a class="merch-link" href="__BANDHREF__" target="_blank" rel="noopener" aria-label="__BAND__ &#8212; merch">
+  <g class="merch-g">
+    <rect class="poster-frame" x="828" y="596" width="304" height="176" fill="transparent" stroke="transparent" stroke-width="0"/>
+    <rect x="836" y="600" width="288" height="24" rx="3" fill="#2a2138"/>
+    <text class="gig-name" x="980" y="618" text-anchor="middle" textLength="248" lengthAdjust="spacingAndGlyphs"
+          font-family="Fraunces,Georgia,serif" font-weight="700" font-size="18" fill="#ffe08a">__BAND__</text>
+    <g>
+      <rect x="846" y="634" width="76" height="86" rx="4" fill="#3a3160"/>
+      <rect x="942" y="634" width="76" height="86" rx="4" fill="#5a2a3c"/>
+      <rect x="1038" y="634" width="76" height="86" rx="4" fill="#2c4a52"/>
+      <g fill="#ffe08a" opacity=".8" font-family="Fraunces,Georgia,serif" font-size="20" text-anchor="middle">
+        <text x="884" y="686">&#9733;</text><text x="980" y="686">&#9733;</text><text x="1076" y="686">&#9733;</text>
+      </g>
+    </g>
+    <rect x="836" y="726" width="288" height="14" rx="3" fill="#241d2e"/>
+    <g class="merch-card">
+      <rect x="900" y="744" width="160" height="30" rx="2" fill="#efe6cf" stroke="#a8987a" stroke-width="1.6"/>
+      <text x="980" y="764" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#2a2118" opacity=".8">SHIRTS $45 NOW</text>
+    </g>
+  </g>
+  </a>
+
+  <rect width="1200" height="800" fill="url(#arFall)"/>
+</svg>`,
 };
 function venueFor(n) { return VENUES.find(v => n >= v.from && n <= v.to) || VENUES[VENUES.length - 1]; }
 function venueIndex(n) { const v = venueFor(n); return VENUES.indexOf(v); }
@@ -3115,13 +3328,17 @@ let _lastSmoke = 0;
 function clubSmoke() {
   const el = document.getElementById('clubSmoke');
   if (!el || !document.body.classList.contains('v-club')) return;
-  if (document.documentElement.classList.contains('lowgfx') || reducedMotion()) return;
+  // A 2.4-second burst of a few puffs is far cheaper than fog that animates forever, so
+  // lite-mode machines DO get the smoke machine — just fewer puffs. Only reduced-motion,
+  // which is a stated preference rather than a hardware limit, switches it off entirely.
+  if (reducedMotion()) return;
+  const lite = document.documentElement.classList.contains('lowgfx');
   const now = Date.now();
   if (now - _lastSmoke < 4000) return;                 // the machine needs a moment
   _lastSmoke = now;
   try {
     el.innerHTML = '';
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < (lite ? 3 : 5); i++) {
       const puff = document.createElement('span');
       puff.className = 'puff';
       const w = 26 + Math.random() * 26;
@@ -3137,12 +3354,39 @@ function clubSmoke() {
   } catch (e) {}
 }
 
+/* The crowd lifts their phones. Same shape as the smoke machine, and the same promise:
+   it lives behind the board, so a cascade never costs you a move. */
+let _lastLights = 0;
+function arenaLights() {
+  const el = document.getElementById('arenaLights');
+  if (!el || !document.body.classList.contains('v-arena')) return;
+  if (reducedMotion()) return;
+  const now = Date.now();
+  if (now - _lastLights < 7000) return;
+  _lastLights = now;
+  const lite = document.documentElement.classList.contains('lowgfx');
+  try {
+    el.innerHTML = '';
+    for (let i = 0, n = lite ? 26 : 54; i < n; i++) {
+      const dot = document.createElement('span');
+      dot.style.left = (Math.random() * 100).toFixed(1) + '%';
+      dot.style.top = (46 + Math.random() * 46).toFixed(1) + '%';   // out across the crowd
+      dot.style.animationDelay = (Math.random() * 1.2).toFixed(2) + 's';
+      el.appendChild(dot);
+    }
+    el.classList.remove('fire'); void el.offsetWidth; el.classList.add('fire');
+    clearTimeout(el._lightsTimer);
+    el._lightsTimer = setTimeout(() => { el.classList.remove('fire'); el.innerHTML = ''; }, 7000);
+  } catch (e) {}
+}
+
 function showCombo(chain) {
   if (!comboTag || chain < 2) return;
   comboTag.textContent = `${COMBO_WORDS[Math.min(chain, COMBO_WORDS.length - 1)] || 'Unreal!'}  ×${chain}`;
   comboTag.classList.remove('show'); void comboTag.offsetWidth; comboTag.classList.add('show');
   if (chain >= 3) screenPulse();
-  if (chain >= 4) clubSmoke();          // a proper cascade earns the fog
+  if (chain >= 3) clubSmoke();          // The Club: a proper cascade earns the fog
+  if (chain >= 3) arenaLights();        // The Arena: the crowd answers
 }
 const comboBannerEl = document.getElementById('comboBanner');
 const screenPulseEl = document.getElementById('screenPulse');
@@ -3151,6 +3395,7 @@ function showComboBanner(name) {
   comboBannerEl.textContent = name || 'COMBO!';
   comboBannerEl.classList.remove('show'); void comboBannerEl.offsetWidth; comboBannerEl.classList.add('show');
   clubSmoke();                            // two specials together is exactly the moment for it
+  arenaLights();
 }
 let _lastPulse = 0;
 function screenPulse() {
@@ -3836,12 +4081,22 @@ function applyVenue(n) {
   // The band's name counts as a change: it fires once, at the rename.
   const host = document.getElementById('venueArt');
   if (!host) return;
-  if (host.dataset.venue === v.cls && host.dataset.gig === gig.key) return;
+  if (host.dataset.venue === v.cls && host.dataset.gig === gig.key) { setRiser(n); return; }
   host.dataset.venue = v.cls;
   host.dataset.gig = gig.key;
   host.innerHTML = (VENUE_ART[v.cls] || '')
     .split('__BANDHREF__').join(gig.href)
     .split('__BAND__').join(gig.name);
+  setRiser(n);
+}
+/* "A drum riser that rises \u2014 and does not come back down." One notch per set of the
+   Arena, five notches in all, and nobody ever mentions it. Moving the group by script
+   beats drawing the room five times. */
+function setRiser(n) {
+  const riser = document.querySelector('.riser-g');
+  if (!riser) return;
+  const notches = Math.max(0, Math.min(4, n - 26));
+  riser.setAttribute('transform', 'translate(0 ' + (-notches * 17) + ')');
 }
 function showVenueToast(v) {
   const n = document.getElementById('vtN'), s = document.getElementById('vtS'), t = document.getElementById('venueToast');
@@ -5248,9 +5503,26 @@ updateCoinDisplays();
     }
   } catch (e) {}
 })();
+/* PREVIEW. Adding ?set=26 to the address opens straight into that set, so a room can be
+   looked at without playing the whole way there. It unlocks nothing and saves nothing —
+   it is a viewing window, not a cheat: whatever you were really up to is untouched. */
+function previewSet() {
+  try {
+    const m = String(location.search || '').match(/[?&]set=(\d+)/);
+    if (!m) return false;
+    const n = Math.max(1, Math.min(LEVELS.length, parseInt(m[1], 10)));
+    Session.clear();
+    Game.atTitle = false;
+    startLevel(n);
+    setMsg('Preview — Set ' + n + '. Nothing here is saved.');
+    return true;
+  } catch (_) { return false; }
+}
+
 Game.newGame();   // Level 1 is set up behind the title screen
-// ...and if they were part-way through a set when the page went away, put it straight back.
-try { Session.restore(); } catch (_) {}
+// A ?set= preview wins; otherwise, if they were part-way through a set when the page went
+// away, put it straight back.
+try { if (!previewSet()) Session.restore(); } catch (_) {}
 </script>
 </body>
 </html>
