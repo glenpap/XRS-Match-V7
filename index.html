@@ -148,27 +148,52 @@ body.v-arena .stage-bg{background:
 .venue-art{transition:opacity .26s ease;}
 .sub.peekable{cursor:pointer; pointer-events:auto; transition:color .2s ease;}
 .sub.peekable:hover, .sub.peekable:focus-visible{color:var(--gold-hi); outline:none;}
+.sub.peekable{position:relative;}
 .sub.peekable::after{content:'\1F441'; margin-left:7px; opacity:.62; letter-spacing:0;}
-.sub.peekable.peek-nudge::after{animation:peek-breathe 3.2s ease-in-out infinite;}
-@keyframes peek-breathe{0%,100%{opacity:.32;}50%{opacity:.9;}}
+.sub.peekable.peek-nudge::after{animation:peek-breathe 3.6s ease-in-out infinite;}
+@keyframes peek-breathe{0%,100%{opacity:.34;}50%{opacity:.95;}}
+/* The twinkle: one small glint that drifts across the eye and fades out, once every four
+   seconds. SAFETY — this is a 4s cycle (a quarter of one flash per second), it moves a few
+   pixels, it never exceeds 55% opacity, and it is a single tiny dot rather than any change
+   to the screen or a large area. It is switched off completely under reduced-motion and on
+   lowgfx machines. Nothing here approaches a flash or a strobe. */
+.peek-glint{position:absolute; right:-1px; top:2px; width:6px; height:6px; pointer-events:none;
+  opacity:0; border-radius:50%; background:radial-gradient(circle,#fff6d8 0%, rgba(255,224,138,.7) 45%, rgba(255,224,138,0) 70%);}
+.sub.peekable.peek-nudge .peek-glint{animation:peek-glint 4s ease-in-out infinite;}
+@keyframes peek-glint{
+  0%,62%{opacity:0; transform:translate(-7px,3px) scale(.5);}
+  74%{opacity:.55; transform:translate(-2px,0) scale(1);}
+  88%{opacity:.22; transform:translate(2px,-2px) scale(.8);}
+  100%{opacity:0; transform:translate(5px,-3px) scale(.5);}
+}
 .app, .fab{transition:opacity .55s var(--ease);}
 body.peeking .app{opacity:.045;}
 body.peeking .app > *{pointer-events:none;}
 body.peeking .fab{opacity:.1; pointer-events:none;}
 /* a transparent sheet that catches the tap that ends the peek, so the tap can never reach
-   a tile underneath — the same "don't steal input from the board" rule as the corner layer */
+   a tile underneath — the same "don't steal input from the board" rule as the corner layer.
+   It sits BELOW the artwork on purpose. The peek is the one moment the room is properly
+   visible, so it had better also be the moment the room is properly clickable: lifting the
+   backdrop and the corner pieces over the sheet means Josh, the poster, the flyer and the
+   sticker all take their own taps, while every tap that lands on nothing in particular
+   falls through to the sheet and closes the peek. (.stage-bg is pointer-events:none apart
+   from its links, so raising it cannot swallow anything.) */
 .peek-catch{position:fixed; inset:0; z-index:94; display:none; background:transparent;}
 body.peeking .peek-catch{display:block; cursor:pointer;}
+body.peeking .stage-bg{z-index:95;}
+body.peeking .pc-corner, body.peeking .gig-corner, body.peeking .sticker-corner{z-index:96;}
 .peek-hint{position:fixed; left:50%; bottom:calc(env(safe-area-inset-bottom,0px) + 20px);
-  transform:translateX(-50%); z-index:95; font-family:var(--mono); font-size:.58rem;
+  transform:translateX(-50%); z-index:97; font-family:var(--mono); font-size:.58rem;
   letter-spacing:.16em; text-transform:uppercase; color:var(--cream-mute);
   background:rgba(10,8,16,.62); border:1px solid var(--line); border-radius:99px;
   padding:7px 15px; opacity:0; pointer-events:none; transition:opacity .5s ease .5s; white-space:nowrap;}
 body.peeking .peek-hint{opacity:.9;}
 .lowgfx .sub.peekable.peek-nudge::after{animation:none; opacity:.8;}
+.lowgfx .peek-glint{display:none;}
 @media (prefers-reduced-motion:reduce){
   .app,.fab,.peek-hint,.venue-art,.sub.peekable{transition:none;}
   .sub.peekable.peek-nudge::after{animation:none; opacity:.8;}
+  .peek-glint{display:none;}
 }
 .title{font-family:var(--serif); font-weight:700; font-size:1.5rem; letter-spacing:.01em; color:var(--cream); text-align:center; line-height:1.05;}
 .title .star{color:var(--gold-hi);}
@@ -950,7 +975,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
     </svg>
   </a>
   <div class="peek-catch" id="peekCatch" onclick="Game.peek()" aria-hidden="true"></div>
-  <div class="peek-hint" id="peekHint">Tap anywhere to go back</div>
+  <div class="peek-hint" id="peekHint">Tap what you find · or anywhere to go back</div>
   <div class="fab">
     <button id="muteBtn" onclick="Game.toggleMute()" title="Sound on / off">🔊</button>
     <button id="helpBtn" onclick="Game.showHelp()" title="How to play">?</button>
@@ -3371,9 +3396,10 @@ Game.newGame = function() {
   Peek.cancel();
   const subEl = document.getElementById('levelInfo');
   subEl.textContent = `Set ${lv.n} · ${v.name}`;
-  // until they have used it once, the eye breathes gently so it reads as a button
-  let seenPeek = false; try { seenPeek = Prefs.get('seenPeek', false); } catch (_) {}
-  subEl.classList.toggle('peek-nudge', !seenPeek);
+  subEl.appendChild(Object.assign(document.createElement('span'), { className: 'peek-glint' }));
+  // The eye breathes and glints until they have looked around THIS room. It starts again
+  // in each new venue, because each new venue is the one thing worth looking around at.
+  subEl.classList.toggle('peek-nudge', !Peek.seen(v.cls));
   hideOverlay();
   buildDOM();
   render();
@@ -4264,7 +4290,7 @@ const TUTORIAL_STEPS = [
   { icon: '↔', title: 'The Amp', text: 'Match <b>4 in a row</b> to forge an <b>Amp</b> (look for the ↔ or ↕ badge). The trick: <b>swap an Amp into any neighbor — no match needed</b> — to fire it. It blasts that whole row or column.' },
   { icon: '🔥', title: 'More Toys as You Climb', text: 'New specials <b>unlock as you rise through the venues</b> — the <b>Pyro</b> 🔥 (L/T shape, 3×3 blast), the <b>X-Ray Star</b> ★ (match 5, clears a whole instrument), and the <b>Bass Drop</b> ✛ (match 6, clears a full row <i>and</i> column). The game tells you when each one arrives.' },
   { icon: '⭐', title: 'Win the Set', text: 'Every set has a <b>goal</b> shown up top — usually a <b>target score</b>, but some ask you to <b>collect</b> a certain instrument, or to clear the band\u2019s <b>road cases</b> 📦 (match next to a case to smash it). Finish with <b>moves to spare</b> for an <b>Encore</b> and more <b>stars</b>.' },
-  { icon: '👁', title: 'Look Around the Room', text: 'Every venue is a hand-drawn room, and the board covers most of it. <b>Tap the venue name</b> up top \u2014 the one with the 👁 \u2014 and the game steps out of the way so you can see the whole place. There is more in these rooms than you think, and <b>not everything in them is scenery</b>. Tap anywhere to go back.' },
+  { icon: '👁', title: 'Look Around the Room', text: 'Every venue is a hand-drawn room, and the board covers most of it. <b>Tap the venue name</b> up top \u2014 the one with the 👁 \u2014 and the game steps out of the way so you can see the whole place. There is more in these rooms than you think, and <b>not everything in them is scenery</b> \u2014 whatever you find in there can be tapped. Anywhere else puts the game back.' },
   { icon: '🎶', title: 'Ready to Rock', text: 'This whole game is a love letter to <b>X-Ray Star</b>. Have fun up there — and go give the real band a listen.' },
 ];
 let tutStep = 0;
@@ -4295,7 +4321,7 @@ const Peek = {
   on: false,
   timer: null,
   steps: [],
-  HOLD: 6500,                       // closes itself if the player wanders off
+  HOLD: 9000,                       // closes itself if the player wanders off
   art()    { return document.querySelector('.venue-art'); },
   artSvg() { return document.querySelector('#venueArt svg'); },
   clearSteps() { this.steps.forEach(t => clearTimeout(t)); this.steps = []; },
@@ -4307,9 +4333,18 @@ const Peek = {
     }) || Game.atTitle === true;
   },
   toggle() { this.on ? this.end() : this.start(); },
+  // which rooms the player has already looked around, so the eye stops nagging per room
+  seenList() { try { return String(Prefs.get('peekedIn', '')).split(',').filter(Boolean); } catch (_) { return []; } },
+  seen(cls) { return this.seenList().indexOf(cls) > -1; },
+  markSeen() {
+    const cls = (VENUES.find(v => document.body.classList.contains(v.cls)) || {}).cls;
+    if (!cls || this.seen(cls)) return;
+    try { Prefs.set('peekedIn', this.seenList().concat(cls).join(',')); } catch (_) {}
+  },
   start() {
     if (this.on || this.blocked()) return;
     this.on = true;
+    this.markSeen();
     try { Prefs.set('seenPeek', true); } catch (_) {}
     const sub = document.getElementById('levelInfo');
     if (sub) sub.classList.remove('peek-nudge');       // found it — stop nudging
@@ -4353,6 +4388,14 @@ const Peek = {
   },
 };
 Game.peek = function() { Peek.toggle(); };
+// Tapping Josh (or a poster, flyer or sticker) during a peek should follow the link AND
+// tidy the peek away, so returning from the shop tab lands on a normal game screen.
+// No preventDefault here — the link itself must still do its job.
+document.addEventListener('click', (e) => {
+  if (!Peek.on) return;
+  const a = e.target && e.target.closest && e.target.closest('.venue-art a, .pc-corner, .gig-corner, .sticker-corner');
+  if (a) Peek.end();
+}, true);
 
 Game.showHelp = function() { showTutorial(); };
 
