@@ -115,26 +115,35 @@ body.v-arena .stage-bg{background:
    coordinates inside a cropped image, phones get a real corner element instead (.pc-corner
    in the markup) and the wall copy stands down. Wide screens are untouched — the poster
    stays on the wall where it belongs. */
-.pc-corner, .gig-corner, .sticker-corner{
+.pc-corner, .gig-corner, .sticker-corner, .merch-corner{
   position:fixed; right:9px; bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
   width:76px; z-index:2; display:none; line-height:0;
   transform:rotate(-4deg); filter:drop-shadow(0 6px 14px rgba(0,0,0,.6));
 }
 .gig-corner{transform:rotate(3deg);}
 .sticker-corner{transform:rotate(-7deg); width:70px;}
-.pc-corner svg, .gig-corner svg, .sticker-corner svg{width:100%; height:auto; display:block;}
-.pc-corner .pc-corner-frame, .gig-corner .pc-corner-frame, .sticker-corner .pc-corner-frame{transition:stroke .18s ease, stroke-opacity .18s ease;}
+.merch-corner{transform:rotate(2deg); width:76px;}
+.pc-corner svg, .gig-corner svg, .sticker-corner svg, .merch-corner svg{width:100%; height:auto; display:block;}
+.pc-corner .pc-corner-frame, .gig-corner .pc-corner-frame, .sticker-corner .pc-corner-frame, .merch-corner .pc-corner-frame{transition:stroke .18s ease, stroke-opacity .18s ease;}
 .pc-corner:hover .pc-corner-frame, .pc-corner:focus-visible .pc-corner-frame,
 .gig-corner:hover .pc-corner-frame, .gig-corner:focus-visible .pc-corner-frame,
-.sticker-corner:hover .pc-corner-frame, .sticker-corner:focus-visible .pc-corner-frame{stroke:#ffe08a; stroke-opacity:1;}
+.sticker-corner:hover .pc-corner-frame, .sticker-corner:focus-visible .pc-corner-frame,
+.merch-corner:hover .pc-corner-frame, .merch-corner:focus-visible .pc-corner-frame{stroke:#ffe08a; stroke-opacity:1;}
 @media (prefers-reduced-motion:reduce){ .pc-corner .pc-corner-frame, .gig-corner .pc-corner-frame{transition:none;} }
 @media (max-aspect-ratio:7/10){
   body.v-basement .pc-corner{display:block;}
   body.v-coffee .gig-corner{display:block;}
   body.v-dive .sticker-corner{display:block;}
+  body.v-club .merch-corner{display:block;}
   .venue-art .pc-poster-g{display:none;}
   .venue-art .gig-flyer-g{display:none;}
   .venue-art .sticker-g{display:none;}
+  /* The Club's merch table sits low and centre — on a phone the Menu / Band / Replay row
+     lands right on top of it, so the price card comes off and the table stops being a link.
+     Josh keeps his seat on the shirts, which stay as artwork, and the shop moves to the
+     corner where it can actually be seen and hit. */
+  .venue-art .merch-card{display:none;}
+  .venue-art .merch-link{pointer-events:none;}
 }
 
 /* ===== LOOK AROUND — "the peek" =====
@@ -1011,6 +1020,22 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
        the bathroom door is cropped clean off the side of the picture, so on phones the
        sticker stops being part of the painting and becomes a real corner element whose
        position is guaranteed rather than calculated. Dive Bar only. -->
+  <!-- PHONE MERCH TABLE. The Club only. Same reasoning as the poster, flyer and sticker. -->
+  <a class="merch-corner" data-kind="merch" href="https://www.redbubble.com/shop/ap/172252421?asc=u"
+     target="_blank" rel="noopener" aria-label="X-Ray Star &#8212; merch">
+    <svg viewBox="0 0 108 118" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect class="pc-corner-frame" x="2" y="2" width="104" height="114" rx="4" fill="#181430"
+            stroke="#8b7a5a" stroke-opacity=".85" stroke-width="2"/>
+      <rect x="10" y="74" width="88" height="12" rx="2" fill="#6a5030"/>
+      <rect x="14" y="86" width="80" height="24" fill="#2f2a52"/>
+      <rect x="20" y="56" width="68" height="14" rx="3" fill="#2b2646"/>
+      <rect x="23" y="44" width="62" height="14" rx="3" fill="#37305a"/>
+      <rect x="26" y="32" width="56" height="14" rx="3" fill="#443b6d"/>
+      <text x="54" y="26" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="15" fill="#ffd58c">&#9733;</text>
+      <text class="gig-name" x="54" y="103" text-anchor="middle" textLength="72" lengthAdjust="spacingAndGlyphs"
+            font-family="Fraunces,Georgia,serif" font-weight="700" font-size="13" fill="#efe6cf">X-RAY STAR</text>
+    </svg>
+  </a>
   <a class="sticker-corner" data-kind="sticker" href="https://www.redbubble.com/shop/ap/172252421?asc=u"
      target="_blank" rel="noopener" aria-label="X-Ray Star &#8212; sticker">
     <svg viewBox="0 0 100 96" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -2351,7 +2376,7 @@ const VENUE_ART = {
   <rect x="722" y="646" width="74" height="12" rx="3" fill="#a08a63"/>
   <path d="M746 646 h26 v-8 h-26Z" fill="#6d5a3e"/>
 
-  <a href="__BANDHREF__" target="_blank" rel="noopener" aria-label="__BAND__ &#8212; merch">
+  <a class="merch-link" href="__BANDHREF__" target="_blank" rel="noopener" aria-label="__BAND__ &#8212; merch">
   <g class="merch-g">
     <rect class="poster-frame" x="440" y="618" width="150" height="76" fill="transparent" stroke="transparent" stroke-width="0"/>
     <g>
@@ -2362,8 +2387,9 @@ const VENUE_ART = {
       <path d="M486 626 q29 14 58 0" fill="none" stroke="#6e60a8" stroke-width="2.4"/>
       <text x="515" y="640" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="13" fill="#ffd58c">&#9733;</text>
     </g>
-    <!-- the price card, written by hand, taped to the front -->
-    <g transform="rotate(-2 520 722)">
+    <!-- the price card, written by hand, taped to the front. Hidden on phones: it sits
+         low on the table, which on a phone is exactly where the button row lands. -->
+    <g class="merch-card" transform="rotate(-2 520 722)">
       <rect x="446" y="700" width="148" height="44" rx="2" fill="#efe6cf" stroke="#a8987a" stroke-width="1.6"/>
       <text class="gig-name" x="520" y="718" text-anchor="middle" textLength="122" lengthAdjust="spacingAndGlyphs"
             font-family="Fraunces,Georgia,serif" font-weight="700" font-size="15" fill="#2a2118">__BAND__</text>
@@ -3486,6 +3512,7 @@ function reshuffleBoard() {
   } while (!hasAnyMove(Game.board) && guard < 40);
 }
 function endLevel() {
+  Session.clear();                 // the set is over; nothing left to resume
   if (Game.ended) return;
   Game.ended = true;
   Game.busy = true;
@@ -3646,6 +3673,89 @@ function launchConfetti() {
 function setMsg(s) { document.getElementById('msg').textContent = s; }
 
 /* ===== lifecycle ===== */
+// the set name in the header, plus the eye that opens the peek
+function setVenueLabel(n) {
+  const lv = LEVELS[(n - 1) % LEVELS.length], v = venueFor(lv.n);
+  const subEl = document.getElementById('levelInfo');
+  if (!subEl) return;
+  subEl.textContent = `Set ${lv.n} \u00b7 ${v.name}`;
+  subEl.appendChild(Object.assign(document.createElement('span'), { className: 'peek-glint' }));
+  // The eye breathes and glints until they have looked around THIS room. It starts again
+  // in each new venue, because each new venue is the one thing worth looking around at.
+  subEl.classList.toggle('peek-nudge', !Peek.seen(v.cls));
+}
+
+/* =====================================================================
+   THE SET IN PROGRESS
+   Progress between sets was always saved, but the set you were actually PLAYING was not.
+   So anything that reloaded the page — above all tapping through to the shop, which on a
+   phone often replaces the page rather than opening a tab — dropped you back at the start
+   of the level with your moves and score gone. That made every merch link a small penalty,
+   which is precisely backwards.
+
+   This writes the live board after every settled move and again the moment the page is
+   hidden, then puts it straight back on the way in. Cheap: one small object, only ever
+   written when the board is at rest.
+   ===================================================================== */
+const Session = {
+  KEY: 'session',
+  MAX_AGE: 12 * 60 * 60 * 1000,        // a set left overnight is not worth resuming
+  // only true when the player is actually at the board, not on a menu or behind a card
+  atBoard() {
+    if (Game.atTitle || Game.ended) return false;
+    return !['mapScreen', 'bandScreen', 'bsideScreen', 'overlay', 'setIntro', 'tutorial']
+      .some(id => { const el = document.getElementById(id); return el && el.classList.contains('show'); });
+  },
+  save() {
+    try {
+      if (!Game.board || Game.board.length !== CELLS || Game.ended || Game.atTitle) return;
+      // Only ever write while they are actually at the board. That matters more than it
+      // looks: the Band screen carries shop links too, so if someone opens the menu and
+      // taps through from there, skipping the write leaves the last real board intact
+      // instead of overwriting it with "they were on a menu".
+      if (!this.atBoard()) return;
+      Prefs.set(this.KEY, {
+        v: 1, at: Date.now(),
+        level: Game.level, board: Game.board, score: Game.score, moves: Game.moves,
+        target: Game.target, combo: Game.combo, startMoves: Game.startMoves,
+        lowWarned: !!Game.lowWarned, collected: Game.collected || {},
+        cratesLeft: Game.cratesLeft || 0, cratesTotal: Game.cratesTotal || 0,
+        dropCounter: Game.dropCounter || 0,
+      });
+    } catch (_) {}
+  },
+  clear() { try { Prefs.set(this.KEY, null); } catch (_) {} },
+  restore() {
+    let d = null;
+    try { d = Prefs.get(this.KEY, null); } catch (_) { return false; }
+    if (!d || d.v !== 1) return false;
+    if (!Array.isArray(d.board) || d.board.length !== CELLS) return false;
+    if (!d.level || d.level < 1 || d.level > LEVELS.length) return false;
+    if (!(d.moves > 0)) return false;
+    if (Date.now() - (d.at || 0) > this.MAX_AGE) return false;
+    try {
+      Game.level = d.level;
+      Game.board = d.board.map(t => (t ? Object.assign({}, t) : null));
+      Game.score = d.score || 0; Game.moves = d.moves; Game.target = d.target;
+      Game.combo = d.combo || 0; Game.startMoves = d.startMoves || d.moves;
+      Game.lowWarned = !!d.lowWarned; Game.collected = d.collected || {};
+      Game.cratesLeft = d.cratesLeft || 0; Game.cratesTotal = d.cratesTotal || 0;
+      Game.dropCounter = d.dropCounter || 0;
+      Game.ended = false; Game.busy = false; Game.selected = null;
+      Game.resultShown = false; Game.movesAtWin = 0;
+      Game.lastVenue = venueIndex(d.level);        // no venue toast for a set already in progress
+      applyVenue(d.level);
+      setVenueLabel(d.level);
+      buildDOM(); render();
+      hideTitle(); hideMap();
+      try { syncMuteBtn(); } catch (_) {}
+      try { startHintLoop(); } catch (_) {}
+      setMsg('Right where you left off \u2605');
+      return true;
+    } catch (_) { return false; }
+  },
+};
+
 Game.newGame = function() {
   const lv = LEVELS[(Game.level - 1) % LEVELS.length];
   const v = venueFor(lv.n);
@@ -3673,12 +3783,7 @@ Game.newGame = function() {
     if (Sfx.levelUpSting) setTimeout(() => Sfx.levelUpSting(), 120);
   }
   Peek.cancel();
-  const subEl = document.getElementById('levelInfo');
-  subEl.textContent = `Set ${lv.n} · ${v.name}`;
-  subEl.appendChild(Object.assign(document.createElement('span'), { className: 'peek-glint' }));
-  // The eye breathes and glints until they have looked around THIS room. It starts again
-  // in each new venue, because each new venue is the one thing worth looking around at.
-  subEl.classList.toggle('peek-nudge', !Peek.seen(v.cls));
+  setVenueLabel(lv.n);
   hideOverlay();
   buildDOM();
   render();
@@ -3721,7 +3826,7 @@ function applyVenue(n) {
   const gig = gigFlyerBits(n);
   // every corner piece that carries the band's name — the Coffee Shop flyer and the
   // Dive Bar sticker — is kept in step with the rename in one pass.
-  document.querySelectorAll('.gig-corner, .sticker-corner').forEach(corner => {
+  document.querySelectorAll('.gig-corner, .sticker-corner, .merch-corner').forEach(corner => {
     corner.setAttribute('href', gig.href);
     corner.setAttribute('aria-label', gig.name + ' \u2014 ' + (corner.dataset.kind || 'gig flyer'));
     corner.querySelectorAll('.gig-name').forEach(t => { t.textContent = gig.name; });
@@ -3809,7 +3914,7 @@ function maybeDropSpecial() {
   render();
   celebrateSpecial(cell, sp, true);
 }
-function afterPlayerMove() { maybeDropSpecial(); checkEnd(); }
+function afterPlayerMove() { maybeDropSpecial(); checkEnd(); Session.save(); }
 
 
 Game.seedSpecials = function() {
@@ -4612,6 +4717,18 @@ const Peek = {
     }) || Game.atTitle === true;
   },
   toggle() { this.on ? this.end() : this.start(); },
+  /* HOW FAR TO PULL BACK.
+     Fitting the whole 1200x800 room onto a tall phone leaves it 390px wide and 260px tall
+     — the entire room, far too small to make anything out. A phone simply cannot show a
+     wide picture and keep it readable. So on tall screens the peek pulls back to the middle
+     720 rather than all 1200: that is roughly double the room you see while playing, at
+     more than half size instead of a third. Everything deliberate in these rooms is
+     composed into that middle band anyway. Wide screens have the room, so they get the lot. */
+  region() {
+    let a = 1.4;
+    try { a = window.innerWidth / window.innerHeight; } catch (_) {}
+    return a < 0.85 ? '240 0 720 800' : '0 0 1200 800';
+  },
   // which rooms the player has already looked around, so the eye stops nagging per room
   seenList() { try { return String(Prefs.get('peekedIn', '')).split(',').filter(Boolean); } catch (_) { return []; } },
   seen(cls) { return this.seenList().indexOf(cls) > -1; },
@@ -4633,7 +4750,10 @@ const Peek = {
     this.steps.push(setTimeout(() => { if (art) art.style.opacity = '0'; }, 340));
     this.steps.push(setTimeout(() => {
       const svg = this.artSvg();
-      if (svg) svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');   // whole room
+      if (svg) {
+        svg.setAttribute('viewBox', this.region());
+        svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+      }
       if (art) art.style.opacity = '1';
     }, 620));
     clearTimeout(this.timer);
@@ -4648,7 +4768,7 @@ const Peek = {
     if (art) art.style.opacity = '0';
     this.steps.push(setTimeout(() => {
       const svg = this.artSvg();
-      if (svg) svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');  // back to the crop
+      if (svg) { svg.setAttribute('viewBox', '0 0 1200 800'); svg.setAttribute('preserveAspectRatio', 'xMidYMid slice'); }
       if (art) art.style.opacity = '1';
       document.body.classList.remove('peeking');
     }, 260));
@@ -4660,7 +4780,7 @@ const Peek = {
     clearTimeout(this.timer);
     this.clearSteps();
     const svg = this.artSvg();
-    if (svg) svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+    if (svg) { svg.setAttribute('viewBox', '0 0 1200 800'); svg.setAttribute('preserveAspectRatio', 'xMidYMid slice'); }
     const art = this.art();
     if (art) art.style.opacity = '1';
     document.body.classList.remove('peeking');
@@ -5099,6 +5219,18 @@ updateCoinDisplays();
     window.addEventListener('keydown', unlock, true);
   }
 })();
+/* The page can vanish without warning — a tap through to the shop, a home button, a tab
+   switch. pagehide is the last reliable moment on iOS; visibilitychange covers everything
+   else. Both just write the board, so it does not matter if both fire. */
+(function keepTheSet(){
+  const stash = () => { try { Session.save(); } catch (_) {} };
+  try {
+    window.addEventListener('pagehide', stash);
+    window.addEventListener('beforeunload', stash);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) stash(); });
+  } catch (_) {}
+})();
+
 // living backdrop: a few slow, faint motes drifting up through the world
 (function spawnDrift(){
   try {
@@ -5117,6 +5249,8 @@ updateCoinDisplays();
   } catch (e) {}
 })();
 Game.newGame();   // Level 1 is set up behind the title screen
+// ...and if they were part-way through a set when the page went away, put it straight back.
+try { Session.restore(); } catch (_) {}
 </script>
 </body>
 </html>
