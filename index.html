@@ -2934,6 +2934,39 @@ function resolveBoard() {
         }
       }
     });
+    /* A SPECIAL CAUGHT IN A MATCH DETONATES.
+       It used to be quietly deleted: line up four guitars with an Amp among them and you
+       were handed a new Amp while the old one evaporated. A trade, dressed up as a reward
+       \u2014 and increasingly punishing as the board fills with specials later on.
+       Now it fires, and anything its blast catches fires in turn, exactly like the chain
+       reaction that already runs when a blast catches a special. The one cell that is
+       never consumed is wherever the NEW special is about to land, so building a big match
+       around a special always leaves you better off than you started.
+       Deliberately NOT given the extra blast bonus that a hand-fired special earns: the
+       cleared cells and the cascade they set off are the reward. That keeps the scoring
+       curve where it was and stops this quietly inflating every late-game target. */
+    const caughtBlasts = [];
+    {
+      const fired = new Set();
+      const queue = [];
+      cells.forEach(c => { const t = Game.board[c]; if (t && t.special && !spawn[c]) queue.push(c); });
+      let guard = 0;
+      while (queue.length && guard++ < CELLS * 2) {
+        const i = queue.shift();
+        if (fired.has(i) || spawn[i]) continue;
+        const cur = Game.board[i];
+        if (!cur || !cur.special) continue;
+        fired.add(i);
+        caughtBlasts.push({ origin: i, special: cur.special, dir: cur.dir });
+        specialBlastCells(Game.board, i, null).forEach(c => {
+          if (spawn[c]) return;                 // the new special's cell is protected
+          cells.add(c);
+          const o = Game.board[c];
+          if (o && o.special && !fired.has(c) && c !== i) queue.push(c);
+        });
+      }
+    }
+
     const mult = Math.min(8, chain);
     let gained = 0;
     cells.forEach(c => { gained += 130 * mult; });
@@ -2942,7 +2975,8 @@ function resolveBoard() {
     tallyCollected(cells);                                      // COLLECT objective
     const crateBreaks = crateBreaksFor(cells);                  // CASES objective — break cases next to a match
     Game.cratesLeft = Math.max(0, (Game.cratesLeft || 0) - crateBreaks.length);
-    steps.push({ kind: 'clear', cells: [...cells, ...crateBreaks], chain, gained, crates: crateBreaks.length });
+    steps.push({ kind: 'clear', cells: [...cells, ...crateBreaks], chain, gained, crates: crateBreaks.length,
+                 matchBlasts: caughtBlasts.length ? caughtBlasts : undefined });
     cells.forEach(c => {
       const sp = spawn[c];
       if (sp) Game.board[c] = { type: Game.board[c].type, special: sp.special, dir: sp.dir };
@@ -3546,6 +3580,15 @@ function playSteps(steps, done) {
           showComboBanner('CHAIN ×' + step.blasts.length);
           screenPulse();
           step.blasts.slice(0, 6).forEach((bl, k) => setTimeout(() => { try { blastFx(bl.origin, bl.special, bl.dir); } catch (_) {} }, k * 70));
+        }
+        // a special swept up in a match now goes off; show and sound each one in turn
+        if (step.matchBlasts && step.matchBlasts.length) {
+          shakeBoard();
+          if (step.matchBlasts.length > 1) { showComboBanner('CHAIN \u00d7' + step.matchBlasts.length); screenPulse(); }
+          step.matchBlasts.slice(0, 6).forEach((bl, k) => setTimeout(() => {
+            try { blastFx(bl.origin, bl.special, bl.dir); } catch (_) {}
+            try { Sfx.special(bl.special); } catch (_) {}
+          }, k * 70));
         }
         if (step.chain >= 2) showCombo(step.chain);
         // SOUND — every detonating special speaks; a chain fires them in sequence (spectacular)
