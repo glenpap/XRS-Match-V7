@@ -111,13 +111,15 @@ body.v-arena .stage-bg{background:
 .venue-art a:focus-visible .josh-hit ellipse[fill="#c3e04f"]{fill:#eaff7a;}
 @media (prefers-reduced-motion:reduce){ .venue-art a .poster-frame{transition:none;} }
 /* Tall/narrow screens crop the backdrop hard on both sides, and the board fills almost
-   the whole width, so there is no side strip left for the poster to live in. On phones
-   it comes down off the wall and leans against it beside Josh, in the one band of art
-   that survives. Static transform only — painted once, no per-frame cost. */
+   the whole width. Measured against a real S25 screenshot, the gap between the board's
+   bottom edge and the buttons is only about 45px tall — too thin for the poster to be
+   hittable there. The one genuinely empty area is the corner to the right of Replay, so
+   on phones the poster comes down off the wall and leans there instead, at a size that
+   can actually be tapped. Static transform only — painted once, no per-frame cost. */
 @media (max-aspect-ratio:7/10){
   .venue-art .pc-poster-g{
     transform-box:view-box; transform-origin:855px 268px;
-    transform:translate(-155px,372px) scale(.5) rotate(-4.5deg);
+    transform:translate(-110px,462px) scale(.55) rotate(-4.5deg);
   }
 }
 .title{font-family:var(--serif); font-weight:700; font-size:1.5rem; letter-spacing:.01em; color:var(--cream); text-align:center; line-height:1.05;}
@@ -734,6 +736,13 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
 .bar-wrap{margin-bottom:8px;}
 .board-wrap{max-width:min(460px, calc(100vh - 320px));}
 .msg{margin-top:8px; font-size:.8rem; min-height:1em;}
+/* The empty message strip sits directly over Josh, and the button row's box spans the
+   full width even where there is no button in it. Both were swallowing taps meant for
+   the backdrop. Neither is ever interactive, so let taps fall through — the buttons
+   themselves are switched back on below. */
+.msg{pointer-events:none;}
+.controls{pointer-events:none;}
+.controls button{pointer-events:auto;}
 .controls{margin-top:8px;}
 /* The buttons were parked on Josh's face. Give them clearance, but only where there is
    vertical room to spare — the phone layout is height-locked, so on a short viewport the
