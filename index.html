@@ -115,22 +115,26 @@ body.v-arena .stage-bg{background:
    coordinates inside a cropped image, phones get a real corner element instead (.pc-corner
    in the markup) and the wall copy stands down. Wide screens are untouched — the poster
    stays on the wall where it belongs. */
-.pc-corner, .gig-corner{
+.pc-corner, .gig-corner, .sticker-corner{
   position:fixed; right:9px; bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
   width:76px; z-index:2; display:none; line-height:0;
   transform:rotate(-4deg); filter:drop-shadow(0 6px 14px rgba(0,0,0,.6));
 }
 .gig-corner{transform:rotate(3deg);}
-.pc-corner svg, .gig-corner svg{width:100%; height:auto; display:block;}
-.pc-corner .pc-corner-frame, .gig-corner .pc-corner-frame{transition:stroke .18s ease, stroke-opacity .18s ease;}
+.sticker-corner{transform:rotate(-7deg); width:70px;}
+.pc-corner svg, .gig-corner svg, .sticker-corner svg{width:100%; height:auto; display:block;}
+.pc-corner .pc-corner-frame, .gig-corner .pc-corner-frame, .sticker-corner .pc-corner-frame{transition:stroke .18s ease, stroke-opacity .18s ease;}
 .pc-corner:hover .pc-corner-frame, .pc-corner:focus-visible .pc-corner-frame,
-.gig-corner:hover .pc-corner-frame, .gig-corner:focus-visible .pc-corner-frame{stroke:#ffe08a; stroke-opacity:1;}
+.gig-corner:hover .pc-corner-frame, .gig-corner:focus-visible .pc-corner-frame,
+.sticker-corner:hover .pc-corner-frame, .sticker-corner:focus-visible .pc-corner-frame{stroke:#ffe08a; stroke-opacity:1;}
 @media (prefers-reduced-motion:reduce){ .pc-corner .pc-corner-frame, .gig-corner .pc-corner-frame{transition:none;} }
 @media (max-aspect-ratio:7/10){
   body.v-basement .pc-corner{display:block;}
   body.v-coffee .gig-corner{display:block;}
+  body.v-dive .sticker-corner{display:block;}
   .venue-art .pc-poster-g{display:none;}
   .venue-art .gig-flyer-g{display:none;}
+  .venue-art .sticker-g{display:none;}
 }
 
 /* ===== LOOK AROUND — "the peek" =====
@@ -770,6 +774,11 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
   .app{ max-height:none; }
 }
 .app-top{display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; margin-bottom:2px;}
+/* The sound and help buttons are fixed to the top-right of the SCREEN, while the coin
+   counter is pinned to the right of the app COLUMN. On a phone those are the same place,
+   so the counter was sitting half underneath them. Step the row's right edge in past the
+   buttons on narrow screens; wide screens have room and are left alone. */
+@media (max-width:560px){ .app-top{padding-right:96px;} }
 .wordmark-sm{font-family:var(--serif); font-weight:700; font-size:1.02rem; letter-spacing:.02em; color:var(--cream);}
 .wordmark-sm .star{color:var(--gold-hi);}
 .coin-chip{margin:0;}
@@ -923,6 +932,23 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
   <div class="combo-banner" id="comboBanner"></div>
   <div class="level-intro" id="levelIntro"><div class="li-n" id="liN"></div><div class="li-t" id="liT"></div><div class="li-obj" id="liObj"></div></div>
   <div class="venue-toast" id="venueToast"><div class="vt-k" id="vtK">Now playing</div><div class="vt-n" id="vtN"></div><div class="vt-s" id="vtS"></div></div>
+  <!-- PHONE STICKER. Same reasoning as the poster and the flyer above: on a tall screen
+       the bathroom door is cropped clean off the side of the picture, so on phones the
+       sticker stops being part of the painting and becomes a real corner element whose
+       position is guaranteed rather than calculated. Dive Bar only. -->
+  <a class="sticker-corner" data-kind="sticker" href="https://www.redbubble.com/shop/ap/172252421?asc=u"
+     target="_blank" rel="noopener" aria-label="X-Ray Star &#8212; sticker">
+    <svg viewBox="0 0 100 96" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect class="pc-corner-frame" x="2" y="2" width="96" height="92" rx="12" fill="#f2e9d4"
+            stroke="#8b7a5a" stroke-opacity=".85" stroke-width="2"/>
+      <rect x="9" y="9" width="82" height="78" rx="8" fill="#1b1020"/>
+      <text x="50" y="40" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="19" fill="#ffd58c">&#9733;</text>
+      <text class="gig-name" x="50" y="66" text-anchor="middle" textLength="68" lengthAdjust="spacingAndGlyphs"
+            font-family="Fraunces,Georgia,serif" font-weight="700" font-size="14" fill="#f2e9d4">X-RAY STAR</text>
+      <path d="M98 70 l0 24 -24 0 q16-6 24-24Z" fill="#dcd0b4"/>
+      <path d="M98 70 q-8 18-24 24" fill="none" stroke="#8b7a5a" stroke-width="1.6" opacity=".7"/>
+    </svg>
+  </a>
   <div class="peek-catch" id="peekCatch" onclick="Game.peek()" aria-hidden="true"></div>
   <div class="peek-hint" id="peekHint">Tap anywhere to go back</div>
   <div class="fab">
@@ -1887,6 +1913,223 @@ const VENUE_ART = {
   </g>
 
   <rect width="1200" height="800" fill="url(#csFall)"/>
+</svg>`,
+  'v-dive': `<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="dbWall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2b1a2c"/><stop offset="46%" stop-color="#34202c"/><stop offset="100%" stop-color="#180f1c"/>
+    </linearGradient>
+    <radialGradient id="dbGlow" cx="50%" cy="14%" r="66%">
+      <stop offset="0%"   stop-color="#ff6a3c" stop-opacity=".30"/>
+      <stop offset="44%"  stop-color="#c9402c" stop-opacity=".12"/>
+      <stop offset="100%" stop-color="#c9402c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="dbHalo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff8a5c" stop-opacity=".42"/><stop offset="100%" stop-color="#ff8a5c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="dbStageGlow" cx="50%" cy="20%" r="62%">
+      <stop offset="0%" stop-color="#ffcf8a" stop-opacity=".22"/><stop offset="100%" stop-color="#ffcf8a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="dbBulb" cx="50%" cy="42%" r="52%">
+      <stop offset="0%" stop-color="#fff4dc"/><stop offset="60%" stop-color="#ffcf8a"/><stop offset="100%" stop-color="#d4923f"/>
+    </radialGradient>
+    <linearGradient id="dbWood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6d4527"/><stop offset="100%" stop-color="#331f11"/>
+    </linearGradient>
+    <linearGradient id="dbBarTop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8a5a30"/><stop offset="55%" stop-color="#5b391e"/><stop offset="100%" stop-color="#2e1c0f"/>
+    </linearGradient>
+    <linearGradient id="dbBrass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c9a14a"/><stop offset="40%" stop-color="#f0d68e"/><stop offset="100%" stop-color="#7a5c22"/>
+    </linearGradient>
+    <linearGradient id="dbFloor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2b1d26"/><stop offset="100%" stop-color="#120c14"/>
+    </linearGradient>
+    <linearGradient id="dbFall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#000" stop-opacity=".38"/>
+      <stop offset="46%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity=".40"/>
+    </linearGradient>
+  </defs>
+
+  <!-- room shell -->
+  <rect width="1200" height="800" fill="url(#dbWall)"/>
+  <rect width="1200" height="72" fill="#1a1018"/>
+  <!-- wainscot: every dive has this exact panelling and it has never once been replaced -->
+  <rect y="430" width="1200" height="192" fill="#2a1a1b"/>
+  <g stroke="#170e10" stroke-width="3" opacity=".8">
+    <path d="M0 430 H1200 M0 616 H1200"/>
+    <path d="M60 430 V616 M180 430 V616 M300 430 V616 M420 430 V616 M540 430 V616 M900 430 V616 M1020 430 V616 M1140 430 V616"/>
+  </g>
+  <rect y="620" width="1200" height="180" fill="url(#dbFloor)"/>
+  <g stroke="#0d080f" stroke-width="2" opacity=".55">
+    <path d="M0 654 H1200 M0 696 H1200 M0 744 H1200"/>
+    <path d="M130 620 V800 M370 620 V800 M640 620 V800 M900 620 V800 M1120 620 V800"/>
+  </g>
+
+  <!-- THE LIGHT. One beer sign, and it is the whole room.
+       It does not flicker, buzz or cycle — not once, not ever. The joke is in the two
+       letters that gave up years ago and were never replaced: LI E MU IC TONITE. -->
+  <ellipse cx="600" cy="150" rx="500" ry="400" fill="url(#dbGlow)"/>
+  <g stroke="#140c12" stroke-width="4"><path d="M520 0 V66"/><path d="M680 0 V66"/></g>
+  <rect x="452" y="64" width="296" height="130" rx="10" fill="#1b1016" stroke="#4e3038" stroke-width="4"/>
+  <rect x="462" y="74" width="276" height="110" rx="6" fill="#2b0f16"/>
+  <ellipse cx="600" cy="126" rx="168" ry="78" fill="url(#dbHalo)"/>
+  <g font-family="'JetBrains Mono',monospace" font-weight="700" font-size="32" text-anchor="middle">
+    <!-- the letters that still work -->
+    <g fill="#ff7a4d">
+      <text x="510" y="136">L</text><text x="530" y="136">I</text><text x="570" y="136">E</text>
+      <text x="610" y="136">M</text><text x="630" y="136">U</text><text x="670" y="136">I</text><text x="690" y="136">C</text>
+    </g>
+    <!-- the two that do not, and never will -->
+    <g fill="#3f2329">
+      <text x="550" y="136">V</text><text x="650" y="136">S</text>
+    </g>
+  </g>
+  <text x="600" y="170" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="17"
+        letter-spacing="4" fill="#ffb26a" opacity=".85">TONITE</text>
+
+  <!-- THE BAR, left. Four regulars, every one of them facing the drinks. -->
+  <rect x="0" y="286" width="440" height="266" fill="#1d1219"/>
+  <rect x="16" y="298" width="404" height="126" fill="#2a1c26" opacity=".75"/>
+  <g stroke="#3a2833" stroke-width="3" opacity=".7"><path d="M16 424 H420 M0 470 H440 M0 516 H440"/></g>
+  <g opacity=".9">
+    <g fill="#3f5a3a"><rect x="30" y="432" width="18" height="36" rx="4"/><rect x="96" y="430" width="16" height="38" rx="4"/><rect x="214" y="434" width="18" height="34" rx="4"/><rect x="330" y="430" width="16" height="38" rx="4"/></g>
+    <g fill="#6b4a24"><rect x="58" y="436" width="18" height="32" rx="4"/><rect x="140" y="432" width="20" height="36" rx="4"/><rect x="258" y="430" width="16" height="38" rx="4"/><rect x="368" y="434" width="18" height="34" rx="4"/></g>
+    <g fill="#57323f"><rect x="184" y="436" width="16" height="32" rx="4"/><rect x="296" y="434" width="18" height="34" rx="4"/></g>
+    <g fill="#4a3a2a"><rect x="40" y="478" width="20" height="38" rx="4"/><rect x="120" y="480" width="18" height="36" rx="4"/><rect x="238" y="478" width="20" height="38" rx="4"/><rect x="352" y="480" width="18" height="36" rx="4"/></g>
+    <g fill="#ffc98a" opacity=".18"><rect x="30" y="432" width="6" height="36"/><rect x="140" y="432" width="6" height="36"/><rect x="258" y="430" width="5" height="38"/><rect x="352" y="480" width="5" height="36"/></g>
+  </g>
+  <rect x="0" y="546" width="452" height="20" rx="4" fill="url(#dbBarTop)"/>
+  <rect x="0" y="566" width="452" height="140" fill="#2c1a12"/>
+  <g stroke="#1a0f0a" stroke-width="3" opacity=".7"><path d="M0 604 H452 M0 648 H452"/><path d="M110 566 V706 M232 566 V706 M354 566 V706"/></g>
+  <rect x="0" y="672" width="452" height="9" rx="4" fill="url(#dbBrass)" opacity=".8"/>
+  <!-- the regulars. Backs to the stage, to a man. -->
+  <g fill="#120b12">
+    <g><circle cx="66" cy="474" r="27"/><path d="M18 566 q6-58 48-58 q42 0 48 58Z"/><rect x="52" y="620" width="10" height="70"/><ellipse cx="66" cy="616" rx="34" ry="9" fill="#1d141c"/></g>
+    <g><circle cx="176" cy="466" r="26"/><path d="M130 566 q6-56 46-56 q40 0 46 56Z"/><rect x="162" y="620" width="10" height="70"/><ellipse cx="176" cy="616" rx="33" ry="9" fill="#1d141c"/></g>
+    <g><circle cx="288" cy="478" r="28"/><path d="M238 566 q6-58 50-58 q44 0 50 58Z"/><rect x="274" y="620" width="10" height="70"/><ellipse cx="288" cy="616" rx="34" ry="9" fill="#1d141c"/></g>
+    <g><circle cx="398" cy="470" r="26"/><path d="M352 566 q6-56 46-56 q40 0 46 56Z"/><rect x="384" y="620" width="10" height="70"/><ellipse cx="398" cy="616" rx="33" ry="9" fill="#1d141c"/></g>
+  </g>
+  <g stroke="#c9542f" stroke-width="3" opacity=".45" fill="none" stroke-linecap="round">
+    <path d="M90 462 q6 14 4 30"/><path d="M199 456 q5 13 4 28"/><path d="M313 466 q6 14 4 30"/><path d="M421 460 q5 13 4 28"/>
+  </g>
+
+  <!-- the door to the one bathroom, and the layered stickers on it -->
+  <rect x="632" y="236" width="146" height="386" rx="3" fill="#1b1017"/>
+  <rect x="638" y="242" width="134" height="380" fill="#33202b"/>
+  <g fill="none" stroke="#241621" stroke-width="3">
+    <rect x="652" y="258" width="106" height="132"/><rect x="652" y="410" width="106" height="192"/>
+  </g>
+  <circle cx="750" cy="440" r="7" fill="#8a6a3a"/>
+  <rect x="666" y="272" width="78" height="26" rx="3" fill="#211520"/>
+  <text x="705" y="290" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12"
+        letter-spacing="2" fill="#9b8574">RESTROOM</text>
+  <!-- three dead stickers underneath, and ours on top -->
+  <g opacity=".55">
+    <rect x="646" y="470" width="62" height="44" rx="8" fill="#3e3a2c" transform="rotate(-13 677 492)"/>
+    <rect x="700" y="486" width="56" height="40" rx="8" fill="#2f3a3e" transform="rotate(9 728 506)"/>
+    <rect x="662" y="512" width="70" height="30" rx="6" fill="#3a2c33" transform="rotate(4 697 527)"/>
+  </g>
+  <a href="__BANDHREF__" target="_blank" rel="noopener" aria-label="__BAND__ &#8212; sticker">
+  <g class="sticker-g" transform="rotate(-7 700 486)">
+    <rect class="poster-frame" x="652" y="440" width="96" height="92" rx="12" fill="#f2e9d4"
+          stroke="#b3a483" stroke-width="0"/>
+    <rect x="659" y="447" width="82" height="78" rx="8" fill="#1b1020"/>
+    <text x="700" y="478" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="19" fill="#ffd58c">&#9733;</text>
+    <text class="gig-name" x="700" y="504" text-anchor="middle" textLength="68" lengthAdjust="spacingAndGlyphs"
+          font-family="Fraunces,Georgia,serif" font-weight="700" font-size="14" fill="#f2e9d4">__BAND__</text>
+    <!-- the corner somebody has been picking at all year -->
+    <path d="M748 508 l0 24 -24 0 q16-6 24-24Z" fill="#dcd0b4"/>
+    <path d="M748 508 q-8 18-24 24" fill="none" stroke="#8b7a5a" stroke-width="1.6" opacity=".7"/>
+  </g>
+  </a>
+
+  <!-- THE STAGE. Pallets, a rug, and a phone book doing structural work. -->
+  <ellipse cx="985" cy="330" rx="300" ry="330" fill="url(#dbStageGlow)"/>
+  <g stroke="#140c12" stroke-width="3"><path d="M985 0 V150"/></g>
+  <path d="M945 192 l40-42 40 42Z" fill="#241a22"/>
+  <ellipse cx="985" cy="192" rx="40" ry="8" fill="#140f14"/>
+  <ellipse cx="985" cy="193" rx="14" ry="7" fill="url(#dbBulb)"/>
+  <rect x="792" y="594" width="392" height="68" fill="url(#dbWood)"/>
+  <rect x="804" y="570" width="368" height="26" fill="#5c3a20"/>
+  <g stroke="#2a1a0e" stroke-width="3" opacity=".75">
+    <path d="M792 616 H1184 M792 640 H1184"/>
+    <path d="M860 594 V662 M950 594 V662 M1040 594 V662 M1120 594 V662"/>
+  </g>
+  <path d="M812 552 H1164 V572 H812Z" fill="#6b2a3a"/>
+  <path d="M812 572 q84 14 176 14 q92 0 176-14 v10 q-84 14-176 14 q-92 0-176-14Z" fill="#57202e"/>
+  <g stroke="#8a3a4a" stroke-width="2" opacity=".7"><path d="M830 552 V586 M900 552 V590 M990 552 V592 M1080 552 V590 M1150 552 V586"/></g>
+  <!-- the phone book. It has been there since 2009 and it is not coming out. -->
+  <rect x="796" y="662" width="40" height="16" rx="2" fill="#c9b06a"/>
+  <g stroke="#8f7a3f" stroke-width="1.4"><path d="M796 667 H836 M796 672 H836"/></g>
+  <!-- amp + mic stand -->
+  <rect x="1058" y="474" width="106" height="80" rx="5" fill="#241c26"/>
+  <rect x="1066" y="482" width="90" height="56" rx="3" fill="#150f18"/>
+  <g stroke="#3a2f3d" stroke-width="2" opacity=".8"><path d="M1066 494 H1156 M1066 508 H1156 M1066 522 H1156"/></g>
+  <rect x="1096" y="540" width="30" height="8" rx="2" fill="#c9a14a" opacity=".7"/>
+  <g stroke="#2c2430" stroke-width="6" stroke-linecap="round" fill="none">
+    <path d="M900 552 V402"/><path d="M900 402 q0-14 22-14"/>
+  </g>
+  <ellipse cx="932" cy="388" rx="13" ry="10" fill="#3a3140" transform="rotate(-18 932 388)"/>
+  <ellipse cx="900" cy="554" rx="34" ry="7" fill="#241c26"/>
+
+  <!-- JOSH has taken Steve's bed. Steve is three feet away, reviewing his options.
+       Neither of them will move for the next five sets.
+       Steve is scaled about his own base, for the same reason Josh is: on a phone the
+       board's bottom edge cuts the artwork at about y=601, and at full size his ears
+       were sliced off by it. Scaled, his head clears the edge and his feet stay planted.
+       Josh is left exactly where the Coffee Shop put him — that position is already tuned. -->
+  <ellipse cx="470" cy="700" rx="88" ry="27" fill="#3e2028"/>
+  <ellipse cx="470" cy="698" rx="66" ry="19" fill="#552d38"/>
+  <text x="470" y="726" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="14"
+        letter-spacing="3" fill="#8f5f6b" opacity=".9">STEVE</text>
+  <g transform="translate(470 690) scale(.76) translate(-470 -690)">
+  <a href="https://www.redbubble.com/shop/ap/134520091?asc=u" target="_blank" rel="noopener"
+     aria-label="Josh&#8217;s merch shop">
+  <g class="josh-hit">
+    <ellipse cx="470" cy="648" rx="64" ry="60" fill="transparent"/>
+    <path d="M424 690 q-8-54 46-62 q54-8 60 44 q3 18-2 18Z" fill="#141119"/>
+    <path d="M492 690 q34-8 44-30 q6-14-6-18 q-12-4-14 8" fill="none" stroke="#141119" stroke-width="11" stroke-linecap="round"/>
+    <circle cx="470" cy="634" r="36" fill="#191521"/>
+    <path d="M440 606 l-4-30 28 14Z" fill="#191521"/>
+    <path d="M500 606 l6-30 -27 15Z" fill="#191521"/>
+    <path d="M441 604 l-2-17 15 8Z" fill="#a9707c" opacity=".75"/>
+    <path d="M498 604 l4-17 -15 9Z" fill="#a9707c" opacity=".75"/>
+    <ellipse cx="456" cy="630" rx="8" ry="9" fill="#c3e04f"/>
+    <ellipse cx="486" cy="630" rx="8" ry="9" fill="#c3e04f"/>
+    <ellipse cx="456" cy="630" rx="2.6" ry="8" fill="#141119"/>
+    <ellipse cx="486" cy="630" rx="2.6" ry="8" fill="#141119"/>
+    <path d="M466 648 l8 0 -4 5Z" fill="#a9707c"/>
+    <path d="M470 653 q-6 6-13 3 M470 653 q6 6 13 3" stroke="#2b2634" stroke-width="2" fill="none"/>
+    <g stroke="#8a8397" stroke-width="2.2" opacity=".8" fill="none">
+      <path d="M436 640 q-24 2-34 10"/><path d="M436 648 q-24 8-32 18"/>
+      <path d="M506 640 q24 2 34 10"/><path d="M506 648 q24 8 32 18"/>
+    </g>
+  </g>
+  </a>
+  </g>
+
+  <!-- STEVE. Good dog. Wrong bed. -->
+  <g transform="translate(606 700) scale(.72) translate(-606 -700)">
+    <ellipse cx="606" cy="722" rx="58" ry="12" fill="#0e090f" opacity=".55"/>
+    <path d="M578 716 q-8-56 26-58 q30-2 32 34 q2 24-4 24Z" fill="#2b1d1e"/>
+    <path d="M626 714 q26-4 34-26 q5-14-6-17 q-11-3-13 8" fill="none" stroke="#2b1d1e" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="580" cy="650" r="30" fill="#332323"/>
+    <path d="M556 632 q-14-30 4-34 q12-2 14 22Z" fill="#2b1d1e"/>
+    <path d="M600 630 q12-30 -6-32 q-12-2-12 22Z" fill="#2b1d1e"/>
+    <path d="M552 656 q-24 2-26 14 q-1 10 12 10 q16 0 22-10Z" fill="#3a2828"/>
+    <ellipse cx="530" cy="666" rx="7" ry="6" fill="#171012"/>
+    <ellipse cx="570" cy="648" rx="6" ry="7" fill="#e8d7a8"/>
+    <ellipse cx="570" cy="649" rx="2.4" ry="6" fill="#171012"/>
+    <path d="M548 682 q10 6 20 2" stroke="#171012" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <g stroke="#c9542f" stroke-width="3" opacity=".4" fill="none" stroke-linecap="round">
+      <path d="M604 630 q10 16 8 34"/><path d="M636 700 q10 6 12 14"/>
+    </g>
+  </g>
+
+
+  <rect width="1200" height="800" fill="url(#dbFall)"/>
 </svg>`,
 };
 function venueFor(n) { return VENUES.find(v => n >= v.from && n <= v.to) || VENUES[VENUES.length - 1]; }
@@ -3171,12 +3414,13 @@ function applyVenue(n) {
   VENUES.forEach(x => document.body.classList.remove(x.cls));
   document.body.classList.add(v.cls);
   const gig = gigFlyerBits(n);
-  const corner = document.querySelector('.gig-corner');
-  if (corner) {
+  // every corner piece that carries the band's name — the Coffee Shop flyer and the
+  // Dive Bar sticker — is kept in step with the rename in one pass.
+  document.querySelectorAll('.gig-corner, .sticker-corner').forEach(corner => {
     corner.setAttribute('href', gig.href);
-    corner.setAttribute('aria-label', gig.name + ' \u2014 gig flyer');
+    corner.setAttribute('aria-label', gig.name + ' \u2014 ' + (corner.dataset.kind || 'gig flyer'));
     corner.querySelectorAll('.gig-name').forEach(t => { t.textContent = gig.name; });
-  }
+  });
   // Swap the illustration only when the room actually changes — re-injecting identical
   // markup every level would throw away and rebuild a few hundred nodes for nothing.
   // The band's name counts as a change: it fires once, at the rename.
