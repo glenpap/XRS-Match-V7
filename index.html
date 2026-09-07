@@ -115,19 +115,22 @@ body.v-arena .stage-bg{background:
    coordinates inside a cropped image, phones get a real corner element instead (.pc-corner
    in the markup) and the wall copy stands down. Wide screens are untouched — the poster
    stays on the wall where it belongs. */
-.pc-corner{
+.pc-corner, .gig-corner{
   position:fixed; right:9px; bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
   width:76px; z-index:2; display:none; line-height:0;
   transform:rotate(-4deg); filter:drop-shadow(0 6px 14px rgba(0,0,0,.6));
 }
-.pc-corner svg{width:100%; height:auto; display:block;}
-.pc-corner .pc-corner-frame{transition:stroke .18s ease, stroke-opacity .18s ease;}
-.pc-corner:hover .pc-corner-frame,
-.pc-corner:focus-visible .pc-corner-frame{stroke:#ffe08a; stroke-opacity:1;}
-@media (prefers-reduced-motion:reduce){ .pc-corner .pc-corner-frame{transition:none;} }
+.gig-corner{transform:rotate(3deg);}
+.pc-corner svg, .gig-corner svg{width:100%; height:auto; display:block;}
+.pc-corner .pc-corner-frame, .gig-corner .pc-corner-frame{transition:stroke .18s ease, stroke-opacity .18s ease;}
+.pc-corner:hover .pc-corner-frame, .pc-corner:focus-visible .pc-corner-frame,
+.gig-corner:hover .pc-corner-frame, .gig-corner:focus-visible .pc-corner-frame{stroke:#ffe08a; stroke-opacity:1;}
+@media (prefers-reduced-motion:reduce){ .pc-corner .pc-corner-frame, .gig-corner .pc-corner-frame{transition:none;} }
 @media (max-aspect-ratio:7/10){
   body.v-basement .pc-corner{display:block;}
+  body.v-coffee .gig-corner{display:block;}
   .venue-art .pc-poster-g{display:none;}
+  .venue-art .gig-flyer-g{display:none;}
 }
 .title{font-family:var(--serif); font-weight:700; font-size:1.5rem; letter-spacing:.01em; color:var(--cream); text-align:center; line-height:1.05;}
 .title .star{color:var(--gold-hi);}
@@ -863,6 +866,24 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
       </svg>
     </svg>
   </a>
+  <a class="gig-corner" href="https://www.redbubble.com/shop/ap/172252421?asc=u" target="_blank"
+     rel="noopener" aria-label="X-Ray Star — gig flyer">
+    <svg viewBox="0 0 120 164" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect class="pc-corner-frame" x="1" y="1" width="118" height="162" fill="#e7dcc2"
+            stroke="#8b7a5a" stroke-opacity=".85" stroke-width="2"/>
+      <g opacity=".35" transform="translate(3 2)">
+        <text class="gig-name" x="60" y="46" text-anchor="middle" textLength="104" lengthAdjust="spacingAndGlyphs" font-family="Fraunces,Georgia,serif" font-weight="700" font-size="21" fill="#d33a7a">X-RAY STAR</text>
+      </g>
+      <text class="gig-name" x="60" y="44" text-anchor="middle" textLength="104" lengthAdjust="spacingAndGlyphs" font-family="Fraunces,Georgia,serif" font-weight="700" font-size="21" fill="#2a2118">X-RAY STAR</text>
+      <path d="M14 56 H106" stroke="#2a2118" stroke-width="1.6" opacity=".7"/>
+      <text x="60" y="84" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="15" fill="#2a2118" opacity=".85">TONIGHT</text>
+      <text x="60" y="106" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11" fill="#2a2118" opacity=".6">8PM · NO COVER</text>
+      <text x="60" y="126" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="#2a2118" opacity=".45">TWO DRINK MINIMUM</text>
+      <g fill="#2a2118" opacity=".14">
+        <rect x="0" y="90" width="120" height="7"/><rect x="0" y="138" width="120" height="4"/>
+      </g>
+    </svg>
+  </a>
   <div class="drift" id="drift" aria-hidden="true"></div>
   <div class="screen-pulse" id="screenPulse"></div>
   <div class="combo-banner" id="comboBanner"></div>
@@ -1558,6 +1579,273 @@ const VENUE_ART = {
   </a>
 
   <rect x="1000" y="0" width="200" height="800" fill="#100d18" opacity=".16"/>
+</svg>`,
+  'v-coffee': `<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="csWall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3b2a1f"/><stop offset="42%" stop-color="#4d3626"/><stop offset="100%" stop-color="#241a13"/>
+    </linearGradient>
+    <radialGradient id="csPool" cx="50%" cy="4%" r="72%">
+      <stop offset="0%"   stop-color="#ffd79a" stop-opacity=".40"/>
+      <stop offset="42%"  stop-color="#e0a04c" stop-opacity=".15"/>
+      <stop offset="100%" stop-color="#e0a04c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="csBulb" cx="50%" cy="42%" r="52%">
+      <stop offset="0%" stop-color="#fff7e0"/><stop offset="58%" stop-color="#ffd58c"/><stop offset="100%" stop-color="#dd9c45"/>
+    </radialGradient>
+    <linearGradient id="csShade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#2a2f36"/><stop offset="38%" stop-color="#5c6672"/><stop offset="100%" stop-color="#1e2229"/>
+    </linearGradient>
+    <linearGradient id="csNight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0e1a30"/><stop offset="58%" stop-color="#1c2c49"/><stop offset="100%" stop-color="#0b1220"/>
+    </linearGradient>
+    <radialGradient id="csStreet" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#a8c8f0" stop-opacity=".55"/><stop offset="100%" stop-color="#a8c8f0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="csGlass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#e6efff" stop-opacity=".13"/>
+      <stop offset="44%"  stop-color="#e6efff" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#ffd49a" stop-opacity=".10"/>
+    </linearGradient>
+    <linearGradient id="csChrome" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#666b72"/><stop offset="20%" stop-color="#dbe1e7"/>
+      <stop offset="48%" stop-color="#8b939b"/><stop offset="76%" stop-color="#e8edf1"/>
+      <stop offset="100%" stop-color="#565b62"/>
+    </linearGradient>
+    <linearGradient id="csWood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#75512f"/><stop offset="100%" stop-color="#3a2616"/>
+    </linearGradient>
+    <linearGradient id="csFloor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#392819"/><stop offset="100%" stop-color="#1a120c"/>
+    </linearGradient>
+    <linearGradient id="csFall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#000" stop-opacity=".40"/>
+      <stop offset="46%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity=".36"/>
+    </linearGradient>
+    <clipPath id="csPane"><rect x="344" y="204" width="512" height="486"/></clipPath>
+  </defs>
+
+  <!-- wall, ceiling, floor -->
+  <rect width="1200" height="800" fill="url(#csWall)"/>
+  <rect width="1200" height="84" fill="#1f160f"/>
+  <g stroke="#160f0a" stroke-width="2" opacity=".7">
+    <path d="M0 22 H1200 M0 46 H1200 M0 70 H1200"/>
+  </g>
+  <rect y="700" width="1200" height="100" fill="url(#csFloor)"/>
+  <g stroke="#120c07" stroke-width="2" opacity=".55">
+    <path d="M0 726 H1200 M0 758 H1200 M0 790 H1200"/>
+    <path d="M150 700 V800 M470 700 V800 M780 700 V800 M1040 700 V800"/>
+  </g>
+
+  <!-- three pendants. The evening light in this room is entirely theirs. -->
+  <g>
+    <ellipse cx="240" cy="150" rx="230" ry="330" fill="url(#csPool)"/>
+    <ellipse cx="600" cy="150" rx="250" ry="350" fill="url(#csPool)"/>
+    <ellipse cx="990" cy="150" rx="230" ry="330" fill="url(#csPool)"/>
+  </g>
+  <g stroke="#181310" stroke-width="3">
+    <path d="M240 0 V112"/><path d="M600 0 V96"/><path d="M990 0 V120"/>
+  </g>
+  <g>
+    <path d="M196 152 l44-42 44 42Z" fill="url(#csShade)"/>
+    <ellipse cx="240" cy="152" rx="44" ry="9" fill="#12100e"/>
+    <ellipse cx="240" cy="153" rx="15" ry="8" fill="url(#csBulb)"/>
+    <path d="M552 138 l48-44 48 44Z" fill="url(#csShade)"/>
+    <ellipse cx="600" cy="138" rx="48" ry="10" fill="#12100e"/>
+    <ellipse cx="600" cy="139" rx="16" ry="9" fill="url(#csBulb)"/>
+    <path d="M946 160 l44-42 44 42Z" fill="url(#csShade)"/>
+    <ellipse cx="990" cy="160" rx="44" ry="9" fill="#12100e"/>
+    <ellipse cx="990" cy="161" rx="15" ry="8" fill="url(#csBulb)"/>
+  </g>
+
+  <!-- the chalkboard. The terms are not negotiable. -->
+  <g transform="rotate(-1 175 320)">
+    <rect x="66" y="246" width="218" height="150" rx="4" fill="#2b2f2b" stroke="#6b4c2c" stroke-width="7"/>
+    <rect x="76" y="256" width="198" height="130" fill="#20241f"/>
+    <g fill="#e8e2cf" font-family="'JetBrains Mono',monospace" text-anchor="middle">
+      <text x="175" y="292" font-size="19" letter-spacing="1">TWO DRINK</text>
+      <text x="175" y="318" font-size="19" letter-spacing="1">MINIMUM</text>
+      <text x="175" y="352" font-size="13" opacity=".72">(both oat milk)</text>
+    </g>
+    <path d="M92 366 H258" stroke="#e8e2cf" stroke-width="1.6" opacity=".35"/>
+  </g>
+
+  <!-- storefront window. The sill runs low, so the street is right there. -->
+  <rect x="330" y="190" width="540" height="520" fill="#241a13"/>
+  <g clip-path="url(#csPane)">
+    <rect x="344" y="204" width="512" height="486" fill="url(#csNight)"/>
+    <g fill="#0b1220" opacity=".9">
+      <rect x="344" y="404" width="120" height="180"/>
+      <rect x="476" y="366" width="96" height="218"/>
+      <rect x="588" y="424" width="140" height="160"/>
+      <rect x="742" y="392" width="114" height="192"/>
+    </g>
+    <g fill="#ffdca6" opacity=".5">
+      <rect x="360" y="424" width="12" height="16"/><rect x="392" y="424" width="12" height="16"/>
+      <rect x="360" y="462" width="12" height="16"/><rect x="424" y="500" width="12" height="16"/>
+      <rect x="496" y="392" width="14" height="18"/><rect x="536" y="430" width="14" height="18"/>
+      <rect x="496" y="470" width="14" height="18"/><rect x="612" y="452" width="12" height="16"/>
+      <rect x="668" y="490" width="12" height="16"/><rect x="770" y="418" width="14" height="18"/>
+      <rect x="812" y="456" width="14" height="18"/><rect x="770" y="500" width="14" height="18"/>
+    </g>
+    <ellipse cx="700" cy="536" rx="150" ry="120" fill="url(#csStreet)"/>
+    <g stroke="#3a4b66" stroke-width="7" fill="none"><path d="M700 584 V470"/></g>
+    <path d="M676 470 q24-20 48 0Z" fill="#4a5f80"/>
+    <ellipse cx="700" cy="472" rx="20" ry="9" fill="#cfe2ff" opacity=".8"/>
+    <rect x="344" y="584" width="512" height="106" fill="#141d2c"/>
+    <g stroke="#22314a" stroke-width="3" opacity=".8"><path d="M344 612 H856 M344 648 H856"/></g>
+
+    <!-- JOSH, outside, at the glass. He is not asking to come in.
+         Scaled about his base rather than redrawn: on a phone the board's bottom edge
+         cuts the artwork at roughly y=601, so at full size he was sliced across the
+         face. At .76 he sits between that edge and the buttons with his ears clear. -->
+    <g transform="translate(470 690) scale(.76) translate(-470 -690)">
+    <a href="https://www.redbubble.com/shop/ap/134520091?asc=u" target="_blank" rel="noopener"
+       aria-label="Josh&#8217;s merch shop">
+    <g class="josh-hit">
+      <ellipse cx="470" cy="648" rx="64" ry="60" fill="transparent"/>
+      <path d="M424 690 q-8-54 46-62 q54-8 60 44 q3 18-2 18Z" fill="#141119"/>
+      <path d="M492 690 q34-8 44-30 q6-14-6-18 q-12-4-14 8" fill="none" stroke="#141119" stroke-width="11" stroke-linecap="round"/>
+      <circle cx="470" cy="634" r="36" fill="#191521"/>
+      <path d="M440 606 l-4-30 28 14Z" fill="#191521"/>
+      <path d="M500 606 l6-30 -27 15Z" fill="#191521"/>
+      <path d="M441 604 l-2-17 15 8Z" fill="#a9707c" opacity=".75"/>
+      <path d="M498 604 l4-17 -15 9Z" fill="#a9707c" opacity=".75"/>
+      <ellipse cx="456" cy="630" rx="8" ry="9" fill="#c3e04f"/>
+      <ellipse cx="486" cy="630" rx="8" ry="9" fill="#c3e04f"/>
+      <ellipse cx="456" cy="630" rx="2.6" ry="8" fill="#141119"/>
+      <ellipse cx="486" cy="630" rx="2.6" ry="8" fill="#141119"/>
+      <path d="M466 648 l8 0 -4 5Z" fill="#a9707c"/>
+      <path d="M470 653 q-6 6-13 3 M470 653 q6 6 13 3" stroke="#2b2634" stroke-width="2" fill="none"/>
+      <g stroke="#8a8397" stroke-width="2.2" opacity=".8" fill="none">
+        <path d="M436 640 q-24 2-34 10"/><path d="M436 648 q-24 8-32 18"/>
+        <path d="M506 640 q24 2 34 10"/><path d="M506 648 q24 8 32 18"/>
+      </g>
+    </g>
+    </a>
+    <!-- a nose print, at cat height -->
+    <g fill="#dfe9ff" opacity=".14">
+      <ellipse cx="524" cy="646" rx="7" ry="5"/><ellipse cx="533" cy="654" rx="4" ry="3"/>
+    </g>
+    </g>
+    <rect x="344" y="204" width="512" height="486" fill="url(#csGlass)"/>
+    <g stroke="#dfe9ff" stroke-width="8" opacity=".07" stroke-linecap="round">
+      <path d="M380 660 L560 250"/><path d="M430 676 L610 266"/>
+    </g>
+  </g>
+  <g fill="#3a2717">
+    <rect x="330" y="190" width="540" height="16"/>
+    <rect x="330" y="190" width="16" height="520"/>
+    <rect x="854" y="190" width="16" height="520"/>
+    <rect x="510" y="204" width="12" height="486"/>
+    <rect x="678" y="204" width="12" height="486"/>
+    <rect x="344" y="380" width="512" height="12"/>
+  </g>
+  <rect x="314" y="688" width="572" height="24" rx="3" fill="url(#csWood)"/>
+  <rect x="314" y="688" width="572" height="5" fill="#8a6238" opacity=".55"/>
+
+  <!-- Trevor's stand, with the second mic he brought in case -->
+  <g stroke="#2c3037" stroke-width="7" fill="none" stroke-linecap="round">
+    <path d="M292 706 V438"/><path d="M292 452 H246"/><path d="M292 540 H252"/>
+  </g>
+  <ellipse cx="292" cy="708" rx="40" ry="9" fill="#22262c"/>
+  <g fill="#3b4048">
+    <rect x="228" y="440" width="24" height="26" rx="7"/>
+    <rect x="234" y="530" width="22" height="24" rx="7"/>
+  </g>
+  <g fill="#585f68" opacity=".9">
+    <ellipse cx="240" cy="446" rx="9" ry="6"/><ellipse cx="245" cy="536" rx="8" ry="5"/>
+  </g>
+
+  <!-- the espresso machine, which will win -->
+  <rect x="880" y="558" width="320" height="152" fill="url(#csWood)"/>
+  <rect x="880" y="558" width="320" height="7" fill="#9a6f3f" opacity=".6"/>
+  <g stroke="#2a1b0e" stroke-width="2" opacity=".5"><path d="M960 565 V710 M1060 565 V710"/></g>
+  <rect x="906" y="404" width="214" height="156" rx="7" fill="url(#csChrome)"/>
+  <rect x="906" y="404" width="214" height="26" rx="7" fill="#2f343a"/>
+  <rect x="918" y="446" width="190" height="60" rx="4" fill="#20252b" opacity=".85"/>
+  <g fill="#ffcf8a" opacity=".5"><rect x="928" y="458" width="52" height="8" rx="4"/><rect x="928" y="476" width="34" height="8" rx="4"/></g>
+  <g fill="#3d434a">
+    <rect x="948" y="512" width="34" height="30" rx="4"/><rect x="1044" y="512" width="34" height="30" rx="4"/>
+  </g>
+  <g fill="#6d747c">
+    <rect x="938" y="540" width="54" height="9" rx="4"/><rect x="1034" y="540" width="54" height="9" rx="4"/>
+  </g>
+  <g stroke="#8f979f" stroke-width="6" fill="none" stroke-linecap="round"><path d="M1116 470 q22 10 16 46"/></g>
+  <circle cx="1132" cy="520" r="6" fill="#aab2ba"/>
+  <g fill="#cdd4da">
+    <rect x="922" y="386" width="26" height="18" rx="4"/><rect x="956" y="386" width="26" height="18" rx="4"/>
+    <rect x="990" y="386" width="26" height="18" rx="4"/><rect x="1024" y="386" width="26" height="18" rx="4"/>
+  </g>
+  <rect x="1140" y="452" width="52" height="108" rx="5" fill="#4a5058"/>
+  <path d="M1148 452 q18-34 36 0Z" fill="#5c636c"/>
+  <g stroke="#e8eef4" stroke-width="3" fill="none" opacity=".16" stroke-linecap="round">
+    <path d="M1122 462 q10-26 -2-44"/><path d="M1136 458 q12-22 2-40"/>
+  </g>
+
+  <!-- the flyer. Someone printed it at 5% toner and taped it up anyway. -->
+  <a href="__BANDHREF__" target="_blank" rel="noopener" aria-label="__BAND__ — gig flyer">
+  <g class="gig-flyer-g" transform="rotate(2.4 962 288)">
+    <rect class="flyer-frame" x="902" y="206" width="120" height="164" fill="#e7dcc2" stroke="#8b7a5a" stroke-opacity=".85" stroke-width="2"/>
+    <g opacity=".35" transform="translate(3 2)">
+      <text x="962" y="252" text-anchor="middle" textLength="104" lengthAdjust="spacingAndGlyphs" font-family="Fraunces,Georgia,serif" font-weight="700" font-size="21" fill="#d33a7a">__BAND__</text>
+    </g>
+    <text x="962" y="250" text-anchor="middle" textLength="104" lengthAdjust="spacingAndGlyphs" font-family="Fraunces,Georgia,serif" font-weight="700" font-size="21" fill="#2a2118">__BAND__</text>
+    <path d="M916 262 H1008" stroke="#2a2118" stroke-width="1.6" opacity=".7"/>
+    <text x="962" y="290" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="15" fill="#2a2118" opacity=".85">TONIGHT</text>
+    <text x="962" y="312" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11" fill="#2a2118" opacity=".6">8PM · NO COVER</text>
+    <text x="962" y="332" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="#2a2118" opacity=".45">TWO DRINK MINIMUM</text>
+    <g fill="#2a2118" opacity=".14">
+      <rect x="902" y="296" width="120" height="7"/><rect x="902" y="344" width="120" height="4"/>
+    </g>
+    <rect x="890" y="200" width="30" height="13" fill="#d8cdae" opacity=".26" transform="rotate(-16 905 206)"/>
+    <rect x="1004" y="200" width="30" height="13" fill="#d8cdae" opacity=".26" transform="rotate(14 1019 206)"/>
+  </g>
+  </a>
+
+  <!-- mismatched chairs. No two of them agree on anything. -->
+  <g fill="#2f2a24">
+    <ellipse cx="150" cy="700" rx="86" ry="18"/>
+    <rect x="144" y="612" width="12" height="90"/>
+    <ellipse cx="150" cy="612" rx="62" ry="16" fill="#5d4326"/>
+  </g>
+  <g stroke="#4a3d2c" stroke-width="7" fill="none" stroke-linecap="round">
+    <path d="M56 700 V636 M96 700 V636 M52 636 H100"/>
+    <path d="M56 636 q22-46 44 0"/>
+  </g>
+  <g stroke="#3c4148" stroke-width="6" fill="none" stroke-linecap="round">
+    <path d="M212 702 V644 M254 702 V644 M208 644 H258 M214 644 V590 M252 644 V590 M214 616 H252"/>
+  </g>
+  <g fill="#5a3a3f">
+    <rect x="264" y="620" width="58" height="82" rx="9"/>
+    <rect x="258" y="600" width="70" height="34" rx="10"/>
+  </g>
+  <g fill="#cdd4da">
+    <ellipse cx="126" cy="606" rx="17" ry="6"/><rect x="112" y="592" width="28" height="16" rx="4"/>
+    <ellipse cx="176" cy="604" rx="15" ry="5"/><rect x="163" y="592" width="26" height="14" rx="4"/>
+  </g>
+
+  <!-- the near table, and the two drinks -->
+  <ellipse cx="700" cy="800" rx="96" ry="20" fill="#241a12" opacity=".7"/>
+  <rect x="690" y="726" width="20" height="76" fill="#3a2a1a"/>
+  <ellipse cx="700" cy="728" rx="134" ry="30" fill="#6b4a2c"/>
+  <ellipse cx="700" cy="723" rx="134" ry="30" fill="#8a643c"/>
+  <ellipse cx="700" cy="723" rx="112" ry="23" fill="#7a5733" opacity=".55"/>
+  <g>
+    <ellipse cx="648" cy="716" rx="30" ry="10" fill="#d7dce1"/>
+    <path d="M632 706 q16 14 32 0 l-4-16 h-24Z" fill="#eef2f5"/>
+    <ellipse cx="648" cy="690" rx="16" ry="5.5" fill="#c9a67a"/>
+    <path d="M664 694 q16 2 12 12 q-3 7-11 5" fill="none" stroke="#eef2f5" stroke-width="4"/>
+  </g>
+  <g>
+    <ellipse cx="748" cy="712" rx="28" ry="9" fill="#d7dce1"/>
+    <path d="M734 703 q14 12 28 0 l-3-14 h-22Z" fill="#eef2f5"/>
+    <ellipse cx="748" cy="689" rx="14" ry="5" fill="#c9a67a"/>
+    <path d="M762 692 q14 2 11 11 q-3 6-10 4" fill="none" stroke="#eef2f5" stroke-width="3.6"/>
+  </g>
+
+  <rect width="1200" height="800" fill="url(#csFall)"/>
 </svg>`,
 };
 function venueFor(n) { return VENUES.find(v => n >= v.from && n <= v.to) || VENUES[VENUES.length - 1]; }
@@ -2820,17 +3108,40 @@ function setFeaturedLink(n) {
   const pick = BAND_LINKS[(Math.max(1, n) - 1) % BAND_LINKS.length];   // cycles a different one each board
   a.textContent = pick.label; a.href = pick.url;
 }
+// The Coffee Shop spans levels 5–9 and the rename lands at 7, so the flyer on its wall
+// has to change hands halfway through the room. Before the vote it advertises Plasma
+// Cathedral and points at the relic shirts; after it, X-Ray Star and the main shop.
+function gigFlyerBits(n) {
+  const renamed = n >= RENAME_LEVEL;
+  return {
+    key:  renamed ? 'xrs' : 'pc',
+    name: renamed ? 'X-RAY STAR' : 'PLASMA CATHEDRAL',
+    href: renamed ? 'https://www.redbubble.com/shop/ap/172252421?asc=u'
+                  : 'https://www.redbubble.com/shop/ap/181765220?asc=u'
+  };
+}
 function applyVenue(n) {
   const v = venueFor(n);
   VENUES.forEach(x => document.body.classList.remove(x.cls));
   document.body.classList.add(v.cls);
+  const gig = gigFlyerBits(n);
+  const corner = document.querySelector('.gig-corner');
+  if (corner) {
+    corner.setAttribute('href', gig.href);
+    corner.setAttribute('aria-label', gig.name + ' \u2014 gig flyer');
+    corner.querySelectorAll('.gig-name').forEach(t => { t.textContent = gig.name; });
+  }
   // Swap the illustration only when the room actually changes — re-injecting identical
   // markup every level would throw away and rebuild a few hundred nodes for nothing.
+  // The band's name counts as a change: it fires once, at the rename.
   const host = document.getElementById('venueArt');
   if (!host) return;
-  if (host.dataset.venue === v.cls) return;
+  if (host.dataset.venue === v.cls && host.dataset.gig === gig.key) return;
   host.dataset.venue = v.cls;
-  host.innerHTML = VENUE_ART[v.cls] || '';
+  host.dataset.gig = gig.key;
+  host.innerHTML = (VENUE_ART[v.cls] || '')
+    .split('__BANDHREF__').join(gig.href)
+    .split('__BAND__').join(gig.name);
 }
 function showVenueToast(v) {
   const n = document.getElementById('vtN'), s = document.getElementById('vtS'), t = document.getElementById('venueToast');
