@@ -128,10 +128,43 @@ body.v-arena .stage-bg{background:
 @media (prefers-reduced-motion:reduce){ .pc-corner .pc-corner-frame, .gig-corner .pc-corner-frame{transition:none;} }
 @media (max-aspect-ratio:7/10){
   body.v-basement .pc-corner{display:block;}
-  body.v-coffee .flyer-corner{display:block;}
-  body.v-dive .sticker-corner{display:block;}
+  body.v-coffee .gig-corner{display:block;}
   .venue-art .pc-poster-g{display:none;}
   .venue-art .gig-flyer-g{display:none;}
+}
+
+/* ===== LOOK AROUND — "the peek" =====
+   The board sits directly over the middle of every room, so on a phone most of the artwork
+   is never actually seen. Tapping the venue name fades the whole interface down AND swaps
+   the backdrop from cropped ("slice") to whole-picture ("meet"), so the entire room is
+   visible for a few seconds. Then everything comes back.
+   SAFETY: every state change here is a slow fade of 260ms or more. Nothing in this feature
+   blinks, strobes, cycles colour or flashes the screen. The eye glyph's idle glow is a
+   3.2s breath and is switched off entirely under reduced-motion and on lowgfx machines. */
+.venue-art{transition:opacity .26s ease;}
+.sub.peekable{cursor:pointer; pointer-events:auto; transition:color .2s ease;}
+.sub.peekable:hover, .sub.peekable:focus-visible{color:var(--gold-hi); outline:none;}
+.sub.peekable::after{content:'\1F441'; margin-left:7px; opacity:.62; letter-spacing:0;}
+.sub.peekable.peek-nudge::after{animation:peek-breathe 3.2s ease-in-out infinite;}
+@keyframes peek-breathe{0%,100%{opacity:.32;}50%{opacity:.9;}}
+.app, .fab{transition:opacity .55s var(--ease);}
+body.peeking .app{opacity:.045;}
+body.peeking .app > *{pointer-events:none;}
+body.peeking .fab{opacity:.1; pointer-events:none;}
+/* a transparent sheet that catches the tap that ends the peek, so the tap can never reach
+   a tile underneath — the same "don't steal input from the board" rule as the corner layer */
+.peek-catch{position:fixed; inset:0; z-index:94; display:none; background:transparent;}
+body.peeking .peek-catch{display:block; cursor:pointer;}
+.peek-hint{position:fixed; left:50%; bottom:calc(env(safe-area-inset-bottom,0px) + 20px);
+  transform:translateX(-50%); z-index:95; font-family:var(--mono); font-size:.58rem;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--cream-mute);
+  background:rgba(10,8,16,.62); border:1px solid var(--line); border-radius:99px;
+  padding:7px 15px; opacity:0; pointer-events:none; transition:opacity .5s ease .5s; white-space:nowrap;}
+body.peeking .peek-hint{opacity:.9;}
+.lowgfx .sub.peekable.peek-nudge::after{animation:none; opacity:.8;}
+@media (prefers-reduced-motion:reduce){
+  .app,.fab,.peek-hint,.venue-art,.sub.peekable{transition:none;}
+  .sub.peekable.peek-nudge::after{animation:none; opacity:.8;}
 }
 .title{font-family:var(--serif); font-weight:700; font-size:1.5rem; letter-spacing:.01em; color:var(--cream); text-align:center; line-height:1.05;}
 .title .star{color:var(--gold-hi);}
@@ -867,7 +900,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
       </svg>
     </svg>
   </a>
-  <a class="gig-corner flyer-corner" href="https://www.redbubble.com/shop/ap/172252421?asc=u" target="_blank"
+  <a class="gig-corner" href="https://www.redbubble.com/shop/ap/172252421?asc=u" target="_blank"
      rel="noopener" aria-label="X-Ray Star — gig flyer">
     <svg viewBox="0 0 120 164" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <rect class="pc-corner-frame" x="1" y="1" width="118" height="162" fill="#e7dcc2"
@@ -885,24 +918,13 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
       </g>
     </svg>
   </a>
-  <a class="gig-corner sticker-corner" href="https://www.redbubble.com/shop/ap/172252421?asc=u"
-     target="_blank" rel="noopener" aria-label="X-Ray Star — sticker">
-    <svg viewBox="0 0 108 96" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <rect class="pc-corner-frame" x="2" y="2" width="104" height="92" rx="13" fill="#141018"
-            stroke="#8b7a5a" stroke-opacity=".8" stroke-width="2"/>
-      <rect x="8" y="8" width="92" height="80" rx="9" fill="#221a2c"/>
-      <text class="gig-name" x="54" y="42" text-anchor="middle" textLength="80" lengthAdjust="spacingAndGlyphs"
-            font-family="Fraunces,Georgia,serif" font-weight="700" font-size="19" fill="#ffd6e8">X-RAY STAR</text>
-      <path d="M14 54 H94" stroke="#ff5fa2" stroke-width="2" opacity=".8"/>
-      <text x="54" y="76" text-anchor="middle" font-family="'JetBrains Mono',monospace"
-            font-size="12" fill="#8ce6ff" opacity=".8">ON TOUR</text>
-    </svg>
-  </a>
   <div class="drift" id="drift" aria-hidden="true"></div>
   <div class="screen-pulse" id="screenPulse"></div>
   <div class="combo-banner" id="comboBanner"></div>
   <div class="level-intro" id="levelIntro"><div class="li-n" id="liN"></div><div class="li-t" id="liT"></div><div class="li-obj" id="liObj"></div></div>
   <div class="venue-toast" id="venueToast"><div class="vt-k" id="vtK">Now playing</div><div class="vt-n" id="vtN"></div><div class="vt-s" id="vtS"></div></div>
+  <div class="peek-catch" id="peekCatch" onclick="Game.peek()" aria-hidden="true"></div>
+  <div class="peek-hint" id="peekHint">Tap anywhere to go back</div>
   <div class="fab">
     <button id="muteBtn" onclick="Game.toggleMute()" title="Sound on / off">🔊</button>
     <button id="helpBtn" onclick="Game.showHelp()" title="How to play">?</button>
@@ -912,7 +934,9 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
       <div class="wordmark-sm">X-RAY <span class="star">★</span> STAR</div>
       <div class="coin-chip" id="hudCoins">🪙 0</div>
     </div>
-    <div class="sub" id="levelInfo">Set 1 · The Basement</div>
+    <div class="sub peekable" id="levelInfo" onclick="Game.peek()" role="button" tabindex="0"
+         title="Look around the room"
+         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();Game.peek();}">Set 1 · The Basement</div>
 
     <div class="hud">
       <div class="cell"><div class="lab">Score</div><div class="val" id="hScore">0</div></div>
@@ -1863,243 +1887,6 @@ const VENUE_ART = {
   </g>
 
   <rect width="1200" height="800" fill="url(#csFall)"/>
-</svg>`,
-  'v-dive': `<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <defs>
-    <linearGradient id="dbWall" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#161018"/><stop offset="52%" stop-color="#1d151d"/><stop offset="100%" stop-color="#0d090f"/>
-    </linearGradient>
-    <radialGradient id="dbPink" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#ff3f92" stop-opacity=".42"/>
-      <stop offset="46%" stop-color="#ff3f92" stop-opacity=".13"/>
-      <stop offset="100%" stop-color="#ff3f92" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="dbCyan" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#3fd0ff" stop-opacity=".36"/>
-      <stop offset="48%" stop-color="#3fd0ff" stop-opacity=".11"/>
-      <stop offset="100%" stop-color="#3fd0ff" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="dbGreen" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#5df08a" stop-opacity=".30"/>
-      <stop offset="50%" stop-color="#5df08a" stop-opacity=".09"/>
-      <stop offset="100%" stop-color="#5df08a" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="dbFloor" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#1d1620"/><stop offset="100%" stop-color="#0a070c"/>
-    </linearGradient>
-    <linearGradient id="dbPallet" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#6e5636"/><stop offset="100%" stop-color="#3a2c1b"/>
-    </linearGradient>
-    <linearGradient id="dbBar" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#4a3220"/><stop offset="100%" stop-color="#20150d"/>
-    </linearGradient>
-    <linearGradient id="dbGlassDoor" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#2a2a34" stop-opacity=".9"/>
-      <stop offset="42%" stop-color="#3a3446" stop-opacity=".7"/>
-      <stop offset="100%" stop-color="#1a1a22" stop-opacity=".92"/>
-    </linearGradient>
-    <linearGradient id="dbAmpCloth" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#4a4038"/><stop offset="100%" stop-color="#2a231d"/>
-    </linearGradient>
-    <linearGradient id="dbFall" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#000" stop-opacity=".44"/>
-      <stop offset="44%" stop-color="#000" stop-opacity="0"/>
-      <stop offset="100%" stop-color="#000" stop-opacity=".40"/>
-    </linearGradient>
-  </defs>
-
-  <rect width="1200" height="800" fill="url(#dbWall)"/>
-  <g stroke="#0a070c" stroke-width="2" opacity=".8">
-    <path d="M0 250 H1200 M0 470 H1200"/>
-    <path d="M120 0 V700 M420 0 V700 M760 0 V700 M1040 0 V700"/>
-  </g>
-
-  <!-- The signs are the entire lighting rig. Nothing else in here is switched on. -->
-  <ellipse cx="580" cy="132" rx="330" ry="270" fill="url(#dbPink)"/>
-  <ellipse cx="962" cy="146" rx="240" ry="220" fill="url(#dbCyan)"/>
-  <ellipse cx="246" cy="150" rx="210" ry="200" fill="url(#dbGreen)"/>
-
-  <g>
-    <rect x="410" y="70" width="342" height="104" rx="6" fill="#0d0910" stroke="#2a2230" stroke-width="3"/>
-    <text x="581" y="126" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-style="italic"
-          font-weight="700" font-size="52" fill="none" stroke="#ff8fc0" stroke-width="9" opacity=".22">Cold Beer</text>
-    <text x="581" y="126" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-style="italic"
-          font-weight="700" font-size="52" fill="none" stroke="#ff5fa2" stroke-width="3.4">Cold Beer</text>
-    <text x="581" y="126" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-style="italic"
-          font-weight="700" font-size="52" fill="#ffd6e8" opacity=".55">Cold Beer</text>
-    <text x="581" y="158" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="15"
-          fill="none" stroke="#ff5fa2" stroke-width="1.8" opacity=".8">SUCH AS IT IS</text>
-  </g>
-
-  <g>
-    <g fill="none" stroke="#8ce6ff" stroke-width="9" opacity=".2" stroke-linecap="round">
-      <path d="M886 104 L962 176 L1038 104 Z"/><path d="M962 176 V214"/><path d="M922 216 H1002"/>
-    </g>
-    <g fill="none" stroke="#3fd0ff" stroke-width="3.4" stroke-linecap="round">
-      <path d="M886 104 L962 176 L1038 104 Z"/><path d="M962 176 V214"/><path d="M922 216 H1002"/>
-    </g>
-    <ellipse cx="1016" cy="112" rx="9" ry="9" fill="none" stroke="#7be8b0" stroke-width="3"/>
-  </g>
-
-  <g>
-    <rect x="150" y="104" width="192" height="72" rx="34" fill="#0d0910" stroke="#241f2a" stroke-width="3"/>
-    <text x="246" y="152" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-weight="700"
-          font-size="30" fill="none" stroke="#9dffb8" stroke-width="8" opacity=".2">OPEN</text>
-    <text x="246" y="152" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-weight="700"
-          font-size="30" fill="none" stroke="#5df08a" stroke-width="3">OPEN</text>
-  </g>
-
-  <!-- layered dead flyers, none of them this decade -->
-  <g opacity=".5">
-    <rect x="176" y="300" width="92" height="120" fill="#8a8070" transform="rotate(-5 222 360)"/>
-    <rect x="212" y="330" width="88" height="112" fill="#7b7264" transform="rotate(4 256 386)"/>
-    <rect x="188" y="392" width="96" height="118" fill="#6d6558" transform="rotate(-3 236 451)"/>
-    <g fill="#1a1620" opacity=".55">
-      <rect x="196" y="330" width="60" height="7"/><rect x="196" y="346" width="44" height="5"/>
-      <rect x="230" y="360" width="56" height="7"/><rect x="230" y="376" width="40" height="5"/>
-      <rect x="204" y="424" width="62" height="7"/><rect x="204" y="440" width="46" height="5"/>
-    </g>
-  </g>
-  <circle cx="1116" cy="352" r="52" fill="#141018" stroke="#2e2734" stroke-width="4"/>
-  <circle cx="1116" cy="352" r="34" fill="#1b1a24"/>
-  <circle cx="1116" cy="352" r="15" fill="#2a2130"/>
-  <circle cx="1116" cy="352" r="5" fill="#5df08a" opacity=".6"/>
-
-  <!-- floor -->
-  <rect y="700" width="1200" height="100" fill="url(#dbFloor)"/>
-  <g stroke="#070509" stroke-width="2" opacity=".7">
-    <path d="M0 734 H1200 M0 770 H1200"/>
-  </g>
-  <g opacity=".22">
-    <ellipse cx="560" cy="748" rx="200" ry="30" fill="#ff3f92"/>
-    <ellipse cx="960" cy="756" rx="150" ry="26" fill="#3fd0ff"/>
-  </g>
-
-  <!-- the stage: a stack of pallets, and everyone has agreed to call it a stage -->
-  <rect x="196" y="630" width="574" height="28" fill="#7a6040"/>
-  <rect x="196" y="656" width="574" height="46" fill="url(#dbPallet)"/>
-  <g stroke="#241a10" stroke-width="3" opacity=".9">
-    <path d="M196 668 H770 M196 686 H770"/>
-    <path d="M292 656 V702 M388 656 V702 M484 656 V702 M580 656 V702 M676 656 V702"/>
-  </g>
-  <g fill="#241a10" opacity=".7">
-    <rect x="240" y="672" width="34" height="12"/><rect x="432" y="672" width="34" height="12"/>
-    <rect x="624" y="672" width="34" height="12"/>
-  </g>
-
-  <!-- two cabinets that have seen things -->
-  <g>
-    <rect x="222" y="452" width="132" height="178" rx="5" fill="#1f1a18" stroke="#332b26" stroke-width="3"/>
-    <rect x="234" y="466" width="108" height="120" rx="3" fill="url(#dbAmpCloth)"/>
-    <rect x="234" y="596" width="108" height="22" rx="3" fill="#2c2521"/>
-    <circle cx="246" cy="607" r="4" fill="#ff5fa2" opacity=".8"/>
-  </g>
-  <g>
-    <rect x="642" y="486" width="122" height="144" rx="5" fill="#1f1a18" stroke="#332b26" stroke-width="3"/>
-    <rect x="654" y="500" width="98" height="96" rx="3" fill="url(#dbAmpCloth)"/>
-    <rect x="654" y="604" width="98" height="18" rx="3" fill="#2c2521"/>
-  </g>
-  <g stroke="#2c3037" stroke-width="6" fill="none" stroke-linecap="round">
-    <path d="M492 630 V430"/><path d="M492 442 H448"/>
-  </g>
-  <rect x="430" y="432" width="22" height="24" rx="7" fill="#3b4048"/>
-
-  <!-- the bar, and the fridge nobody has defrosted -->
-  <rect x="770" y="596" width="430" height="18" fill="#6a4a2c"/>
-  <rect x="770" y="614" width="430" height="156" fill="url(#dbBar)"/>
-  <g stroke="#150e08" stroke-width="2" opacity=".6"><path d="M880 614 V770 M1000 614 V770 M1110 614 V770"/></g>
-  <rect x="786" y="386" width="150" height="214" rx="6" fill="#20202a" stroke="#3a3a48" stroke-width="4"/>
-  <rect x="796" y="398" width="130" height="190" rx="3" fill="url(#dbGlassDoor)"/>
-  <g fill="#2e3a44" opacity=".85">
-    <rect x="804" y="470" width="114" height="6"/><rect x="804" y="530" width="114" height="6"/>
-  </g>
-  <g opacity=".55">
-    <rect x="812" y="440" width="14" height="30" rx="4" fill="#3d5a3a"/>
-    <rect x="832" y="440" width="14" height="30" rx="4" fill="#5a4230"/>
-    <rect x="852" y="440" width="14" height="30" rx="4" fill="#3d5a3a"/>
-    <rect x="812" y="500" width="14" height="30" rx="4" fill="#5a4230"/>
-    <rect x="832" y="500" width="14" height="30" rx="4" fill="#3d5a3a"/>
-  </g>
-  <path d="M804 398 L868 588" stroke="#dfe9ff" stroke-width="10" opacity=".05"/>
-  <g fill="#c9d4e0" opacity=".35">
-    <rect x="946" y="512" width="12" height="84" rx="4"/><rect x="966" y="524" width="12" height="72" rx="4"/>
-    <rect x="986" y="506" width="12" height="90" rx="4"/><rect x="1006" y="528" width="12" height="68" rx="4"/>
-  </g>
-
-  <!-- THE STICKER. Slapped on the glass, corner already lifting. -->
-  <a href="__BANDHREF__" target="_blank" rel="noopener" aria-label="__BAND__ — sticker">
-  <g class="gig-flyer-g" transform="rotate(-6 861 462)">
-    <rect class="flyer-frame" x="825" y="430" width="72" height="64" rx="9" fill="#141018"
-          stroke="#8b7a5a" stroke-opacity=".8" stroke-width="2"/>
-    <rect x="829" y="434" width="64" height="56" rx="7" fill="#221a2c"/>
-    <text x="861" y="456" text-anchor="middle" textLength="54" lengthAdjust="spacingAndGlyphs"
-          font-family="Fraunces,Georgia,serif" font-weight="700" font-size="13" fill="#ffd6e8">__BAND__</text>
-    <path d="M833 464 H889" stroke="#ff5fa2" stroke-width="1.4" opacity=".8"/>
-    <text x="861" y="480" text-anchor="middle" font-family="'JetBrains Mono',monospace"
-          font-size="8" fill="#8ce6ff" opacity=".8">ON TOUR</text>
-    <path d="M889 430 l8 6 -8 6Z" fill="#6c6152" opacity=".9"/>
-  </g>
-  </a>
-
-  <!-- STEVE. Four regulars and a dog, and Steve is the one paying attention. -->
-  <g>
-    <ellipse cx="722" cy="782" rx="92" ry="18" fill="#050308" opacity=".6"/>
-    <ellipse cx="736" cy="760" rx="76" ry="26" fill="#6b5a48"/>
-    <path d="M800 758 q34-6 40-24 q4-12-7-14 q-10-2-11 8" fill="none" stroke="#6b5a48" stroke-width="10" stroke-linecap="round"/>
-    <path d="M660 742 q-10-40 24-46 q34-6 40 26 q4 20-10 28Z" fill="#7a6854"/>
-    <circle cx="676" cy="726" r="30" fill="#7a6854"/>
-    <path d="M650 706 q-16 6-14 34 q2 22 18 20 q10-2 8-24Z" fill="#5d4d3c"/>
-    <path d="M704 706 q16 6 14 34 q-2 22-18 20 q-10-2-8-24Z" fill="#5d4d3c"/>
-    <ellipse cx="662" cy="744" rx="22" ry="15" fill="#8d7a63"/>
-    <ellipse cx="648" cy="742" rx="7" ry="5.5" fill="#1a1319"/>
-    <g fill="#1a1319">
-      <ellipse cx="664" cy="722" rx="5" ry="5.5"/><ellipse cx="690" cy="720" rx="5" ry="5.5"/>
-    </g>
-    <g fill="#fff" opacity=".7">
-      <circle cx="666" cy="720" r="1.7"/><circle cx="692" cy="718" r="1.7"/>
-    </g>
-    <path d="M652 754 q10 8 20 2" stroke="#3d3229" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-    <path d="M654 752 q6 12 16 10" stroke="#3d3229" stroke-width="2" fill="none" opacity=".7"/>
-    <g fill="#7a6854">
-      <ellipse cx="628" cy="776" rx="26" ry="11"/><ellipse cx="666" cy="782" rx="26" ry="11"/>
-    </g>
-    <path d="M652 736 q28-8 52 0" stroke="#a4342f" stroke-width="7" fill="none" stroke-linecap="round"/>
-    <circle cx="678" cy="742" r="6" fill="#c9a14a"/>
-  </g>
-
-  <!-- JOSH, on the combo amp, facing front. Steve is not in his field of view. -->
-  <g>
-    <rect x="408" y="686" width="152" height="96" rx="6" fill="#1c1719" stroke="#312a2c" stroke-width="3"/>
-    <rect x="420" y="700" width="128" height="58" rx="3" fill="url(#dbAmpCloth)"/>
-    <rect x="420" y="764" width="128" height="12" rx="3" fill="#2c2521"/>
-    <circle cx="432" cy="770" r="3.4" fill="#ff5fa2" opacity=".85"/>
-    <rect x="404" y="680" width="160" height="10" rx="4" fill="#241f21"/>
-  </g>
-  <a href="https://www.redbubble.com/shop/ap/134520091?asc=u" target="_blank" rel="noopener"
-     aria-label="Josh&#8217;s merch shop">
-  <g class="josh-hit">
-    <ellipse cx="478" cy="646" rx="58" ry="52" fill="transparent"/>
-    <path d="M508 680 q30-6 28-26 q-2-16-18-14 q-11 2-9 12 q2 8 10 6" fill="none" stroke="#141119" stroke-width="8" stroke-linecap="round"/>
-    <path d="M436 680 q-8-44 40-50 q46-6 50 34 q2 12-2 16Z" fill="#141119"/>
-    <circle cx="476" cy="632" r="28" fill="#191521"/>
-    <path d="M453 610 l-4-24 22 11Z" fill="#191521"/>
-    <path d="M500 610 l5-24 -21 12Z" fill="#191521"/>
-    <path d="M454 608 l-2-13 12 6Z" fill="#a9707c" opacity=".75"/>
-    <path d="M498 608 l3-13 -12 7Z" fill="#a9707c" opacity=".75"/>
-    <ellipse cx="465" cy="630" rx="6.4" ry="7" fill="#c3e04f"/>
-    <ellipse cx="489" cy="630" rx="6.4" ry="7" fill="#c3e04f"/>
-    <ellipse cx="465" cy="630" rx="2" ry="6.4" fill="#141119"/>
-    <ellipse cx="489" cy="630" rx="2" ry="6.4" fill="#141119"/>
-    <path d="M473 644 l6 0 -3 4Z" fill="#a9707c"/>
-    <path d="M476 648 q-5 5-10 2 M476 648 q5 5 10 2" stroke="#2b2634" stroke-width="1.7" fill="none"/>
-    <g stroke="#8a8397" stroke-width="1.8" opacity=".8" fill="none">
-      <path d="M448 638 q-19 2-27 8"/><path d="M448 645 q-19 6-25 14"/>
-      <path d="M504 638 q19 2 27 8"/><path d="M504 645 q19 6 25 14"/>
-    </g>
-  </g>
-  </a>
-
-  <rect width="1200" height="800" fill="url(#dbFall)"/>
 </svg>`,
 };
 function venueFor(n) { return VENUES.find(v => n >= v.from && n <= v.to) || VENUES[VENUES.length - 1]; }
@@ -3338,7 +3125,12 @@ Game.newGame = function() {
     if (Sfx.bgmOn) { Sfx.stopBGM(); Sfx.startBGM(); }        // restart so the bigger arrangement lands immediately
     if (Sfx.levelUpSting) setTimeout(() => Sfx.levelUpSting(), 120);
   }
-  document.getElementById('levelInfo').textContent = `Set ${lv.n} · ${v.name}`;
+  Peek.cancel();
+  const subEl = document.getElementById('levelInfo');
+  subEl.textContent = `Set ${lv.n} · ${v.name}`;
+  // until they have used it once, the eye breathes gently so it reads as a button
+  let seenPeek = false; try { seenPeek = Prefs.get('seenPeek', false); } catch (_) {}
+  subEl.classList.toggle('peek-nudge', !seenPeek);
   hideOverlay();
   buildDOM();
   render();
@@ -3379,11 +3171,12 @@ function applyVenue(n) {
   VENUES.forEach(x => document.body.classList.remove(x.cls));
   document.body.classList.add(v.cls);
   const gig = gigFlyerBits(n);
-  document.querySelectorAll('.gig-corner').forEach(corner => {
+  const corner = document.querySelector('.gig-corner');
+  if (corner) {
     corner.setAttribute('href', gig.href);
     corner.setAttribute('aria-label', gig.name + ' \u2014 gig flyer');
     corner.querySelectorAll('.gig-name').forEach(t => { t.textContent = gig.name; });
-  });
+  }
   // Swap the illustration only when the room actually changes — re-injecting identical
   // markup every level would throw away and rebuild a few hundred nodes for nothing.
   // The band's name counts as a change: it fires once, at the rename.
@@ -4227,6 +4020,7 @@ const TUTORIAL_STEPS = [
   { icon: '↔', title: 'The Amp', text: 'Match <b>4 in a row</b> to forge an <b>Amp</b> (look for the ↔ or ↕ badge). The trick: <b>swap an Amp into any neighbor — no match needed</b> — to fire it. It blasts that whole row or column.' },
   { icon: '🔥', title: 'More Toys as You Climb', text: 'New specials <b>unlock as you rise through the venues</b> — the <b>Pyro</b> 🔥 (L/T shape, 3×3 blast), the <b>X-Ray Star</b> ★ (match 5, clears a whole instrument), and the <b>Bass Drop</b> ✛ (match 6, clears a full row <i>and</i> column). The game tells you when each one arrives.' },
   { icon: '⭐', title: 'Win the Set', text: 'Every set has a <b>goal</b> shown up top — usually a <b>target score</b>, but some ask you to <b>collect</b> a certain instrument, or to clear the band\u2019s <b>road cases</b> 📦 (match next to a case to smash it). Finish with <b>moves to spare</b> for an <b>Encore</b> and more <b>stars</b>.' },
+  { icon: '👁', title: 'Look Around the Room', text: 'Every venue is a hand-drawn room, and the board covers most of it. <b>Tap the venue name</b> up top \u2014 the one with the 👁 \u2014 and the game steps out of the way so you can see the whole place. There is more in these rooms than you think, and <b>not everything in them is scenery</b>. Tap anywhere to go back.' },
   { icon: '🎶', title: 'Ready to Rock', text: 'This whole game is a love letter to <b>X-Ray Star</b>. Have fun up there — and go give the real band a listen.' },
 ];
 let tutStep = 0;
@@ -4243,6 +4037,79 @@ function showTutorial() { tutStep = 0; renderTutStep(); document.getElementById(
 function hideTutorial() { document.getElementById('tutorial').classList.remove('show'); Prefs.set('seenTut', true); }
 Game.nextTutorial = function() { Sfx.swap(); if (tutStep >= TUTORIAL_STEPS.length - 1) { hideTutorial(); return; } tutStep++; renderTutStep(); };
 Game.skipTutorial = function() { hideTutorial(); };
+/* =====================================================================
+   LOOK AROUND — the peek
+   Each venue is a full painted room, but the board covers the middle of it, and on a phone
+   the backdrop is cropped so hard that only a narrow strip of the picture survives. This
+   lets the player step back: the interface fades out and the artwork un-crops to show the
+   whole room, then it all comes back.
+
+   No strobing anywhere in here. The sequence is: fade the UI (550ms), fade the picture out
+   (260ms), swap the crop while it is invisible, fade it back in. Reversed on the way out.
+   ===================================================================== */
+const Peek = {
+  on: false,
+  timer: null,
+  steps: [],
+  HOLD: 6500,                       // closes itself if the player wanders off
+  art()    { return document.querySelector('.venue-art'); },
+  artSvg() { return document.querySelector('#venueArt svg'); },
+  clearSteps() { this.steps.forEach(t => clearTimeout(t)); this.steps = []; },
+  // never open on top of another screen or a win/lose panel
+  blocked() {
+    return ['overlay', 'mapScreen', 'bandScreen', 'bsideScreen', 'tutorial'].some(id => {
+      const el = document.getElementById(id);
+      return el && el.classList.contains('show');
+    }) || Game.atTitle === true;
+  },
+  toggle() { this.on ? this.end() : this.start(); },
+  start() {
+    if (this.on || this.blocked()) return;
+    this.on = true;
+    try { Prefs.set('seenPeek', true); } catch (_) {}
+    const sub = document.getElementById('levelInfo');
+    if (sub) sub.classList.remove('peek-nudge');       // found it — stop nudging
+    document.body.classList.add('peeking');
+    const art = this.art();
+    this.clearSteps();
+    this.steps.push(setTimeout(() => { if (art) art.style.opacity = '0'; }, 340));
+    this.steps.push(setTimeout(() => {
+      const svg = this.artSvg();
+      if (svg) svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');   // whole room
+      if (art) art.style.opacity = '1';
+    }, 620));
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => this.end(), this.HOLD);
+  },
+  end() {
+    if (!this.on) return;
+    this.on = false;
+    clearTimeout(this.timer);
+    this.clearSteps();
+    const art = this.art();
+    if (art) art.style.opacity = '0';
+    this.steps.push(setTimeout(() => {
+      const svg = this.artSvg();
+      if (svg) svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');  // back to the crop
+      if (art) art.style.opacity = '1';
+      document.body.classList.remove('peeking');
+    }, 260));
+  },
+  // hard reset with no animation — used when the screen changes underneath it
+  cancel() {
+    if (!this.on && !document.body.classList.contains('peeking')) return;
+    this.on = false;
+    clearTimeout(this.timer);
+    this.clearSteps();
+    const svg = this.artSvg();
+    if (svg) svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+    const art = this.art();
+    if (art) art.style.opacity = '1';
+    document.body.classList.remove('peeking');
+  },
+};
+Game.peek = function() { Peek.toggle(); };
+
 Game.showHelp = function() { showTutorial(); };
 
 /* =====================================================================
@@ -4374,6 +4241,7 @@ function refreshUpgradeCues() {
   document.querySelectorAll('.band-cta').forEach(b => b.classList.toggle('nudge', on));
 }
 function showMap() {
+  Peek.cancel();
   hideOverlay();
   document.getElementById('bandScreen').classList.remove('show');
   document.getElementById('bsideScreen').classList.remove('show');
@@ -4593,6 +4461,7 @@ function buyLifestyle(key) {
   } else if (Sfx.tone) { Sfx.tone(180, 0.1, 'sine', 0.12); }
 }
 function showBand() {
+  Peek.cancel();
   hideOverlay();
   hideTitle();
   buildBand();
