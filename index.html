@@ -110,6 +110,16 @@ body.v-arena .stage-bg{background:
 .venue-art a:hover .josh-hit ellipse[fill="#c3e04f"],
 .venue-art a:focus-visible .josh-hit ellipse[fill="#c3e04f"]{fill:#eaff7a;}
 @media (prefers-reduced-motion:reduce){ .venue-art a .poster-frame{transition:none;} }
+/* Tall/narrow screens crop the backdrop hard on both sides, and the board fills almost
+   the whole width, so there is no side strip left for the poster to live in. On phones
+   it comes down off the wall and leans against it beside Josh, in the one band of art
+   that survives. Static transform only — painted once, no per-frame cost. */
+@media (max-aspect-ratio:7/10){
+  .venue-art .pc-poster-g{
+    transform-box:view-box; transform-origin:855px 268px;
+    transform:translate(-155px,372px) scale(.5) rotate(-4.5deg);
+  }
+}
 .title{font-family:var(--serif); font-weight:700; font-size:1.5rem; letter-spacing:.01em; color:var(--cream); text-align:center; line-height:1.05;}
 .title .star{color:var(--gold-hi);}
 .sub{font-family:var(--mono); font-size:.66rem; letter-spacing:.16em; text-transform:uppercase; color:var(--cream-low); margin:4px 0 14px;}
@@ -725,6 +735,10 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
 .board-wrap{max-width:min(460px, calc(100vh - 320px));}
 .msg{margin-top:8px; font-size:.8rem; min-height:1em;}
 .controls{margin-top:8px;}
+/* The buttons were parked on Josh's face. Give them clearance, but only where there is
+   vertical room to spare — the phone layout is height-locked, so on a short viewport the
+   old spacing stands rather than risk pushing Replay off the bottom. */
+@media (min-height:640px){ .controls{margin-top:22px;} }
 .app-links{border-top:none; padding-top:8px; margin-top:8px;}
 .featured-link{background:linear-gradient(160deg,var(--surface-hi),var(--surface-low)); border:1px solid var(--gold-deep); border-radius:99px; padding:7px 16px; color:var(--gold-hi)!important; font-weight:700;}
 
@@ -1255,7 +1269,7 @@ const VENUE_ART = {
   <!-- ============ THE TOUR POSTER ============ -->
   <a href="https://www.redbubble.com/shop/ap/181765220?asc=u" target="_blank" rel="noopener"
      aria-label="Plasma Cathedral — Feel the PlaZZ '77 tour poster">
-  <g transform="rotate(-2.6 855 268)">
+  <g class="pc-poster-g" transform="rotate(-2.6 855 268)">
     <rect class="poster-frame" x="783" y="178" width="144" height="180" fill="#0a0616"
           stroke="#6a5f7d" stroke-opacity=".9" stroke-width="2"/>
     <svg x="787" y="182" width="136" height="172" viewBox="0 0 100 126" preserveAspectRatio="xMidYMid meet">
