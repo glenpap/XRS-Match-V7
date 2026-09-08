@@ -639,6 +639,33 @@ body.v-club .club-fog{display:block;}
 @keyframes fog-c{from{transform:translate3d(-16vw,3vh,0) scale(.95);}  to{transform:translate3d(12vw,-3vh,0) scale(1.3);}}
 @keyframes fog-d{from{transform:translate3d(10vw,3vh,0) scale(1.2);}   to{transform:translate3d(-15vw,-2vh,0) scale(.92);}}
 
+/* ===== EVERY ROOM ANSWERS, FROM SET ONE =====
+   The reactions used to start at the Club, halfway in — past the point where most people
+   decide whether to stay. So the three early rooms answer too, and the idea escalates:
+   a bulb, then lamps, then a dog, then a machine they bought, then the building itself,
+   then twenty thousand people. The player learns in set one that playing well changes
+   the room, which is the promise the whole back half pays off.
+   SAFETY: rotation only, on a single group, no brightness change anywhere. The bulb swings
+   about the point it hangs from, so the light moves with it exactly as a real one would. */
+.bulb-g{transform-box:view-box; transform-origin:304px 142px;}
+.pendant-g{transform-box:view-box; transform-origin:600px 0px;}
+.steve-g{transform-box:view-box; transform-origin:606px 726px;}
+body.room-react .bulb-g{animation:room-swing 3.4s ease-in-out 2;}
+body.room-react .pendant-g{animation:room-swing 4.2s ease-in-out 2;}
+body.room-react .steve-g{animation:steve-howl 2.4s ease-in-out 1;}
+@keyframes room-swing{
+  0%{transform:rotate(0deg);} 16%{transform:rotate(2.4deg);} 38%{transform:rotate(-1.9deg);}
+  58%{transform:rotate(1.2deg);} 76%{transform:rotate(-.6deg);} 100%{transform:rotate(0deg);}
+}
+/* Steve howls on the bridge. He earned a writing credit for this. */
+@keyframes steve-howl{
+  0%{transform:rotate(0deg);} 22%{transform:rotate(-9deg);} 62%{transform:rotate(-9deg);}
+  100%{transform:rotate(0deg);}
+}
+@media (prefers-reduced-motion:reduce){
+  body.room-react .bulb-g, body.room-react .pendant-g, body.room-react .steve-g{animation:none;}
+}
+
 /* ===== THE CHANDELIER (The Theater only) =====
    Set 23: "The chandelier begins to vibrate in sympathy. Maintenance is concerned. You are
    thrilled." It swings on a big cascade. This escalates the idea past the Club: there, the
@@ -883,6 +910,31 @@ body.v-club .club-smoke{display:block;}
 @keyframes cta-pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,224,138,.5);}50%{box-shadow:0 0 0 6px rgba(255,224,138,0);}}
 .ov-band-note{margin-top:10px; font-family:var(--sans); font-size:.82rem; color:var(--gold-hi); font-weight:600;}
 /* link rows on the hubs + in-game */
+/* The advisory sticker on the cover. Deliberately NOT the RIAA mark — that is a
+   registered design and not ours to reproduce. This is the band's own, and it says what
+   is actually in here rather than what a committee decided in 1985. */
+.advisory{display:inline-block; margin:14px auto 0; background:#0a0a0a; border:2px solid #f2f2f2;
+  padding:6px 12px 7px; max-width:270px; text-align:center; transform:rotate(-1.2deg);}
+.advisory .adv-top{font-family:var(--sans); font-weight:900; font-size:.74rem; letter-spacing:.06em;
+  color:#f2f2f2; line-height:1; text-transform:uppercase;}
+.advisory .adv-rule{height:2px; background:#f2f2f2; margin:5px 0 5px;}
+.advisory .adv-body{font-family:var(--sans); font-weight:700; font-size:.52rem; letter-spacing:.1em;
+  color:#f2f2f2; line-height:1.45; text-transform:uppercase;}
+
+/* ===== THE CURTAIN CALL — clearing set 30 =====
+   Thirty sets earn more than the same card with the button relabelled. */
+.overlay .panel.finale{border-color:var(--gold-hi); box-shadow:0 0 0 1px rgba(255,224,138,.25), 0 30px 90px -30px rgba(0,0,0,.9);}
+.finale-mark{font-family:var(--serif); font-size:2.6rem; color:var(--gold-hi); line-height:1; margin-bottom:2px;}
+.finale-line{font-family:var(--serif); font-style:italic; font-size:.94rem; color:var(--cream);
+  line-height:1.55; margin:10px 0 4px;}
+.finale-sig{font-family:var(--mono); font-size:.58rem; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--gold-warm); margin-top:10px;}
+.finale-tally{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:14px;}
+.finale-tally div{background:var(--surface-low); border:1px solid var(--line); border-radius:10px;
+  padding:7px 12px; min-width:74px;}
+.finale-tally .k{font-family:var(--mono); font-size:.52rem; letter-spacing:.14em; text-transform:uppercase; color:var(--cream-low);}
+.finale-tally .v{font-family:var(--serif); font-weight:700; font-size:1.02rem; color:var(--gold-hi); margin-top:2px;}
+
 /* the engagement strip on the Journey map */
 .gauge{margin-top:20px; padding-top:16px; border-top:1px solid var(--line); text-align:center;}
 .gauge-stats{font-family:var(--mono); font-size:.62rem; letter-spacing:.1em; text-transform:uppercase;
@@ -1171,6 +1223,11 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
         <a class="link" href="https://www.redbubble.com/shop/ap/172252421" target="_blank" rel="noopener">👕 Merch</a>
       </div>
       <div class="links-note">A little gift from the band. Have fun — then go give them a listen.</div>
+      <div class="advisory" role="note" aria-label="Content advisory">
+        <div class="adv-top">Advisory</div>
+        <div class="adv-rule"></div>
+        <div class="adv-body">Adult language &middot; loud opinions<br>drummers who did not make it<br>and a cat with a boa</div>
+      </div>
     </div>
   </div>
 
@@ -1589,7 +1646,7 @@ const VENUE_ART = {
   <path d="M270 210 q180 92 372 34" stroke="#2e2839" stroke-width="5" fill="none"/>
 
   <!-- ============ BARE BULB ============ -->
-  <g>
+  <g class="bulb-g">
     <path d="M304 142 V236" stroke="#332d40" stroke-width="4"/>
     <ellipse cx="304" cy="252" rx="19" ry="23" fill="url(#bulbCore)"/>
     <rect x="295" y="230" width="18" height="12" rx="2" fill="#8a7a5f"/>
@@ -1794,6 +1851,15 @@ const VENUE_ART = {
     <ellipse cx="37" cy="29" rx="1.7" ry="5.4" fill="#161306"/>
     <circle cx="18" cy="26" r="1.4" fill="#f6ffdc" opacity=".95"/>
     <circle cx="35" cy="26" r="1.4" fill="#f6ffdc" opacity=".95"/>
+    <g class="josh-boa">
+      <g fill="#d4548f">
+        <circle cx="46" cy="41" r="8"/><circle cx="60" cy="38" r="8.5"/><circle cx="74" cy="38" r="8"/>
+        <circle cx="87" cy="41" r="7"/>
+      </g>
+      <g fill="#ff9ccb" opacity=".9">
+        <circle cx="50" cy="37" r="4.4"/><circle cx="65" cy="34" r="4.8"/><circle cx="80" cy="35" r="4.4"/>
+      </g>
+    </g>
     <path d="M25 39 l6 0 -3 4.5Z" fill="#e096ab"/>
     <path d="M28 44 q-4 4-9 1 M28 44 q4 4 9 1" stroke="#4e4759" stroke-width="1.6" fill="none" stroke-linecap="round"/>
     <g stroke="#9c95a8" stroke-width="1.3" opacity=".65" stroke-linecap="round">
@@ -1864,12 +1930,12 @@ const VENUE_ART = {
   </g>
 
   <!-- three pendants. The evening light in this room is entirely theirs. -->
-  <g>
+  <g class="pendant-g">
     <ellipse cx="240" cy="150" rx="230" ry="330" fill="url(#csPool)"/>
     <ellipse cx="600" cy="150" rx="250" ry="350" fill="url(#csPool)"/>
     <ellipse cx="990" cy="150" rx="230" ry="330" fill="url(#csPool)"/>
   </g>
-  <g stroke="#181310" stroke-width="3">
+  <g class="pendant-g" stroke="#181310" stroke-width="3">
     <path d="M240 0 V112"/><path d="M600 0 V96"/><path d="M990 0 V120"/>
   </g>
   <g>
@@ -1947,6 +2013,21 @@ const VENUE_ART = {
         <path d="M436 640 q-24 2-34 10"/><path d="M436 648 q-24 8-32 18"/>
         <path d="M506 640 q24 2 34 10"/><path d="M506 648 q24 8 32 18"/>
       </g>
+    <!-- THE BOA. He has had it since the Basement and it goes everywhere he goes.
+         Nobody knows where he got it. Nobody has asked. -->
+    <g class="josh-boa">
+      <g fill="#d4548f">
+        <circle cx="430" cy="670" r="11"/><circle cx="444" cy="679" r="12"/><circle cx="460" cy="684" r="12"/>
+        <circle cx="478" cy="684" r="12"/><circle cx="494" cy="679" r="12"/><circle cx="509" cy="670" r="11"/>
+      </g>
+      <g fill="#ff9ccb" opacity=".9">
+        <circle cx="434" cy="666" r="6"/><circle cx="450" cy="677" r="7"/><circle cx="469" cy="681" r="7"/>
+        <circle cx="488" cy="677" r="7"/><circle cx="505" cy="666" r="6"/>
+      </g>
+      <g stroke="#ffd0e6" stroke-width="2" opacity=".65" fill="none" stroke-linecap="round">
+        <path d="M436 662 q10 8 6 16"/><path d="M470 676 q2 9-3 14"/><path d="M504 662 q-9 8-5 16"/>
+      </g>
+    </g>
     </g>
     </a>
     <!-- a nose print, at cat height -->
@@ -2267,12 +2348,27 @@ const VENUE_ART = {
       <path d="M436 640 q-24 2-34 10"/><path d="M436 648 q-24 8-32 18"/>
       <path d="M506 640 q24 2 34 10"/><path d="M506 648 q24 8 32 18"/>
     </g>
+    <!-- THE BOA. He has had it since the Basement and it goes everywhere he goes.
+         Nobody knows where he got it. Nobody has asked. -->
+    <g class="josh-boa">
+      <g fill="#d4548f">
+        <circle cx="430" cy="670" r="11"/><circle cx="444" cy="679" r="12"/><circle cx="460" cy="684" r="12"/>
+        <circle cx="478" cy="684" r="12"/><circle cx="494" cy="679" r="12"/><circle cx="509" cy="670" r="11"/>
+      </g>
+      <g fill="#ff9ccb" opacity=".9">
+        <circle cx="434" cy="666" r="6"/><circle cx="450" cy="677" r="7"/><circle cx="469" cy="681" r="7"/>
+        <circle cx="488" cy="677" r="7"/><circle cx="505" cy="666" r="6"/>
+      </g>
+      <g stroke="#ffd0e6" stroke-width="2" opacity=".65" fill="none" stroke-linecap="round">
+        <path d="M436 662 q10 8 6 16"/><path d="M470 676 q2 9-3 14"/><path d="M504 662 q-9 8-5 16"/>
+      </g>
+    </g>
   </g>
   </a>
   </g>
 
   <!-- STEVE. Good dog. Wrong bed. -->
-  <g transform="translate(606 700) scale(.72) translate(-606 -700)">
+  <g class="steve-g" transform="translate(606 700) scale(.72) translate(-606 -700)">
     <ellipse cx="606" cy="722" rx="58" ry="12" fill="#0e090f" opacity=".55"/>
     <path d="M578 716 q-8-56 26-58 q30-2 32 34 q2 24-4 24Z" fill="#2b1d1e"/>
     <path d="M626 714 q26-4 34-26 q5-14-6-17 q-11-3-13 8" fill="none" stroke="#2b1d1e" stroke-width="10" stroke-linecap="round"/>
@@ -2482,6 +2578,21 @@ const VENUE_ART = {
       <path d="M436 640 q-24 2-34 10"/><path d="M436 648 q-24 8-32 18"/>
       <path d="M506 640 q24 2 34 10"/><path d="M506 648 q24 8 32 18"/>
     </g>
+    <!-- THE BOA. He has had it since the Basement and it goes everywhere he goes.
+         Nobody knows where he got it. Nobody has asked. -->
+    <g class="josh-boa">
+      <g fill="#d4548f">
+        <circle cx="430" cy="670" r="11"/><circle cx="444" cy="679" r="12"/><circle cx="460" cy="684" r="12"/>
+        <circle cx="478" cy="684" r="12"/><circle cx="494" cy="679" r="12"/><circle cx="509" cy="670" r="11"/>
+      </g>
+      <g fill="#ff9ccb" opacity=".9">
+        <circle cx="434" cy="666" r="6"/><circle cx="450" cy="677" r="7"/><circle cx="469" cy="681" r="7"/>
+        <circle cx="488" cy="677" r="7"/><circle cx="505" cy="666" r="6"/>
+      </g>
+      <g stroke="#ffd0e6" stroke-width="2" opacity=".65" fill="none" stroke-linecap="round">
+        <path d="M436 662 q10 8 6 16"/><path d="M470 676 q2 9-3 14"/><path d="M504 662 q-9 8-5 16"/>
+      </g>
+    </g>
   </g>
   </a>
   </g>
@@ -2647,6 +2758,21 @@ const VENUE_ART = {
     <g stroke="#8a8397" stroke-width="2.2" opacity=".8" fill="none">
       <path d="M436 640 q-24 2-34 10"/><path d="M436 648 q-24 8-32 18"/>
       <path d="M506 640 q24 2 34 10"/><path d="M506 648 q24 8 32 18"/>
+    </g>
+    <!-- THE BOA. He has had it since the Basement and it goes everywhere he goes.
+         Nobody knows where he got it. Nobody has asked. -->
+    <g class="josh-boa">
+      <g fill="#d4548f">
+        <circle cx="430" cy="670" r="11"/><circle cx="444" cy="679" r="12"/><circle cx="460" cy="684" r="12"/>
+        <circle cx="478" cy="684" r="12"/><circle cx="494" cy="679" r="12"/><circle cx="509" cy="670" r="11"/>
+      </g>
+      <g fill="#ff9ccb" opacity=".9">
+        <circle cx="434" cy="666" r="6"/><circle cx="450" cy="677" r="7"/><circle cx="469" cy="681" r="7"/>
+        <circle cx="488" cy="677" r="7"/><circle cx="505" cy="666" r="6"/>
+      </g>
+      <g stroke="#ffd0e6" stroke-width="2" opacity=".65" fill="none" stroke-linecap="round">
+        <path d="M436 662 q10 8 6 16"/><path d="M470 676 q2 9-3 14"/><path d="M504 662 q-9 8-5 16"/>
+      </g>
     </g>
   </g>
   </a>
@@ -2825,6 +2951,21 @@ const VENUE_ART = {
       <path d="M436 640 q-24 2-34 10"/><path d="M436 648 q-24 8-32 18"/>
       <path d="M506 640 q24 2 34 10"/><path d="M506 648 q24 8 32 18"/>
     </g>
+    <!-- THE BOA. He has had it since the Basement and it goes everywhere he goes.
+         Nobody knows where he got it. Nobody has asked. -->
+    <g class="josh-boa">
+      <g fill="#d4548f">
+        <circle cx="430" cy="670" r="11"/><circle cx="444" cy="679" r="12"/><circle cx="460" cy="684" r="12"/>
+        <circle cx="478" cy="684" r="12"/><circle cx="494" cy="679" r="12"/><circle cx="509" cy="670" r="11"/>
+      </g>
+      <g fill="#ff9ccb" opacity=".9">
+        <circle cx="434" cy="666" r="6"/><circle cx="450" cy="677" r="7"/><circle cx="469" cy="681" r="7"/>
+        <circle cx="488" cy="677" r="7"/><circle cx="505" cy="666" r="6"/>
+      </g>
+      <g stroke="#ffd0e6" stroke-width="2" opacity=".65" fill="none" stroke-linecap="round">
+        <path d="M436 662 q10 8 6 16"/><path d="M470 676 q2 9-3 14"/><path d="M504 662 q-9 8-5 16"/>
+      </g>
+    </g>
   </g>
   </a>
   </g>
@@ -2995,8 +3136,25 @@ const BSIDES = [
     x:'Day 961. They have put me on the album cover. I am told this is an honour. It is a photograph of me asleep, taken without my consent, and I intend to do nothing about it. I sleep on the amp because it is warm. Not because it talks. It talks. We have an arrangement: I keep its secrets, it keeps mine, and neither of us mentions the humming.' },
   { i:'\uD83D\uDD0C', t:'The Amp \u2014 Fragment II',
     x:'Maya checked the serial number once. The maker confirmed the model \u2014 ordinary, built 1968 to 1979. Then they asked her to read the number again. Then they asked where she got it. Then they hung up. The number, they said before the line went dead, was never assigned.' },
+  { i:'\uD83D\uDC15', t:'Steve \u2014 A Statement',
+    x:'HELLO. I am STEVE. I live at the bar. I love the bar. I love everyone AT the bar. I love the loud ones who come on Thursdays especially the tall one who smells like batteries. I have a bed. It has my NAME on it. Recently there is a CAT in my bed. I love the cat. The cat does not love me but that is FINE because I have enough love for BOTH of us and also for the mailman and also for a chair I met once. Sometimes the cat sleeps ON me. This is the best thing that has ever happened. I have not moved in four hours. I will not move. Somebody tell the loud ones I am available for backing vocals. \u2014 STEVE (good dog)' },
+  { i:'\uD83E\uDD41', t:'The Plasma Cathedral Drummer Situation',
+    x:'Before Dave there were four drummers, and the band does not like to talk about it. Nigel left to \u201Cpursue ceramics.\u201D Baz was last seen entering a portable toilet at a festival in Reading and has not been seen since; his kit was still warm. The third one\u2019s name nobody can agree on \u2014 Maya says Terry, Jake swears it was a woman named Terry, and Kat maintains there was never a third drummer and that they are both thinking of a coat rack. The fourth lasted nine minutes. Dave has now been in the band longer than all of them combined and has been told none of this.' },
+  { i:'\uD83E\uDD87', t:'Jake and the Thing on Stage',
+    x:'Someone threw something onto the stage in Akron and Jake, who was nineteen and had opinions about commitment, bit it. It turned out to be a novelty rubber bat. It also turned out to belong to a nine-year-old, who cried, and whose mother had to be physically restrained by security \u2014 not from Jake, but from her own child, who wanted it back with the bite marks in it. Jake still gets sent photographs of it every year on the anniversary. It is framed. It has its own shelf. Jake has never once bitten anything on stage since, and would like the record to show that the bat started it.' },
+  { i:'\uD83D\uDCDD', t:'Kat\u2019s Rider, Plasma Cathedral Era',
+    x:'One case of water. One case of the other thing. Six towels, black, because white ones make everyone behave. NO brown M&Ms \u2014 not because Kat cares, but because if they are in the bowl it means nobody read the rest of the page, and the rest of the page is about whether the stage will hold four people and an amp. Item fourteen reads, in Kat\u2019s handwriting: \u201CIf you have read this far, one of you gets a beer. Ask for it. I want to know who reads.\u201D In eleven years, three people asked. All three are still friends of the band.' },
+  { i:'\uD83C\uDF99\uFE0F', t:'Maya on the Name',
+    x:'\u201CPlasma Cathedral. I know. I KNOW. We were twenty-two and we had just found out what a thesaurus was. In our defence the other options were Velvet Ambulance and \u2014 and I want you to sit with this \u2014 The Reasonable Doubt. We put all three on a napkin and let the bartender pick. She picked Plasma Cathedral, then she said, and I have never forgotten this, \u2018It sounds like a place you\u2019d get an X-ray.\u2019 Six years later that\u2019s the name. She never knew. She moved to Tucson. If anyone finds her, tell her the drinks are on us forever.\u201D' },
+  { i:'\uD83D\uDD0C', t:'The Amp \u2014 Fragment III',
+    x:'Dave swears the amp was warm the night the Cathedral broke up \u2014 unplugged, in a van, in February, warm. He put his hand on it and said out loud, to nobody, \u201CNot yet.\u201D He does not remember saying it. Kat does. She has never brought it up because she is not certain the amp was the one being spoken to.' },
+  { i:'\uD83D\uDC3E', t:'Josh\u2019s Diary \u2014 Entry Four',
+    x:'Day 1,208. There is a dog. He is called Steve, he is enormously stupid, and he has done nothing to deserve what is coming. I have taken his bed. He watched me do it. He did not object. He has instead brought me, over four days: a rope, a tennis ball, a second tennis ball, and a shoe belonging to the tall one. I have accepted none of these. Last night it was cold and I slept on him. He held completely still for four hours. In the morning his tail was going before his eyes were open. I want to be extremely clear that this changes nothing, that I remain unaffiliated, and that if it is cold again tonight I will do it again purely for the warmth. The bed is still mine. He may keep the shoe.' },
 ];
-const BSIDE_AT = [2, 6, 10, 14, 18, 22, 26, 30];   // clear this level to reveal the matching B-Side
+// Fifteen scraps across thirty sets — one every other set, so there is always another
+// one close enough to be worth reaching. The story turned out to be half the reason
+// people play, so it pays out twice as often as it used to.
+const BSIDE_AT = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30];
 const AMP_PYRO_PER_CELL = 200;
 const ROCKSTAR_PER_TILE = 250;
 
@@ -3633,6 +3791,23 @@ function arenaLights() {
   } catch (e) {}
 }
 
+/* The early rooms answer too. One class on <body>; the CSS above only matches the element
+   that room actually contains, so no venue check is needed here. */
+let _lastReact = 0;
+function roomReact() {
+  if (reducedMotion()) return;
+  const now = Date.now();
+  if (now - _lastReact < 9000) return;
+  _lastReact = now;
+  try {
+    document.body.classList.remove('room-react');
+    void document.body.offsetWidth;
+    document.body.classList.add('room-react');
+    clearTimeout(roomReact._t);
+    roomReact._t = setTimeout(() => document.body.classList.remove('room-react'), 9000);
+  } catch (e) {}
+}
+
 /* Maintenance is concerned. */
 let _lastSway = 0;
 function theaterSway() {
@@ -3658,6 +3833,7 @@ function showCombo(chain) {
   if (chain >= 3) clubSmoke();          // The Club: a proper cascade earns the fog
   if (chain >= 3) arenaLights();        // The Arena: the crowd answers
   if (chain >= 3) theaterSway();        // The Theater: the chandelier answers
+  if (chain >= 3) roomReact();          // Basement bulb / Coffee lamps / Steve
 }
 const comboBannerEl = document.getElementById('comboBanner');
 const screenPulseEl = document.getElementById('screenPulse');
@@ -3668,6 +3844,7 @@ function showComboBanner(name) {
   clubSmoke();                            // two specials together is exactly the moment for it
   arenaLights();
   theaterSway();
+  roomReact();
 }
 let _lastPulse = 0;
 function screenPulse() {
@@ -4108,7 +4285,13 @@ function showOverlay(won) {
     updateCoinDisplays(true);
   }
 
-  document.getElementById('ovEyebrow').textContent = won ? `Level ${lv.n} Complete` : `Level ${lv.n}`;
+  const finale = won && lv.n >= LEVELS.length;
+  // guarded: if this ever came back null it would throw here and the player would get no
+  // result card at all — a decorative class is never worth risking that
+  const panelEl = document.querySelector('#overlay .panel');
+  if (panelEl) panelEl.classList.toggle('finale', finale);
+  document.getElementById('ovEyebrow').textContent = finale ? 'The Last Set'
+    : (won ? `Level ${lv.n} Complete` : `Level ${lv.n}`);
   document.getElementById('ovTitle').textContent = won ? (stars === 3 ? 'Showstopper!' : stars === 2 ? 'Encore!' : 'Nice set!') : 'Last Call';
   const pool = won ? WIN_FLAVORS : LOSE_FLAVORS;
   document.getElementById('ovFlavor').textContent = pool[(Math.random() * pool.length) | 0];
@@ -4167,6 +4350,27 @@ function showOverlay(won) {
     mkBtn('↻ Try Again', true, () => { hideOverlay(); Game.newGame(); });
     mkBtn('☰ Menu', false, () => { hideOverlay(); showMap(); });
   }
+  if (finale) {
+    // The story already had an ending written for it. Let it actually land.
+    const t = Tally.read();
+    const totalStars = Object.keys(Save.data.stars).reduce((n, k) => n + Save.data.stars[k], 0);
+    document.getElementById('ovTitle').textContent = 'Take a Bow';
+    document.getElementById('ovFlavor').innerHTML =
+      '<div class="finale-mark">\u2605</div>'
+      + '<div class="finale-line">The lights drop. The amp glows white, then goes quiet \u2014 for good. '
+      + 'A voicemail arrives: three seconds of static, then a familiar voice. \u201cSoon.\u201d</div>'
+      + '<div class="finale-line">Final bill: $2.18.</div>'
+      + '<div class="finale-sig">You came from a basement</div>'
+      + '<div class="finale-tally">'
+      +   '<div><div class="k">Sets</div><div class="v">' + (t.cleared || 0) + '</div></div>'
+      +   '<div><div class="k">Stars</div><div class="v">' + totalStars + '</div></div>'
+      +   '<div><div class="k">Best set</div><div class="v">' + (t.best || 0).toLocaleString() + '</div></div>'
+      +   '<div><div class="k">Josh</div><div class="v">Still not in the band</div></div>'
+      + '</div>';
+    row.innerHTML = '';
+    mkBtn('Take a bow \u2605', true, () => { hideOverlay(); showMap(); });
+    mkBtn('\u21bb Play it again', false, () => { hideOverlay(); Game.newGame(); });
+  }
   refreshUpgradeCues();
 
   const bandNote = (won && anyUpgradeAffordable()) ? `<div class="ov-band-note">🎸 You've earned enough to level up the band — tap ★ Band!</div>` : '';
@@ -4178,7 +4382,29 @@ function showOverlay(won) {
   calmBoard();   // stop repainting the board the instant it goes behind the card
   if (won) { Sfx.win(); launchConfetti(); } else { Sfx.lose(); }
 }
-function hideOverlay() { document.getElementById('overlay').classList.remove('show'); calmBoard(); }
+function hideOverlay() {
+  document.getElementById('overlay').classList.remove('show');
+  calmBoard();
+  teachPeek();
+}
+/* Looking around turns out to be the part people like most — more than the matching. It
+   deserves better than one small eye that goes quiet. Once, after the first set is cleared,
+   say it out loud. */
+function teachPeek() {
+  try {
+    if (Prefs.get('peekTaught', false)) return;
+    if (Tally.read().cleared < 1) return;
+    Prefs.set('peekTaught', true);
+    setTimeout(() => {
+      const t = document.getElementById('venueToast');
+      if (!t) return;
+      document.getElementById('vtK').textContent = 'Look around';
+      document.getElementById('vtN').textContent = 'Tap the venue name \uD83D\uDC41';
+      document.getElementById('vtS').textContent = 'Every room is drawn by hand, and not everything in one is scenery.';
+      t.classList.remove('show'); void t.offsetWidth; t.classList.add('show');
+    }, 700);
+  } catch (_) {}
+}
 
 function launchConfetti() {
   if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -5323,7 +5549,8 @@ const Peek = {
   on: false,
   timer: null,
   steps: [],
-  HOLD: 9000,                       // closes itself if the player wanders off
+  HOLD: 16000,                      // closes itself if the player wanders off
+                                    // (long: looking around turns out to be the point)
   art()    { return document.querySelector('.venue-art'); },
   artSvg() { return document.querySelector('#venueArt svg'); },
   clearSteps() { this.steps.forEach(t => clearTimeout(t)); this.steps = []; },
