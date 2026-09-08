@@ -850,6 +850,26 @@ body.v-club .club-smoke{display:block;}
   color:var(--cream-low); margin-left:8px; vertical-align:middle;}
 .josh-role{font-size:.78rem; color:var(--cream-mute); font-style:italic; margin:3px 0 7px;}
 .josh-crime{font-size:.78rem; line-height:1.45; color:var(--cream-low);}
+.josh-saved{margin-top:6px; font-family:var(--mono); font-size:.56rem; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--gold-warm); opacity:.9;}
+.josh-shop{margin-top:14px; border:1px solid var(--line); border-radius:14px; padding:14px 14px 6px;
+  background:var(--surface-low); text-align:left;}
+.josh-shop-head{font-family:var(--serif); font-weight:700; font-size:1rem; color:var(--gold-hi);}
+.josh-shop-sub{font-family:var(--mono); font-size:.56rem; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--cream-low); margin:2px 0 12px;}
+.jg{display:flex; gap:11px; align-items:center; padding:9px 0; border-top:1px solid var(--line);}
+.jg:first-of-type{border-top:none;}
+.jg-ico{font-size:1.4rem; width:30px; text-align:center; flex:0 0 auto;}
+.jg-bd{flex:1 1 auto; min-width:0;}
+.jg-name{font-family:var(--serif); font-weight:700; font-size:.92rem; color:var(--cream);}
+.jg-tag{font-family:var(--mono); font-size:.5rem; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--gold-warm); border:1px solid var(--gold-deep); border-radius:99px; padding:1px 7px; margin-left:5px;}
+.jg-flavor{font-size:.74rem; line-height:1.4; color:var(--cream-low); margin-top:2px;}
+.jg-buy{flex:0 0 auto; font-family:var(--sans); font-weight:700; font-size:.78rem; color:#10131c;
+  background:linear-gradient(160deg,var(--gold-hi),var(--gold)); border:none; border-radius:99px;
+  padding:7px 13px; cursor:pointer;}
+.jg-buy.off{background:var(--surface-hi); color:var(--cream-low); cursor:not-allowed;}
+.jg.owned{opacity:.72;}
 .josh-crime b{color:var(--gold-warm); font-weight:600;}
 .lifestyle-head{font-family:var(--serif); font-weight:700; font-size:1.25rem; color:var(--gold-hi); margin:30px 0 2px; text-align:center;}
 .fame-badge{display:inline-block; font-family:var(--mono); font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; color:#10131c;
@@ -910,6 +930,13 @@ body.v-club .club-smoke{display:block;}
 @keyframes cta-pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,224,138,.5);}50%{box-shadow:0 0 0 6px rgba(255,224,138,0);}}
 .ov-band-note{margin-top:10px; font-family:var(--sans); font-size:.82rem; color:var(--gold-hi); font-weight:600;}
 /* link rows on the hubs + in-game */
+/* BUILD STAMP. Files get downloaded as index (7), index (8), index (9)... across two
+   machines, and there was no way to tell from inside the game which one you were running.
+   Now there is, on the title screen and on the Journey map. */
+.build-stamp{font-family:var(--mono); font-size:.5rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--cream-low); opacity:.55; margin-top:12px; text-align:center;}
+.j-foot .build-stamp{margin-top:14px;}
+
 /* The advisory sticker on the cover. Deliberately NOT the RIAA mark — that is a
    registered design and not ours to reproduce. This is the band's own, and it says what
    is actually in here rather than what a committee decided in 1985. */
@@ -1223,6 +1250,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
         <a class="link" href="https://www.redbubble.com/shop/ap/172252421" target="_blank" rel="noopener">👕 Merch</a>
       </div>
       <div class="links-note">A little gift from the band. Have fun — then go give them a listen.</div>
+      <div class="build-stamp">Build B20 · counting</div>
       <div class="advisory" role="note" aria-label="Content advisory">
         <div class="adv-top">Advisory</div>
         <div class="adv-rule"></div>
@@ -1312,6 +1340,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
       </div>
       <div class="j-path" id="mapPath"></div>
       <div class="gauge">
+        <div class="build-stamp">Build B20 · counting</div>
         <div class="gauge-stats" id="gaugeStats"></div>
         <button class="like-btn" id="likeBtn" onclick="Game.like()">♥ Like this game</button>
       </div>
@@ -1720,6 +1749,10 @@ const VENUE_ART = {
   <rect x="0" y="646" width="1200" height="154" fill="#1c1826"/>
   <path d="M0 646 H1200" stroke="#100d18" stroke-width="6"/>
   <rect x="0" y="652" width="1200" height="26" fill="#272134" opacity=".8"/>
+
+  <!-- WHAT THE MONEY BOUGHT. Placed here on purpose: after the wall and floor, before the
+       boxes and the cat \u2014 so the rug goes UNDER Josh and the foam goes behind everything. -->
+  __CRIB__
   <g opacity=".8">
     <circle cx="742" cy="742" r="26" fill="#141119"/>
     <circle cx="742" cy="742" r="18" fill="#221d2c"/>
@@ -1869,6 +1902,9 @@ const VENUE_ART = {
   </g>
   </a>
 
+  <!-- his things, on the basement floor -->
+  <g transform="translate(700 700) scale(.9)">__JOSHGEAR__</g>
+
   <rect x="1000" y="0" width="200" height="800" fill="#100d18" opacity=".16"/>
 </svg>`,
   'v-coffee': `<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -1986,6 +2022,11 @@ const VENUE_ART = {
     <ellipse cx="700" cy="472" rx="20" ry="9" fill="#cfe2ff" opacity=".8"/>
     <rect x="344" y="584" width="512" height="106" fill="#141d2c"/>
     <g stroke="#22314a" stroke-width="3" opacity=".8"><path d="M344 612 H856 M344 648 H856"/></g>
+
+    <!-- WHAT THE BAND DRIVES, parked at the kerb. Substituted per tier, exactly the way
+         the band name is: the art is rebuilt whenever the tier changes. Inside the window
+         clip and behind Josh, because Josh is at the glass and the car is across the road. -->
+    __RIDE__
 
     <!-- JOSH, outside, at the glass. He is not asking to come in.
          Scaled about his base rather than redrawn: on a phone the board's bottom edge
@@ -2153,6 +2194,9 @@ const VENUE_ART = {
     <ellipse cx="748" cy="689" rx="14" ry="5" fill="#c9a67a"/>
     <path d="M762 692 q14 2 11 11 q-3 6-10 4" fill="none" stroke="#eef2f5" stroke-width="3.6"/>
   </g>
+
+  <!-- his things, out on the pavement with him -->
+  <g transform="translate(640 706) scale(.8)">__JOSHGEAR__</g>
 
   <rect width="1200" height="800" fill="url(#csFall)"/>
 </svg>`,
@@ -2405,6 +2449,9 @@ const VENUE_ART = {
   </g>
 
 
+  <!-- his things, at the end of the bar -->
+  <g transform="translate(330 712) scale(.82)">__JOSHGEAR__</g>
+
   <rect width="1200" height="800" fill="url(#dbFall)"/>
 </svg>`,
   'v-club': `<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -2482,6 +2529,7 @@ const VENUE_ART = {
   <rect x="260" y="516" width="680" height="52" fill="url(#clStage)"/>
   <rect x="260" y="568" width="680" height="34" fill="#100d22"/>
   <g stroke="#0b0918" stroke-width="3" opacity=".7"><path d="M260 568 H940"/></g>
+  <g transform="translate(392 470)">__CAPE__</g>
   <g fill="#0d0b1c">
     <g><circle cx="392" cy="450" r="17"/><path d="M368 516 q4-46 24-46 q20 0 24 46Z"/>
        <path d="M356 486 q40-16 62-4" stroke="#0d0b1c" stroke-width="7" fill="none" stroke-linecap="round"/>
@@ -2618,6 +2666,9 @@ const VENUE_ART = {
   <!-- one shirt he has comprehensively sat on -->
   <path d="M624 686 q22 8 44 2 l-2 6 q-22 6-44-2Z" fill="#3a3260" opacity=".9"/>
 
+  <!-- his things, dumped by the merch table -->
+  <g transform="translate(300 756) scale(.86)">__JOSHGEAR__</g>
+
   <rect width="1200" height="800" fill="url(#clFall)"/>
 </svg>`,
   'v-arena': `<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -2700,6 +2751,7 @@ const VENUE_ART = {
   <!-- the stage, and the band on it -->
   <rect x="150" y="496" width="900" height="46" fill="url(#arStage)"/>
   <rect x="150" y="542" width="900" height="30" fill="#0d0a14"/>
+  <g transform="translate(330 448)">__CAPE__</g>
   <g fill="#0b0813">
     <g><circle cx="330" cy="428" r="16"/><path d="M308 496 q4-48 22-48 q18 0 22 48Z"/>
        <path d="M296 466 q38-16 58-4" stroke="#0b0813" stroke-width="7" fill="none" stroke-linecap="round"/>
@@ -2819,6 +2871,9 @@ const VENUE_ART = {
     </g>
   </g>
   </a>
+
+  <!-- his things, at front of house -->
+  <g transform="translate(690 768) scale(.86)">__JOSHGEAR__</g>
 
   <rect width="1200" height="800" fill="url(#arFall)"/>
 </svg>`,
@@ -3018,6 +3073,9 @@ const VENUE_ART = {
     <ellipse cx="700" cy="778" rx="16" ry="7"/><ellipse cx="900" cy="778" rx="16" ry="7"/>
     <ellipse cx="1105" cy="778" rx="16" ry="7"/>
   </g>
+
+  <!-- his things, in the aisle -->
+  <g transform="translate(700 770) scale(.82)">__JOSHGEAR__</g>
 
   <rect width="1200" height="800" fill="url(#thFall)"/>
 </svg>`,
@@ -4608,10 +4666,21 @@ function applyVenue(n) {
   // The band's name counts as a change: it fires once, at the rename.
   const host = document.getElementById('venueArt');
   if (!host) return;
-  if (host.dataset.venue === v.cls && host.dataset.gig === gig.key) { setRiser(n); return; }
+  // the lifestyle tiers are part of the room's identity now: buy a van and the room
+  // it stands in has to be rebuilt, exactly as it is when the band changes its name
+  const lifeKey = (typeof Save !== 'undefined' && Save.lifestyleTier)
+    ? [Save.lifestyleTier('ride'), Save.lifestyleTier('threads'), Save.lifestyleTier('crib'), Save.joshCount(),
+       Save.joshOwns('toy'), Save.joshOwns('bed'), Save.joshOwns('treats')].join('-') : '0-0-0';
+  if (host.dataset.venue === v.cls && host.dataset.gig === gig.key && host.dataset.life === lifeKey) { setRiser(n); return; }
+  host.dataset.life = lifeKey;
   host.dataset.venue = v.cls;
   host.dataset.gig = gig.key;
+  const rideTier = (typeof Save !== 'undefined' && Save.lifestyleTier) ? Save.lifestyleTier('ride') : 0;
   host.innerHTML = (VENUE_ART[v.cls] || '')
+    .split('__JOSHGEAR__').join(joshGearArt())
+    .split('__CRIB__').join(cribArt())
+    .split('__CAPE__').join(capeArt())
+    .split('__RIDE__').join(RIDE_ART[rideTier] || '')
     .split('__BANDHREF__').join(gig.href)
     .split('__BAND__').join(gig.name);
   setRiser(n);
@@ -4956,7 +5025,7 @@ const UPGRADE_COST = [200, 450, 900];                                // cost to 
 const LIFESTYLE = [
   { key: 'ride', label: 'The Ride', icon: '🚗', tiers: [
     { name: "Mom's Hatchback", flavor: 'Smells of fries. Two doors. One of them works.' },
-    { name: 'Rusty Tour Van', flavor: 'They named it "The Coffin." It runs on hope and old oil.' },
+    { name: 'The Corrode Warrior', flavor: 'Sixty percent oxide by weight. Starts on the third try, every time, without fail.' },
     { name: 'Sleeper Bus', flavor: 'Twelve bunks. Dave sleeps in the luggage bay, by choice.' },
     { name: 'Private Jet', flavor: 'The amp gets its own seat. It insisted, somehow.' },
   ] },
@@ -4968,12 +5037,254 @@ const LIFESTYLE = [
   ] },
   { key: 'crib', label: 'The Crib', icon: '🏠', tiers: [
     { name: "Mom's Basement", flavor: 'Rent: free. Electric bill: catastrophic.' },
-    { name: 'Shared Apartment', flavor: 'Four people, one bathroom, one cat named Josh who considers all four of them staff.' },
-    { name: 'House with a Studio', flavor: 'Soundproofed. Mrs. Krenshaw moves in next door anyway.' },
-    { name: 'Hilltop Mansion', flavor: 'Gold records on the wall. The amp has its own wing.' },
+    { name: 'A Rug, Finally', flavor: 'They never left the basement. They just put a rug down. Four people, one bathroom, one cat who considers all four of them staff.' },
+    { name: 'Proper Soundproofing', flavor: 'Foam on the same damp wall. This, and only this, is why Mrs. Krenshaw stopped writing letters.' },
+    { name: 'Gold Records on the Wall', flavor: 'Three of them, hung in the room where it started, under the same bare bulb. They could rehearse anywhere now. They rehearse here.' },
   ] },
 ];
 const LIFESTYLE_COST = [500, 1400, 3200];   // cost to reach tier 1, 2, 3
+
+/* =====================================================================
+   THE CRIB \u2014 and why it never leaves the basement
+   You cannot park a hilltop mansion outside a coffee shop, and the Basement cannot become
+   one either: the story has them playing there in sets 1 to 4. But plenty of bands never
+   leave the room they started in \u2014 Tool are still in the same one twenty-odd years on.
+   They just fill it with better things. So the money goes INTO the basement: a rug, then
+   soundproofing (which is the only reason Mrs. Krenshaw stopped writing letters), then
+   gold records on the same damp wall, under the same bare bulb.
+   Cumulative \u2014 each tier keeps everything below it.
+   ===================================================================== */
+function cribArt() {
+  if (typeof Save === 'undefined' || !Save.lifestyleTier) return '';
+  const t = Save.lifestyleTier('crib');
+  let out = '';
+  if (t >= 1) out += `
+    <g>
+      <path d="M336 704 h528 l44 82 H292Z" fill="#5c2b3a"/>
+      <path d="M362 714 h476 l30 62 H332Z" fill="none" stroke="#8a4459" stroke-width="4"/>
+      <path d="M392 730 h416 l16 32 H376Z" fill="none" stroke="#7a3b4d" stroke-width="3" opacity=".8"/>
+      <g stroke="#3f1d28" stroke-width="3" opacity=".5"><path d="M470 704 L444 786 M730 704 L756 786"/></g>
+    </g>`;
+  if (t >= 2) out += `
+    <g opacity=".9">
+      <rect x="186" y="252" width="368" height="268" rx="4" fill="#241f30"/>
+      <g fill="#2f2940">
+        ${[0,1,2,3,4,5].map(r => [0,1,2,3,4,5,6,7].map(c =>
+          `<path d="M${196 + c*44} ${262 + r*44} l22 -14 22 14 -22 14Z"/>`).join('')).join('')}
+      </g>
+      <rect x="186" y="252" width="368" height="268" rx="4" fill="none" stroke="#3a3350" stroke-width="4"/>
+    </g>`;
+  if (t >= 3) out += `
+    <g>
+      ${[0,1,2].map(i => {
+        const x = 690 + i * 150;
+        return `<g>
+          <rect x="${x}" y="424" width="122" height="130" rx="3" fill="#1a1524" stroke="#a9853c" stroke-width="6"/>
+          <circle cx="${x + 61}" cy="482" r="42" fill="#c9a14a"/>
+          <circle cx="${x + 61}" cy="482" r="42" fill="none" stroke="#f0d68e" stroke-width="2" opacity=".7"/>
+          <circle cx="${x + 61}" cy="482" r="13" fill="#1a1524"/>
+          <circle cx="${x + 61}" cy="482" r="4" fill="#c9a14a"/>
+          <rect x="${x + 20}" y="530" width="82" height="12" rx="2" fill="#2a2436"/>
+        </g>`;
+      }).join('')}
+    </g>`;
+  return out;
+}
+
+/* Jake's cape, off the band card and onto the stage. Threads tier 3 only. */
+function capeArt() {
+  if (typeof Save === 'undefined' || !Save.lifestyleTier) return '';
+  if (Save.lifestyleTier('threads') < 3) return '';
+  return `<g>
+    <path d="M-15 -6 q-34 28-38 56 h106 q-4-28-38-56Z" fill="#5b2a94"/>
+    <path d="M-15 -6 q-34 28-38 56 h106 q-4-28-38-56Z" fill="none" stroke="#ffe08a" stroke-width="2.4"/>
+    <g fill="#fff7d6">
+      <circle cx="-30" cy="30" r="1.8"/><circle cx="-14" cy="42" r="1.5"/><circle cx="4" cy="26" r="1.7"/>
+      <circle cx="22" cy="40" r="1.5"/><circle cx="34" cy="28" r="1.8"/><circle cx="-40" cy="44" r="1.4"/>
+    </g>
+  </g>`;
+}
+
+
+/* =====================================================================
+   JOSH'S GEAR
+   The rule that governs all of this: buying him things REDIRECTS the destruction, it never
+   stops it. Switching the incidents off would be buying away the best writing in the game,
+   and the rap sheet still has to reach the platinum record and the eleven bathrooms.
+   So the trade is real and it goes both ways \u2014 an untended Josh is funnier, a tended Josh
+   is cheaper, and each thing he owns pays the band 3% more on every win because he is
+   destroying a $4 mouse instead of the venue.
+   ===================================================================== */
+const JOSH_GEAR = [
+  { key: 'toy',    icon: '\uD83D\uDC01', name: 'A Toy Mouse',        cost: 400,
+    flavor: 'Grey felt, one bell, no dignity. He will carry it to a different room every night and leave it exactly where you will step on it.' },
+  { key: 'bed',    icon: '\uD83D\uDECF\uFE0F', name: 'A Bed of His Own', cost: 900,
+    flavor: 'So he has somewhere to sleep that is not the amp, the merch, or another animal. He will not use it. He will sleep beside it, touching it, to make a point.' },
+  { key: 'treats', icon: '\uD83C\uDF6A', name: 'The Good Treats',    cost: 1600,
+    flavor: 'The ones from behind the counter. Kat says they are extortionate. Kat buys them.' },
+];
+
+/* One drawing, six placements. The gear is drawn around a local origin at floor level and
+   each room positions it beside wherever Josh happens to be in that room. */
+function joshGearArt() {
+  if (typeof Save === 'undefined' || !Save.joshOwns) return '';
+  let out = '';
+  if (Save.joshOwns('bed')) out += `
+    <ellipse cx="0" cy="-4" rx="54" ry="17" fill="#3b2a46"/>
+    <ellipse cx="0" cy="-8" rx="40" ry="11" fill="#4e3a5c"/>
+    <path d="M-54 -6 q54 -26 108 0" fill="none" stroke="#5d4770" stroke-width="5"/>`;
+  if (Save.joshOwns('toy')) out += `
+    <g transform="translate(-84 -6)">
+      <ellipse cx="0" cy="0" rx="17" ry="11" fill="#9a94a6"/>
+      <circle cx="13" cy="-4" r="8" fill="#a9a3b4"/>
+      <path d="M11 -11 a6 6 0 0 1 8 2" fill="#cbbcc6"/>
+      <circle cx="19" cy="-4" r="2" fill="#2a2534"/>
+      <path d="M-16 2 q-22 6-26 -6" fill="none" stroke="#9a94a6" stroke-width="3.4" stroke-linecap="round"/>
+      <circle cx="-2" cy="6" r="4" fill="#e8c46a"/>
+    </g>`;
+  if (Save.joshOwns('treats')) out += `
+    <g transform="translate(70 -12)">
+      <rect x="-19" y="-22" width="38" height="24" rx="4" fill="#c46a3a"/>
+      <rect x="-19" y="-28" width="38" height="8" rx="3" fill="#8f4a26"/>
+      <ellipse cx="0" cy="-11" rx="12" ry="7" fill="#f0dcc0" opacity=".9"/>
+      <text x="0" y="-8" text-anchor="middle" font-family="'JetBrains Mono',monospace"
+            font-size="8" fill="#6b3a20">GOOD</text>
+      <circle cx="-26" cy="0" r="4" fill="#a9743f"/><circle cx="-33" cy="2" r="3.4" fill="#a9743f"/>
+    </g>`;
+  return out;
+}
+
+/* =====================================================================
+   THE DISCOVERY LAYER — what money actually buys
+   Coins used to move a number on a card. Now they change a room, and the peek is how you
+   go and look at what you bought. Each tier is a genuinely different silhouette, because
+   a tier you cannot SEE is just a number again, which is the thing this replaces.
+   ===================================================================== */
+const RIDE_ART = [
+  /* 0 \u2014 Mom's Hatchback. Smells of fries. Two doors. One of them works.
+       Drawn from Glen's reference: a mid-70s bubble hatchback. The whole character is in
+       the greenhouse \u2014 an enormous domed glass area taking up nearly half the height,
+       thin pillars, and a body far too short for it. Get that wrong and you have drawn a
+       generic wedge; get it right and it is unmistakable even at this size. */
+  `<g>
+     <ellipse cx="506" cy="646" rx="118" ry="10" fill="#070b12" opacity=".55"/>
+     <!-- the dome. Nearly half the car. -->
+     <path d="M404 596 q12-48 62-58 q44-10 82 2 q36 12 48 56Z" fill="#d9b93f"/>
+     <path d="M418 590 q12-40 56-48 q38-8 70 4 q30 10 40 44Z" fill="#2a3646"/>
+     <path d="M424 586 q10-30 40-40" fill="none" stroke="#8fa4bd" stroke-width="4" opacity=".45"/>
+     <rect x="498" y="540" width="8" height="50" fill="#d9b93f"/>
+     <!-- short, wide, rounded body -->
+     <path d="M392 634 q0-32 16-44 h196 q18 12 18 44Z" fill="#d9b93f"/>
+     <path d="M392 634 q0-32 16-44 h196 q18 12 18 44Z" fill="none" stroke="#b1922b" stroke-width="2" opacity=".7"/>
+     <path d="M398 612 H620" stroke="#b1922b" stroke-width="3" opacity=".65"/>
+     <!-- the door that does not work, replaced in primer and never painted -->
+     <rect x="500" y="592" width="52" height="34" rx="2" fill="#9a9086" opacity=".85"/>
+     <circle cx="546" cy="608" r="3.4" fill="#5e5850"/>
+     <!-- chrome, of which there is a great deal -->
+     <rect x="588" y="614" width="42" height="9" rx="4" fill="#c9ccd2"/>
+     <rect x="592" y="596" width="34" height="14" rx="3" fill="#3a4048"/>
+     <g stroke="#c9ccd2" stroke-width="1.6" opacity=".8">
+       <path d="M594 600 H624 M594 605 H624"/>
+     </g>
+     <ellipse cx="618" cy="590" rx="8" ry="7" fill="#ffe6a8" opacity=".7"/>
+     <rect x="386" y="614" width="16" height="8" rx="3" fill="#c9ccd2" opacity=".8"/>
+     <!-- wheels set wide, chrome caps -->
+     <path d="M420 636 a24 22 0 0 1 48 0Z" fill="#0f1319" opacity=".8"/>
+     <path d="M546 636 a24 22 0 0 1 48 0Z" fill="#0f1319" opacity=".8"/>
+     <circle cx="444" cy="636" r="19" fill="#12161c"/><circle cx="444" cy="636" r="10" fill="#c9ccd2"/>
+     <circle cx="444" cy="636" r="4" fill="#7d838c"/>
+     <circle cx="570" cy="636" r="19" fill="#12161c"/><circle cx="570" cy="636" r="10" fill="#c9ccd2"/>
+     <circle cx="570" cy="636" r="4" fill="#7d838c"/>
+   </g>`,
+  /* 1 \u2014 The Corrode Warrior. Sixty percent oxide by weight.
+       Second redraw, from Glen's reference: a mid-60s forward-control van. The defining
+       feature is that there is NO BONNET \u2014 the windscreen is the front of the vehicle and
+       the front wheel sits directly underneath the driver. Draw a sloped nose on it and it
+       stops being this van and becomes a generic one. Flat roof, slab sides, wheels pushed
+       right to the corners, and rust doing most of the paintwork. */
+  `<g>
+     <ellipse cx="504" cy="654" rx="150" ry="11" fill="#070b12" opacity=".55"/>
+     <g>
+       <rect x="392" y="504" width="150" height="6" rx="3" fill="#4a3a33"/>
+       <rect x="404" y="482" width="58" height="22" rx="3" fill="#33302e"/>
+       <g stroke="#c9b08a" stroke-width="2.2" opacity=".6"><path d="M420 480 V506"/></g>
+     </g>
+     <!-- flat roof, vertical front face, no nose whatsoever -->
+     <path d="M372 638 V526 q0-10 10-10 h248 q8 0 8 10 v112Z" fill="#b0553a"/>
+     <path d="M576 530 h50 q6 0 6 8 v34 h-56Z" fill="#2a3646"/>
+     <rect x="524" y="532" width="44" height="40" rx="2" fill="#2a3646"/>
+     <path d="M580 534 q16 4 22 16" fill="none" stroke="#8fa4bd" stroke-width="3.4" opacity=".4"/>
+     <path d="M372 598 H638" stroke="#8a3f28" stroke-width="3" opacity=".8"/>
+     <!-- rust, primer, and one panel from a different van -->
+     <g fill="#7d3a25" opacity=".85">
+       <path d="M384 556 q26-10 44 2 q10 16-6 24 q-30 8-40-6Z"/>
+       <path d="M452 610 q30-8 44 4 q4 14-14 18 q-28 4-32-10Z"/>
+       <path d="M604 578 q22-4 26 8 q2 12-14 14 q-16 0-16-12Z"/>
+     </g>
+     <g fill="#8a8078" opacity=".55">
+       <rect x="498" y="546" width="34" height="30" rx="3"/>
+       <path d="M398 616 q24-6 34 4 q2 10-12 12 q-22 2-24-8Z"/>
+     </g>
+     <!-- stencilled by hand, by somebody in a hurry -->
+     <text x="432" y="580" text-anchor="middle" font-family="'JetBrains Mono',monospace"
+           font-size="16" letter-spacing="2" fill="#f0e4cc" opacity=".8">CORRODE</text>
+     <text x="432" y="600" text-anchor="middle" font-family="'JetBrains Mono',monospace"
+           font-size="16" letter-spacing="2" fill="#f0e4cc" opacity=".8">WARRIOR</text>
+     <!-- mirror on a stalk, as they all had -->
+     <g stroke="#5e5a55" stroke-width="3"><path d="M632 534 l14-8"/></g>
+     <rect x="642" y="518" width="9" height="14" rx="2" fill="#3a3632"/>
+     <!-- what chrome survives -->
+     <rect x="624" y="620" width="26" height="8" rx="3" fill="#b9bcc2"/>
+     <ellipse cx="642" cy="592" rx="8" ry="9" fill="#ffe6a8" opacity=".65"/>
+     <!-- wheels at the very corners, plain steel, no caps -->
+     <path d="M566 640 a26 24 0 0 1 52 0Z" fill="#0f1319" opacity=".85"/>
+     <path d="M398 640 a26 24 0 0 1 52 0Z" fill="#0f1319" opacity=".85"/>
+     <circle cx="592" cy="642" r="21" fill="#12161c"/><circle cx="592" cy="642" r="10" fill="#6e6a66"/>
+     <circle cx="592" cy="642" r="3.5" fill="#3a3632"/>
+     <circle cx="424" cy="642" r="21" fill="#12161c"/><circle cx="424" cy="642" r="10" fill="#6e6a66"/>
+     <circle cx="424" cy="642" r="3.5" fill="#3a3632"/>
+   </g>`,
+  /* 2 — Sleeper Bus. Twelve bunks. It does not fit in the window, which is the point. */
+  `<g>
+     <ellipse cx="600" cy="656" rx="280" ry="12" fill="#070b12" opacity=".6"/>
+     <path d="M320 644 V498 q0-18 20-18 h500 q26 0 34 26 v138Z" fill="#2f3a4e"/>
+     <rect x="320" y="516" width="540" height="6" fill="#8a97ad" opacity=".5"/>
+     <g fill="#141b28">
+       <rect x="352" y="534" width="86" height="44" rx="5"/><rect x="456" y="534" width="86" height="44" rx="5"/>
+       <rect x="560" y="534" width="86" height="44" rx="5"/><rect x="664" y="534" width="86" height="44" rx="5"/>
+       <rect x="768" y="534" width="76" height="44" rx="5"/>
+     </g>
+     <rect x="320" y="596" width="540" height="18" fill="#1f2836"/>
+     <text x="590" y="638" text-anchor="middle" font-family="Fraunces,Georgia,serif"
+           font-weight="700" font-size="26" letter-spacing="6" fill="#ffe08a" opacity=".85">__BAND__</text>
+     <circle cx="420" cy="648" r="23" fill="#0e1218"/><circle cx="420" cy="648" r="9" fill="#59636f"/>
+     <circle cx="760" cy="648" r="23" fill="#0e1218"/><circle cx="760" cy="648" r="9" fill="#59636f"/>
+   </g>`,
+  /* 3 — Private Jet. You cannot park one outside a coffee shop, so it is overhead, and
+        what is at the kerb is a car with somebody else driving it. */
+  `<g>
+     <g opacity=".8">
+       <path d="M470 300 l86-16 34 8 -14 20 -86 6Z" fill="#39435a"/>
+       <path d="M540 292 l-20-26 12-2 30 24Z" fill="#39435a"/>
+       <path d="M536 304 l-16 24 12 2 26-22Z" fill="#39435a"/>
+       <ellipse cx="472" cy="296" rx="6" ry="4" fill="#ffe6a8" opacity=".7"/>
+     </g>
+     <ellipse cx="510" cy="646" rx="132" ry="10" fill="#070b12" opacity=".55"/>
+     <path d="M392 622 q8-40 44-44 h116 q32 4 42 44Z" fill="#12151c"/>
+     <path d="M414 600 q8-24 28-26 h96 q22 2 28 26Z" fill="#222a38"/>
+     <rect x="382" y="616" width="256" height="24" rx="10" fill="#191d26"/>
+     <circle cx="428" cy="642" r="18" fill="#0c0f14"/><circle cx="428" cy="642" r="7" fill="#6b7480"/>
+     <circle cx="592" cy="642" r="18" fill="#0c0f14"/><circle cx="592" cy="642" r="7" fill="#6b7480"/>
+     <g>
+       <circle cx="672" cy="574" r="15" fill="#161b24"/>
+       <path d="M650 636 q4-46 22-46 q18 0 22 46Z" fill="#1d232e"/>
+       <rect x="656" y="556" width="32" height="9" rx="3" fill="#2a3240"/>
+       <rect x="694" y="596" width="16" height="20" rx="3" fill="#c9b08a"/>
+       <rect x="700" y="590" width="14" height="18" rx="3" fill="#d8c3a0"/>
+     </g>
+   </g>`,
+];
+
 /* =====================================================================
    THE ENGAGEMENT METER
    A page on GitHub Pages cannot count its own players — there is no server to count with.
@@ -4989,7 +5300,7 @@ const LIFESTYLE_COST = [500, 1400, 3200];   // cost to reach tier 1, 2, 3
    enable: make a free account at goatcounter.com, then put the subdomain below.
        const GC_SITE = 'xraystar';     ->  loads xraystar.goatcounter.com
    ===================================================================== */
-const GC_SITE = '';            // <-- your GoatCounter subdomain goes here, nothing else
+const GC_SITE = 'glenpap';     // -> glenpap.goatcounter.com. Empty string switches it all off.
 
 const Metrics = {
   on() { return !!GC_SITE; },
@@ -5060,13 +5371,14 @@ const Save = {
       band: Object.assign({ guitar: 0, mic: 0, drums: 0, bass: 0 }, d.band || {}),
       bsidesSeen: d.bsidesSeen || 0,
       lifestyle: Object.assign({ ride: 0, threads: 0, crib: 0 }, d.lifestyle || {}),
+      josh: Object.assign({ toy: 0, bed: 0, treats: 0 }, d.josh || {}),
       relicUnlocked: !!d.relicUnlocked,
     };
     return this.data;
   },
   save() { Prefs.set('save', this.data); },
   reset() {
-    this.data = { unlocked: 1, stars: {}, coins: 0, band: { guitar: 0, mic: 0, drums: 0, bass: 0 }, bsidesSeen: 0, lifestyle: { ride: 0, threads: 0, crib: 0 }, relicUnlocked: false };
+    this.data = { unlocked: 1, stars: {}, coins: 0, band: { guitar: 0, mic: 0, drums: 0, bass: 0 }, bsidesSeen: 0, lifestyle: { ride: 0, threads: 0, crib: 0 }, josh: { toy: 0, bed: 0, treats: 0 }, relicUnlocked: false };
     this.save();
   },
   maxCleared() { const k = Object.keys(this.data.stars).map(Number); return k.length ? Math.max.apply(null, k) : 0; },
@@ -5098,6 +5410,15 @@ const Save = {
   canBuyLifestyle(key) { const c = this.lifestyleCost(key); return c != null && this.data.coins >= c; },
   buyLifestyle(key) { const c = this.lifestyleCost(key); if (c == null || this.data.coins < c) return false; this.data.coins -= c; this.data.lifestyle[key]++; this.save(); return true; },
   lifestyleTotal() { const l = this.data.lifestyle; return l.ride + l.threads + l.crib; },
+  joshOwns(key) { return !!(this.data.josh && this.data.josh[key]); },
+  joshCount() { const j = this.data.josh || {}; return (j.toy ? 1 : 0) + (j.bed ? 1 : 0) + (j.treats ? 1 : 0); },
+  buyJoshGear(key) {
+    const g = JOSH_GEAR.find(x => x.key === key);
+    if (!g || this.joshOwns(key) || this.data.coins < g.cost) return false;
+    this.data.coins -= g.cost; this.data.josh[key] = 1; this.save(); return true;
+  },
+  // he is wrecking a four-dollar mouse instead of the venue, and it shows up in the takings
+  joshBonus() { return this.joshCount() * 0.03; },
   fameBonus() { return this.lifestyleTotal() * 0.05; },        // the bigger they live, the more each win pays (+5% per lifestyle tier)
   fameLabel() { const t = this.lifestyleTotal(); return t >= 8 ? 'Superstars' : t >= 5 ? 'Living Large' : t >= 2 ? 'On the Rise' : t >= 1 ? 'Getting By' : 'Basement Days'; },
   canUpgrade(key) { const c = this.upgradeCost(key); return c != null && this.data.coins >= c; },
@@ -5113,7 +5434,7 @@ Save.load();
 function coinsForWin(levelN, stars, score, target) {
   const base = 80 + levelN * 16 + stars * 50;
   const overflow = Math.min(160, Math.floor(Math.max(0, score - target) / 1100) * 7);
-  return Math.round((base + overflow) * (1 + Save.bandBonus() + Save.fameBonus()));
+  return Math.round((base + overflow) * (1 + Save.bandBonus() + Save.fameBonus() + Save.joshBonus()));
 }
 function totalStars() { return Object.values(Save.data.stars).reduce((a, b) => a + b, 0); }
 
@@ -5966,7 +6287,20 @@ function buildJosh() {
     'Knocked a fog machine remote into the fog. It has not been seen since.',
     'Knocked a platinum record off a wall in a house with eleven bathrooms. Regrets nothing.',
   ];
-  const crime = CRIMES[Math.min(CRIMES.length - 1, Math.floor(cleared / 5))];
+  /* The redirected sheet. Same escalation, same six stages, same destination \u2014 he still
+     ends up taking a platinum record off a wall in a house with eleven bathrooms. What
+     changes is what he uses to do it, and what it costs the band. Never switched off. */
+  const REDIRECTED = [
+    'Knocked the toy mouse off the amp. Watched it fall. Made eye contact throughout.',
+    'Knocked the toy mouse into a full mug of tea. Fished it out. Did it again.',
+    'Carried the toy mouse up two flights of stairs to drop it down them.',
+    'Knocked the treat tin off the counter at the Crooked Knee. Ate the evidence.',
+    'Buried the toy mouse in the fog machine. The fog now has a bell in it.',
+    'Knocked a platinum record off a wall in a house with eleven bathrooms \u2014 using the toy mouse. Regrets nothing. Cost to replace: one toy mouse.',
+  ];
+  const stage = Math.min(CRIMES.length - 1, Math.floor(cleared / 5));
+  const tended = Save.joshCount() > 0;
+  const crime = (tended ? REDIRECTED : CRIMES)[stage];
   card.innerHTML =
       '<a class="josh-art" href="' + JOSH_SHOP_URL + '" target="_blank" rel="noopener"'
     + ' aria-label="Josh\u2019s merch shop" title="Josh">' + JOSH_SVG + '</a>'
@@ -5974,7 +6308,48 @@ function buildJosh() {
     +   '<div class="josh-name">Josh <span>Not in the band</span></div>'
     +   '<div class="josh-role">Attends every rehearsal. Has never once been asked to.</div>'
     +   '<div class="josh-crime"><b>Latest incident:</b> ' + crime + '</div>'
+    +   (tended ? '<div class="josh-saved">Redirected \u00b7 the band keeps '
+          + Math.round(Save.joshBonus() * 100) + '% more per set</div>' : '')
     + '</div>';
+  buildJoshShop();
+}
+
+/* His shop. Three things, bought once each, and each one turns up in the rooms \u2014 which
+   is the point: you go and look at what you bought him. */
+function buildJoshShop() {
+  let box = document.getElementById('joshShop');
+  const card = document.getElementById('joshCard');
+  if (!card) return;
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'joshShop';
+    box.className = 'josh-shop';
+    card.parentNode.insertBefore(box, card.nextSibling);
+  }
+  box.innerHTML = '<div class="josh-shop-head">Things For Josh</div>'
+    + '<div class="josh-shop-sub">He will not thank you. It still helps.</div>'
+    + JOSH_GEAR.map(g => {
+        const owned = Save.joshOwns(g.key);
+        const afford = Save.data.coins >= g.cost;
+        return '<div class="jg' + (owned ? ' owned' : '') + '">'
+          + '<div class="jg-ico">' + g.icon + '</div>'
+          + '<div class="jg-bd"><div class="jg-name">' + g.name
+          +   (owned ? ' <span class="jg-tag">bought</span>' : '') + '</div>'
+          + '<div class="jg-flavor">' + g.flavor + '</div></div>'
+          + (owned ? ''
+             : '<button class="jg-buy' + (afford ? '' : ' off') + '"' + (afford ? '' : ' disabled')
+               + ' onclick="buyJoshGear(\'' + g.key + '\')">\uD83E\uDE99 ' + g.cost.toLocaleString() + '</button>')
+          + '</div>';
+      }).join('');
+}
+
+function buyJoshGear(key) {
+  if (Save.buyJoshGear(key)) {
+    if (Sfx.coin) Sfx.coin(); else if (Sfx.tone) Sfx.tone(660, 0.12, 'sine', 0.16);
+    updateCoinDisplays();
+    buildBand();
+    try { applyVenue(Game.level); } catch (_) {}   // it appears in the room straight away
+  } else if (Sfx.tone) { Sfx.tone(180, 0.1, 'sine', 0.12); }
 }
 function buildLifestyle() {
   const grid = document.getElementById('lifestyleGrid');
@@ -6009,6 +6384,7 @@ function buyLifestyle(key) {
     if (Sfx.coin) Sfx.coin(); else if (Sfx.tone) Sfx.tone(660, 0.12, 'sine', 0.16);
     updateCoinDisplays();
     buildBand();
+    try { applyVenue(Game.level); } catch (_) {}   // the room they bought it for updates now
   } else if (Sfx.tone) { Sfx.tone(180, 0.1, 'sine', 0.12); }
 }
 function showBand() {
