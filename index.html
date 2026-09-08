@@ -649,7 +649,7 @@ body.v-club .club-fog{display:block;}
    about the point it hangs from, so the light moves with it exactly as a real one would. */
 .bulb-g{transform-box:view-box; transform-origin:304px 142px;}
 .pendant-g{transform-box:view-box; transform-origin:600px 0px;}
-.steve-g{transform-box:view-box; transform-origin:606px 726px;}
+.steve-g{transform-box:view-box; transform-origin:606px 726px;}   /* safe: that group has no transform attribute of its own */
 body.room-react .bulb-g{animation:room-swing 3.4s ease-in-out 2;}
 body.room-react .pendant-g{animation:room-swing 4.2s ease-in-out 2;}
 body.room-react .steve-g{animation:steve-howl 2.4s ease-in-out 1;}
@@ -2372,7 +2372,15 @@ const VENUE_ART = {
        which meant he simply was not there: Josh sat alone in a bed marked STEVE and the
        whole joke inverted. He is now a tan dog with a red collar, which reads instantly
        against this room, and slightly larger so he cannot be mistaken for another cat. -->
-  <g class="steve-g" transform="translate(606 700) scale(.8) translate(-606 -700)">
+  <!-- TWO groups on purpose, and this is the whole reason:
+       .steve-g is the thing the howl animation rotates, so it carries transform-origin.
+       In SVG the transform ATTRIBUTE and the CSS transform property are the same property,
+       so putting an origin on a group that already has a transform attribute silently
+       re-bases that attribute too — which threw Steve 137px below the bottom of the
+       picture and made it look as though Josh were sitting in his own bed.
+       So: outer group = animation only. Inner group = position only. Never both. -->
+  <g class="steve-g">
+  <g transform="translate(606 700) scale(.8) translate(-606 -700)">
     <ellipse cx="606" cy="724" rx="62" ry="13" fill="#0e090f" opacity=".6"/>
     <path d="M578 716 q-8-56 26-58 q30-2 32 34 q2 24-4 24Z" fill="#8a6144"/>
     <path d="M626 714 q26-4 34-26 q5-14-6-17 q-11-3-13 8" fill="none" stroke="#7a543a" stroke-width="11" stroke-linecap="round"/>
@@ -2393,6 +2401,7 @@ const VENUE_ART = {
     <g stroke="#c9542f" stroke-width="3" opacity=".45" fill="none" stroke-linecap="round">
       <path d="M606 626 q11 16 9 34"/><path d="M638 700 q10 6 12 14"/>
     </g>
+  </g>
   </g>
 
 
