@@ -948,6 +948,39 @@ body.v-club .club-smoke{display:block;}
 .advisory .adv-body{font-family:var(--sans); font-weight:700; font-size:.52rem; letter-spacing:.1em;
   color:#f2f2f2; line-height:1.45; text-transform:uppercase;}
 
+/* ===== THE TROPHY ROOM =====
+   Most of what a player buys they never actually see — the rooms are cropped hard on a
+   phone and the ride sits behind the board. So here it all is in one place, with the four
+   vehicles at a size you can look at. Locked items show as ghosts, because a thing you can
+   see the shape of is worth more than a thing you cannot see at all. */
+.tro-sec{margin-top:22px;}
+.tro-h{font-family:var(--serif); font-weight:700; font-size:1.02rem; color:var(--gold-hi); text-align:left;}
+.tro-sub{font-family:var(--mono); font-size:.55rem; letter-spacing:.13em; text-transform:uppercase;
+  color:var(--cream-low); margin:2px 0 10px; text-align:left;}
+.tro-rides{display:flex; gap:10px; overflow-x:auto; padding-bottom:6px; -webkit-overflow-scrolling:touch;}
+.tro-ride{flex:0 0 auto; width:172px; border:1px solid var(--line); border-radius:14px;
+  background:linear-gradient(170deg,#141a26,#0b0e16); padding:8px; position:relative;}
+.tro-ride svg{width:100%; height:104px; display:block;}
+.tro-ride .rn{font-family:var(--serif); font-weight:700; font-size:.8rem; color:var(--cream); margin-top:6px;}
+.tro-ride .rs{font-family:var(--mono); font-size:.5rem; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--gold-warm); margin-top:2px;}
+.tro-ride.locked{opacity:.42;}
+.tro-ride.locked .rs{color:var(--cream-low);}
+.tro-ride.owned{border-color:var(--gold-deep);}
+.tro-row{display:flex; align-items:center; gap:10px; padding:9px 0; border-top:1px solid var(--line); text-align:left;}
+.tro-row:first-of-type{border-top:none;}
+.tro-tick{flex:0 0 auto; width:22px; height:22px; border-radius:50%; display:flex; align-items:center;
+  justify-content:center; font-size:.7rem; border:1px solid var(--line); color:var(--cream-low);}
+.tro-row.has .tro-tick{background:var(--gold-hi); color:#10131c; border-color:var(--gold-hi);}
+.tro-nm{font-family:var(--serif); font-weight:700; font-size:.88rem; color:var(--cream);}
+.tro-row:not(.has) .tro-nm{color:var(--cream-low);}
+.tro-fl{font-size:.72rem; line-height:1.4; color:var(--cream-low); margin-top:1px;}
+.tro-stats{display:flex; gap:8px; flex-wrap:wrap; margin-top:6px;}
+.tro-stats div{flex:1 1 78px; background:var(--surface-low); border:1px solid var(--line);
+  border-radius:10px; padding:8px 6px;}
+.tro-stats .k{font-family:var(--mono); font-size:.48rem; letter-spacing:.12em; text-transform:uppercase; color:var(--cream-low);}
+.tro-stats .v{font-family:var(--serif); font-weight:700; font-size:1.02rem; color:var(--gold-hi); margin-top:2px;}
+
 /* ===== THE CURTAIN CALL — clearing set 30 =====
    Thirty sets earn more than the same card with the button relabelled. */
 .overlay .panel.finale{border-color:var(--gold-hi); box-shadow:0 0 0 1px rgba(255,224,138,.25), 0 30px 90px -30px rgba(0,0,0,.9);}
@@ -1250,7 +1283,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
         <a class="link" href="https://www.redbubble.com/shop/ap/172252421" target="_blank" rel="noopener">👕 Merch</a>
       </div>
       <div class="links-note">A little gift from the band. Have fun — then go give them a listen.</div>
-      <div class="build-stamp">Build B20 · counting</div>
+      <div class="build-stamp">Build B21 · balance</div>
       <div class="advisory" role="note" aria-label="Content advisory">
         <div class="adv-top">Advisory</div>
         <div class="adv-rule"></div>
@@ -1324,6 +1357,20 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
   </div>
 
   <!-- THE JOURNEY — level map / hub -->
+  <div class="journey" id="trophyScreen">
+    <div class="journey-inner">
+      <div class="j-head">
+        <div class="j-title">The Trophy Room</div>
+        <div class="j-coins" id="trophyCoins">🪙 0</div>
+      </div>
+      <div class="j-sub">Everything the band has to show for it.</div>
+      <div id="trophyBody"></div>
+      <div class="j-foot j-menu">
+        <button class="primary" onclick="hideTrophies()">← Back</button>
+      </div>
+    </div>
+  </div>
+
   <div class="journey" id="mapScreen">
     <div class="journey-inner">
       <div class="j-head">
@@ -1334,13 +1381,14 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
       <div class="j-foot j-menu">
         <button class="primary band-cta" onclick="showBand()">★ The Band</button>
         <button onclick="showBsides()" id="bsideBtn">♫ B-Sides</button>
+        <button onclick="showTrophies()">🏆 Trophy Room</button>
         <button onclick="showBackup()">⇅ Backup</button>
         <button onclick="newJourney(this)">⟲ New Game</button>
         <button onclick="backToTitle()">Title</button>
       </div>
       <div class="j-path" id="mapPath"></div>
       <div class="gauge">
-        <div class="build-stamp">Build B20 · counting</div>
+        <div class="build-stamp">Build B21 · balance</div>
         <div class="gauge-stats" id="gaugeStats"></div>
         <button class="like-btn" id="likeBtn" onclick="Game.like()">♥ Like this game</button>
       </div>
@@ -1480,17 +1528,22 @@ const SIZE = 6;
 const CELLS = SIZE * SIZE;
 const TYPES = ['guitar','drums','mic','piano','sax','bass'];
 
+/* DIFFICULTY, measured rather than guessed. Players reported walls at sets 14 and 29, and
+   the numbers agreed: target-per-move was 1409 at set 14 (a spike, arriving right after 13
+   also dropped to 22 moves), and set 29 was 3417 \u2014 the HARDEST set in the game, harder than
+   the finale at 3143. A difficulty curve that peaks one set before the end is a bug.
+   13 and 14 went to 24 moves, 29 to 26 moves and 79,000. Nothing else moved. */
 const LEVELS = [
   // Gentle on-ramp — early sets are very winnable so new fans get hooked,
   // then the climb tightens. Tuned for 6 instruments + win-at-target.
   {s:1,n:1,m:32,t:5000},{s:1,n:2,m:30,t:7000},{s:1,n:3,m:30,t:9000},{s:1,n:4,m:28,t:11000},
   {s:1,n:5,m:28,t:13000},{s:1,n:6,m:26,t:15000},{s:1,n:7,m:26,t:17000},{s:1,n:8,m:26,t:19000},
   {s:1,n:9,m:24,t:21000},{s:1,n:10,m:24,t:23000},{s:1,n:11,m:24,t:25000},{s:1,n:12,m:24,t:27000},
-  {s:1,n:13,m:22,t:29000},{s:1,n:14,m:22,t:31000},{s:1,n:15,m:24,t:34000},
+  {s:1,n:13,m:24,t:29000},{s:1,n:14,m:24,t:31000},{s:1,n:15,m:24,t:34000},
   {s:2,n:16,m:24,t:36000},{s:2,n:17,m:24,t:39000},{s:2,n:18,m:22,t:42000},{s:2,n:19,m:22,t:45000},
   {s:2,n:20,m:22,t:48000},{s:2,n:21,m:24,t:52000},{s:2,n:22,m:22,t:56000},{s:2,n:23,m:22,t:60000},
   {s:2,n:24,m:24,t:62000},{s:2,n:25,m:26,t:64000},{s:2,n:26,m:24,t:68000},{s:2,n:27,m:24,t:72000},
-  {s:2,n:28,m:24,t:76000},{s:2,n:29,m:24,t:82000},{s:2,n:30,m:28,t:88000}
+  {s:2,n:28,m:24,t:76000},{s:2,n:29,m:26,t:79000},{s:2,n:30,m:28,t:88000}
 ];
 const STAGE_NAME = {1:'Basement Dreamers', 2:'Coffee Shop Circuit'};
 
@@ -4445,7 +4498,8 @@ function showOverlay(won) {
       +   '<div><div class="k">Josh</div><div class="v">Still not in the band</div></div>'
       + '</div>';
     row.innerHTML = '';
-    mkBtn('Take a bow \u2605', true, () => { hideOverlay(); showMap(); });
+    mkBtn('\uD83C\uDFC6 Trophy Room', true, () => { hideOverlay(); showTrophies(); });
+    mkBtn('Take a bow \u2605', false, () => { hideOverlay(); showMap(); });
     mkBtn('\u21bb Play it again', false, () => { hideOverlay(); Game.newGame(); });
   }
   refreshUpgradeCues();
@@ -4592,18 +4646,26 @@ Game.newGame = function() {
   // Attempt 2 is a gentle leg-up (squeak by); by attempt 4 it's a barrage so you always get over the hump.
   Game.failsByLevel = Game.failsByLevel || {};
   const assist = Math.min(Game.failsByLevel[lv.n] || 0, 4);
-  Game.moves = lv.m + assist * 2; Game.target = lv.t; Game.score = 0; Game.combo = 0;
+  Game.moves = lv.m + assist * 3; Game.target = lv.t; Game.score = 0; Game.combo = 0;
   Game.startMoves = Game.moves; Game.movesAtWin = 0; Game.lowWarned = false; Game.resultShown = false;
   Game.selected = null; Game.busy = false; Game.ended = false;
   Game.dropCounter = 0;
   Tally.bump('started');
   Game.board = generateBoard();
-  seedStartingSpecials(2 + assist * 2 + Save.startSpecialBonus());   // 2 base + backup on retries + the band's investment payoff
+  // From the third attempt this is a genuine leg-up: +6 moves and six specials on the board
+  // before you touch it, rising to +12 and ten. Enough to get over a hump, not enough to
+  // hand you the set \u2014 nobody wants a cheap win, but nobody stays for a wall either.
+  seedStartingSpecials(2 + assist * 2 + Save.startSpecialBonus());
   Game.collected = {};                                       // COLLECT objective tally
   Game.cratesLeft = 0; Game.cratesTotal = 0;                 // CASES objective
   const obj = levelObj(lv);
   if (obj.k === 'crates') seedCrates(obj.need);
   applyVenue(lv.n);
+  // tell them help arrived, or it just feels like the game got randomly easier
+  if (assist >= 2) {
+    setMsg(assist >= 4 ? 'The crowd is behind you \u2014 the stage is loaded \u2605'
+                       : 'Another go, with a little help \u2605');
+  }
   // a new room? announce it loudly — backdrop already swapped, now the sound + a toast
   const vi = venueIndex(lv.n);
   if (vi !== Game.lastVenue) {
@@ -5115,12 +5177,15 @@ function capeArt() {
    is cheaper, and each thing he owns pays the band 3% more on every win because he is
    destroying a $4 mouse instead of the venue.
    ===================================================================== */
+/* Priced like actual cat things, not like guitars. At 400/900/1600 these cost as much as
+   band upgrades and blocked real progress, which is wrong: they are a small fun purchase,
+   not a strategic one. A toy mouse is four dollars. */
 const JOSH_GEAR = [
-  { key: 'toy',    icon: '\uD83D\uDC01', name: 'A Toy Mouse',        cost: 400,
+  { key: 'toy',    icon: '\uD83D\uDC01', name: 'A Toy Mouse',        cost: 75,
     flavor: 'Grey felt, one bell, no dignity. He will carry it to a different room every night and leave it exactly where you will step on it.' },
-  { key: 'bed',    icon: '\uD83D\uDECF\uFE0F', name: 'A Bed of His Own', cost: 900,
+  { key: 'bed',    icon: '\uD83D\uDECF\uFE0F', name: 'A Bed of His Own', cost: 250,
     flavor: 'So he has somewhere to sleep that is not the amp, the merch, or another animal. He will not use it. He will sleep beside it, touching it, to make a point.' },
-  { key: 'treats', icon: '\uD83C\uDF6A', name: 'The Good Treats',    cost: 1600,
+  { key: 'treats', icon: '\uD83C\uDF6A', name: 'The Good Treats',    cost: 120,
     flavor: 'The ones from behind the counter. Kat says they are extortionate. Kat buys them.' },
 ];
 
@@ -5431,9 +5496,14 @@ const Save = {
 Save.load();
 
 // coins earned for a win — rewards reaching deeper levels and finishing strong
+/* THE ECONOMY, measured. A perfect 3-star run used to earn 14,991 while everything in the
+   game cost 24,400 \u2014 so you could afford 61% of it, and most of what you bought you never
+   got to see. Payouts roughly doubled so a full run can buy everything BEFORE the last set,
+   with headroom. The band and fame bonuses stack on top, so a player who upgrades early
+   ends up comfortably clear. */
 function coinsForWin(levelN, stars, score, target) {
-  const base = 80 + levelN * 16 + stars * 50;
-  const overflow = Math.min(160, Math.floor(Math.max(0, score - target) / 1100) * 7);
+  const base = 120 + levelN * 30 + stars * 70;
+  const overflow = Math.min(260, Math.floor(Math.max(0, score - target) / 900) * 10);
   return Math.round((base + overflow) * (1 + Save.bandBonus() + Save.fameBonus() + Save.joshBonus()));
 }
 function totalStars() { return Object.values(Save.data.stars).reduce((a, b) => a + b, 0); }
@@ -5896,7 +5966,7 @@ const Peek = {
   clearSteps() { this.steps.forEach(t => clearTimeout(t)); this.steps = []; },
   // never open on top of another screen or a win/lose panel
   blocked() {
-    return ['overlay', 'mapScreen', 'bandScreen', 'bsideScreen', 'tutorial'].some(id => {
+    return ['overlay', 'mapScreen', 'bandScreen', 'bsideScreen', 'trophyScreen', 'tutorial'].some(id => {
       const el = document.getElementById(id);
       return el && el.classList.contains('show');
     }) || Game.atTitle === true;
@@ -6125,7 +6195,77 @@ function showMap() {
   if (Game.pendingBside) { Game.pendingBside = false; setTimeout(bsideToast, 360); }
 }
 function hideMap() { document.getElementById('mapScreen').classList.remove('show'); }
-function backToTitle() { hideMap(); document.getElementById('bandScreen').classList.remove('show'); showTitle(); }
+
+/* THE TROPHY ROOM. Reachable from the Journey map and from the curtain call. */
+const RIDE_FRAME = ['370 468 286 208', '356 468 324 210', '306 456 594 226', '366 246 366 428'];
+function showTrophies() {
+  Peek.cancel();
+  hideOverlay();
+  hideTitle();
+  document.getElementById('mapScreen').classList.remove('show');
+  document.getElementById('bandScreen').classList.remove('show');
+  buildTrophies();
+  document.getElementById('trophyScreen').classList.add('show');
+  Metrics.event('trophy-room');
+}
+function hideTrophies() {
+  document.getElementById('trophyScreen').classList.remove('show');
+  showMap();
+}
+function buildTrophies() {
+  const box = document.getElementById('trophyBody');
+  if (!box) return;
+  const cn = document.getElementById('trophyCoins');
+  if (cn) cn.textContent = '\uD83E\uDE99 ' + Save.data.coins.toLocaleString();
+  const rideTier = Save.lifestyleTier('ride');
+  const ride = LIFESTYLE.find(l => l.key === 'ride').tiers;
+  const crib = LIFESTYLE.find(l => l.key === 'crib').tiers;
+  const look = LIFESTYLE.find(l => l.key === 'threads').tiers;
+  const t = Tally.read();
+
+  let html = '<div class="tro-sec"><div class="tro-h">What They Drive</div>'
+    + '<div class="tro-sub">Hatchback to jet \u00b7 swipe across</div><div class="tro-rides">';
+  RIDE_ART.forEach((art, i) => {
+    const owned = i <= rideTier;
+    html += '<div class="tro-ride ' + (owned ? 'owned' : 'locked') + '">'
+      + '<svg viewBox="' + RIDE_FRAME[i] + '" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+      + art.split('__BAND__').join(gigFlyerBits(Math.max(1, Game.level || 1)).name) + '</svg>'
+      + '<div class="rn">' + ride[i].name + '</div>'
+      + '<div class="rs">' + (i < rideTier ? 'Traded up' : i === rideTier ? 'Current' : 'Locked') + '</div>'
+      + '</div>';
+  });
+  html += '</div></div>';
+
+  const rows = (title, sub, items) => {
+    let h = '<div class="tro-sec"><div class="tro-h">' + title + '</div><div class="tro-sub">' + sub + '</div>';
+    items.forEach(it => {
+      h += '<div class="tro-row' + (it.has ? ' has' : '') + '">'
+        + '<div class="tro-tick">' + (it.has ? '\u2713' : '\u00b7') + '</div>'
+        + '<div><div class="tro-nm">' + it.name + '</div><div class="tro-fl">' + it.flavor + '</div></div>'
+        + '</div>';
+    });
+    return h + '</div>';
+  };
+
+  html += rows('The Basement', 'They never left the room they started in',
+    [1, 2, 3].map(i => ({ has: Save.lifestyleTier('crib') >= i, name: crib[i].name, flavor: crib[i].flavor })));
+  html += rows('The Look', 'What they wear on stage',
+    [1, 2, 3].map(i => ({ has: Save.lifestyleTier('threads') >= i, name: look[i].name, flavor: look[i].flavor })));
+  html += rows('Things For Josh', 'He will not thank you',
+    JOSH_GEAR.map(g => ({ has: Save.joshOwns(g.key), name: g.name, flavor: g.flavor })));
+
+  html += '<div class="tro-sec"><div class="tro-h">The Numbers</div>'
+    + '<div class="tro-sub">Where it all got to</div><div class="tro-stats">'
+    + '<div><div class="k">Stars</div><div class="v">' + totalStars() + '</div></div>'
+    + '<div><div class="k">Furthest</div><div class="v">Set ' + Save.maxCleared() + '</div></div>'
+    + '<div><div class="k">Best set</div><div class="v">' + (t.best || 0).toLocaleString() + '</div></div>'
+    + '<div><div class="k">B-Sides</div><div class="v">' + Save.bsidesUnlocked() + '/' + BSIDES.length + '</div></div>'
+    + '<div><div class="k">Sets played</div><div class="v">' + t.started + '</div></div>'
+    + '<div><div class="k">Josh</div><div class="v">Still out</div></div>'
+    + '</div></div>';
+  box.innerHTML = html;
+}
+function backToTitle() { hideMap(); document.getElementById('bandScreen').classList.remove('show'); document.getElementById('trophyScreen').classList.remove('show'); showTitle(); }
 
 // In-game Replay: instant if the set hasn't really started or is already over,
 // otherwise ask first — a mid-set mis-tap used to wipe the whole set with no warning.
