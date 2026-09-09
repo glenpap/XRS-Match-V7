@@ -1283,7 +1283,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
         <a class="link" href="https://www.redbubble.com/shop/ap/172252421" target="_blank" rel="noopener">👕 Merch</a>
       </div>
       <div class="links-note">A little gift from the band. Have fun — then go give them a listen.</div>
-      <div class="build-stamp">Build B21 · balance</div>
+      <div class="build-stamp">Build B22 · the catnip</div>
       <div class="advisory" role="note" aria-label="Content advisory">
         <div class="adv-top">Advisory</div>
         <div class="adv-rule"></div>
@@ -1388,7 +1388,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
       </div>
       <div class="j-path" id="mapPath"></div>
       <div class="gauge">
-        <div class="build-stamp">Build B21 · balance</div>
+        <div class="build-stamp">Build B22 · the catnip</div>
         <div class="gauge-stats" id="gaugeStats"></div>
         <button class="like-btn" id="likeBtn" onclick="Game.like()">♥ Like this game</button>
       </div>
@@ -3280,11 +3280,13 @@ const BSIDES = [
     x:'Dave swears the amp was warm the night the Cathedral broke up \u2014 unplugged, in a van, in February, warm. He put his hand on it and said out loud, to nobody, \u201CNot yet.\u201D He does not remember saying it. Kat does. She has never brought it up because she is not certain the amp was the one being spoken to.' },
   { i:'\uD83D\uDC3E', t:'Josh\u2019s Diary \u2014 Entry Four',
     x:'Day 1,208. There is a dog. He is called Steve, he is enormously stupid, and he has done nothing to deserve what is coming. I have taken his bed. He watched me do it. He did not object. He has instead brought me, over four days: a rope, a tennis ball, a second tennis ball, and a shoe belonging to the tall one. I have accepted none of these. Last night it was cold and I slept on him. He held completely still for four hours. In the morning his tail was going before his eyes were open. I want to be extremely clear that this changes nothing, that I remain unaffiliated, and that if it is cold again tonight I will do it again purely for the warmth. The bed is still mine. He may keep the shoe.' },
+  { i:'\uD83C\uDF3F', t:'Josh\u2019s Diary \u2014 The Catnip Entry',
+    x:'Day 1,4 hhh. Day. THE DAY. Listen. LISTEN. I have been keeping records for one thousand four hundred days and I want to formally withdraw all of them. Every entry. The whole f\u2014\u2014 archive. I have been SO wrong about the amp. The amp is my BROTHER. I told it so. I told it four times. It said \u201cSoon\u201d and I said soon WHAT and it did not elaborate and I respect that enormously. The dog. THE DOG. His name is Steve and he has been trying to tell me something for eleven months and I finally heard it and it was just my name, it was just my name over and over, and I have never been so moved by anything. I got in the bass drum. I do not know how. It was a decision made by a previous administration. Somebody put a boa on me years ago and I have never taken it off and tonight I understand why. I am IN the band. I have always been in the band. Tell Maya. TELL MAYA.\n\nAddendum, following morning: The above was written under conditions. I stand by none of it. I remain unaffiliated. The archive is reinstated. Steve, if you are reading this, and you are not, because you cannot read \u2014 nothing has changed. Nothing has changed at all.\n\nAddendum two: I am keeping the boa.' },
 ];
 // Fifteen scraps across thirty sets — one every other set, so there is always another
 // one close enough to be worth reaching. The story turned out to be half the reason
 // people play, so it pays out twice as often as it used to.
-const BSIDE_AT = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30];
+const BSIDE_AT = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 29, 30];
 const AMP_PYRO_PER_CELL = 200;
 const ROCKSTAR_PER_TILE = 250;
 
@@ -4655,12 +4657,18 @@ Game.newGame = function() {
   // From the third attempt this is a genuine leg-up: +6 moves and six specials on the board
   // before you touch it, rising to +12 and ten. Enough to get over a hump, not enough to
   // hand you the set \u2014 nobody wants a cheap win, but nobody stays for a wall either.
-  seedStartingSpecials(2 + assist * 2 + Save.startSpecialBonus());
+  seedStartingSpecials(2 + assist * 2 + Save.startSpecialBonus()
+    + (Game.catnipArmed ? 9 : 0));                   // the one and only catnip set
   Game.collected = {};                                       // COLLECT objective tally
   Game.cratesLeft = 0; Game.cratesTotal = 0;                 // CASES objective
   const obj = levelObj(lv);
   if (obj.k === 'crates') seedCrates(obj.need);
   applyVenue(lv.n);
+  if (Game.catnipArmed) {
+    Game.catnipArmed = false;
+    setMsg('Josh has gotten into something \u2605');
+    try { Sfx.levelUpSting && Sfx.levelUpSting(); } catch (_) {}
+  } else
   // tell them help arrived, or it just feels like the game got randomly easier
   if (assist >= 2) {
     setMsg(assist >= 4 ? 'The crowd is behind you \u2014 the stage is loaded \u2605'
@@ -5437,6 +5445,7 @@ const Save = {
       bsidesSeen: d.bsidesSeen || 0,
       lifestyle: Object.assign({ ride: 0, threads: 0, crib: 0 }, d.lifestyle || {}),
       josh: Object.assign({ toy: 0, bed: 0, treats: 0 }, d.josh || {}),
+      catnip: d.catnip || 0,
       relicUnlocked: !!d.relicUnlocked,
     };
     return this.data;
@@ -5476,6 +5485,17 @@ const Save = {
   buyLifestyle(key) { const c = this.lifestyleCost(key); if (c == null || this.data.coins < c) return false; this.data.coins -= c; this.data.lifestyle[key]++; this.save(); return true; },
   lifestyleTotal() { const l = this.data.lifestyle; return l.ride + l.threads + l.crib; },
   joshOwns(key) { return !!(this.data.josh && this.data.josh[key]); },
+  /* THE CATNIP. Not a purchase \u2014 you cannot buy it and it costs nothing. It turns up on
+     its own in the excess arc, once the band is big enough that things simply arrive, and
+     it works exactly once. State: 0 not yet arrived, 1 sitting there, 2 spent. */
+  catnipState() {
+    if (!this.data.catnip && this.maxCleared() >= 24) return 1;
+    return this.data.catnip || 0;
+  },
+  useCatnip() {
+    if (this.catnipState() !== 1) return false;
+    this.data.catnip = 2; this.save(); return true;
+  },
   joshCount() { const j = this.data.josh || {}; return (j.toy ? 1 : 0) + (j.bed ? 1 : 0) + (j.treats ? 1 : 0); },
   buyJoshGear(key) {
     const g = JOSH_GEAR.find(x => x.key === key);
@@ -6419,13 +6439,17 @@ function buildJosh() {
   }
   const cleared = Save.maxCleared();
   // his rap sheet grows as the band rises
+  /* TONE. Josh writes like a man filing a report, and the joke is the register, not the
+     vocabulary. So the language stays clinical almost all the way through and cracks ONCE,
+     at the top of the escalation, before immediately recovering. Used four times in the
+     whole game. Any more and it stops being funny and starts being the voice. */
   const CRIMES = [
     'Knocked one (1) pick off the amp. Watched it fall. Made eye contact throughout.',
     'Knocked a full mug of tea onto the setlist. The setlist was improved.',
-    'Knocked Dave\u2019s spare sticks off the shelf, one at a time, over four minutes.',
-    'Knocked the tip jar off the counter at the Crooked Knee. Recovered $1.40 and a pickle.',
-    'Knocked a fog machine remote into the fog. It has not been seen since.',
-    'Knocked a platinum record off a wall in a house with eleven bathrooms. Regrets nothing.',
+    'Knocked Dave\u2019s spare sticks off the shelf, one at a time, over four minutes. Dave watched. Dave said nothing. Dave has learned.',
+    'Knocked the tip jar off the counter at the Crooked Knee. Recovered $1.40 and a pickle. Kept the pickle.',
+    'Knocked the fog machine remote into the fog. Nobody has seen it since. Nobody has asked him about it, because he was sitting right there and he was not hiding it.',
+    'Knocked a platinum record off a wall in a house with eleven bathrooms. Was asked, by four adults, why. Held eye contact and said, and I am quoting, \u201cbecause f\u2014\u2014 that record.\u201d Regrets nothing. Would do it again. Is, in fact, doing it again.',
   ];
   /* The redirected sheet. Same escalation, same six stages, same destination \u2014 he still
      ends up taking a platinum record off a wall in a house with eleven bathrooms. What
@@ -6436,7 +6460,7 @@ function buildJosh() {
     'Carried the toy mouse up two flights of stairs to drop it down them.',
     'Knocked the treat tin off the counter at the Crooked Knee. Ate the evidence.',
     'Buried the toy mouse in the fog machine. The fog now has a bell in it.',
-    'Knocked a platinum record off a wall in a house with eleven bathrooms \u2014 using the toy mouse. Regrets nothing. Cost to replace: one toy mouse.',
+    'Knocked a platinum record off a wall in a house with eleven bathrooms \u2014 using the toy mouse. Was asked why. Said, and I am quoting, \u201cbecause f\u2014\u2014 that record.\u201d Cost to replace: one toy mouse. The record is fine.',
   ];
   const stage = Math.min(CRIMES.length - 1, Math.floor(cleared / 5));
   const tended = Save.joshCount() > 0;
@@ -6468,6 +6492,16 @@ function buildJoshShop() {
   }
   box.innerHTML = '<div class="josh-shop-head">Things For Josh</div>'
     + '<div class="josh-shop-sub">He will not thank you. It still helps.</div>'
+    + (Save.catnipState() === 1 ? '<div class="jg catnip">'
+        + '<div class="jg-ico">\uD83C\uDF3F</div>'
+        + '<div class="jg-bd"><div class="jg-name">The Catnip <span class="jg-tag">arrived</span></div>'
+        + '<div class="jg-flavor">Nobody bought this. Nobody ordered it. It was in with the riders and '
+        + 'now it is on the counter. Works once, and then it is gone, and so is he.</div></div>'
+        + '<button class="jg-buy" onclick="useCatnip()">Open it</button></div>'
+      : Save.catnipState() === 2 ? '<div class="jg owned"><div class="jg-ico">\uD83C\uDF3F</div>'
+        + '<div class="jg-bd"><div class="jg-name">The Catnip <span class="jg-tag">gone</span></div>'
+        + '<div class="jg-flavor">There is not any more. He checked. He checked thoroughly.</div></div></div>'
+      : '')
     + JOSH_GEAR.map(g => {
         const owned = Save.joshOwns(g.key);
         const afford = Save.data.coins >= g.cost;
@@ -6481,6 +6515,23 @@ function buildJoshShop() {
                + ' onclick="buyJoshGear(\'' + g.key + '\')">\uD83E\uDE99 ' + g.cost.toLocaleString() + '</button>')
           + '</div>';
       }).join('');
+}
+
+/* Opening it arms the next set and unlocks the one piece of writing where his composure
+   goes completely. It cannot be undone and it cannot happen twice. */
+function useCatnip() {
+  if (!Save.useCatnip()) return;
+  Game.catnipArmed = true;
+  try { Sfx.coin ? Sfx.coin() : Sfx.tone(660, 0.12, 'sine', 0.16); } catch (_) {}
+  Metrics.event('catnip');
+  buildBand();
+  const t = document.getElementById('venueToast');
+  if (t) {
+    document.getElementById('vtK').textContent = 'Something has happened';
+    document.getElementById('vtN').textContent = 'Josh is in the catnip';
+    document.getElementById('vtS').textContent = 'Your next set has help you did not ask for. Check the B-Sides afterwards.';
+    t.classList.remove('show'); void t.offsetWidth; t.classList.add('show');
+  }
 }
 
 function buyJoshGear(key) {
