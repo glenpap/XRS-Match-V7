@@ -589,7 +589,7 @@ button.primary{background:linear-gradient(160deg,var(--gold),var(--gold-deep)); 
 .journey,.bandscreen{position:fixed; inset:0; z-index:80; display:none; overflow-y:auto;
   background:radial-gradient(140% 100% at 50% -10%, var(--bg-warm), var(--bg-deep) 70%); padding:24px 16px 40px;}
 .journey.show,.bandscreen.show{display:block;}
-/* ===== B-Sides ===== */
+/* ===== Liner Notes (the id stays bside* for save compatibility) ===== */
 .bside-list{display:flex; flex-direction:column; gap:12px;}
 .bside-card{display:flex; gap:14px; align-items:flex-start; text-align:left;
   background:linear-gradient(160deg,var(--surface),var(--surface-low)); border:1px solid var(--gold-deep);
@@ -948,6 +948,9 @@ body.v-club .club-smoke{display:block;}
 .advisory .adv-body{font-family:var(--sans); font-weight:700; font-size:.52rem; letter-spacing:.1em;
   color:#f2f2f2; line-height:1.45; text-transform:uppercase;}
 
+.trevor-line{margin-top:10px; padding-top:10px; border-top:1px solid var(--line);
+  font-family:var(--serif); font-style:italic; font-size:.84rem; line-height:1.5; color:var(--gold-warm);}
+
 /* ===== THE TROPHY ROOM =====
    Most of what a player buys they never actually see — the rooms are cropped hard on a
    phone and the ride sits behind the board. So here it all is in one place, with the four
@@ -975,6 +978,16 @@ body.v-club .club-smoke{display:block;}
 .tro-nm{font-family:var(--serif); font-weight:700; font-size:.88rem; color:var(--cream);}
 .tro-row:not(.has) .tro-nm{color:var(--cream-low);}
 .tro-fl{font-size:.72rem; line-height:1.4; color:var(--cream-low); margin-top:1px;}
+.tro-shelf{margin-top:12px;}
+.tro-who{font-family:var(--mono); font-size:.56rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--gold-warm); text-align:left; margin-bottom:6px;}
+.tro-ride.tro-gear{width:160px;}
+.tro-ride.tro-gear svg{height:96px;}
+.tro-cape{border:1px solid var(--gold-deep); border-radius:16px; padding:14px;
+  background:radial-gradient(circle at 50% 25%, #2a1a44, #120c1e);}
+.tro-cape svg{width:100%; max-width:230px; height:180px; display:block; margin:0 auto;}
+.tro-cape-note{font-family:var(--serif); font-style:italic; font-size:.8rem; line-height:1.5;
+  color:var(--cream-low); margin-top:10px; text-align:left;}
 .tro-stats{display:flex; gap:8px; flex-wrap:wrap; margin-top:6px;}
 .tro-stats div{flex:1 1 78px; background:var(--surface-low); border:1px solid var(--line);
   border-radius:10px; padding:8px 6px;}
@@ -1283,7 +1296,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
         <a class="link" href="https://www.redbubble.com/shop/ap/172252421" target="_blank" rel="noopener">👕 Merch</a>
       </div>
       <div class="links-note">A little gift from the band. Have fun — then go give them a listen.</div>
-      <div class="build-stamp">Build B24 · a formal complaint</div>
+      <div class="build-stamp">Build B28 · the gear wall</div>
       <div class="advisory" role="note" aria-label="Content advisory">
         <div class="adv-top">Advisory</div>
         <div class="adv-rule"></div>
@@ -1380,7 +1393,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
       <div class="j-sub" id="mapSub">From the basement to the bright lights — one set at a time.</div>
       <div class="j-foot j-menu">
         <button class="primary band-cta" onclick="showBand()">★ The Band</button>
-        <button onclick="showBsides()" id="bsideBtn">♫ B-Sides</button>
+        <button onclick="showBsides()" id="bsideBtn">♫ Liner Notes</button>
         <button onclick="showTrophies()">🏆 Trophy Room</button>
         <button onclick="showBackup()">⇅ Backup</button>
         <button onclick="newJourney(this)">⟲ New Game</button>
@@ -1388,7 +1401,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
       </div>
       <div class="j-path" id="mapPath"></div>
       <div class="gauge">
-        <div class="build-stamp">Build B24 · a formal complaint</div>
+        <div class="build-stamp">Build B28 · the gear wall</div>
         <div class="gauge-stats" id="gaugeStats"></div>
         <button class="like-btn" id="likeBtn" onclick="Game.like()">♥ Like this game</button>
       </div>
@@ -1435,7 +1448,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
     </div>
   </div>
 
-  <!-- B-SIDES — collectible lore vignettes -->
+  <!-- LINER NOTES — collectible lore vignettes -->
   <div class="bandscreen" id="bsideScreen">
     <div class="band-inner">
       <div class="band-topbar">
@@ -1443,7 +1456,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
         <div class="j-coins" id="bsideCount">0 / 8</div>
       </div>
       <div class="j-head">
-        <div class="j-title">B-Sides</div>
+        <div class="j-title">Liner Notes</div>
       </div>
       <div class="j-sub">Scraps from the world of X-Ray Star. Clear deeper levels to dig up more.</div>
       <div class="bside-list" id="bsideList"></div>
@@ -1451,7 +1464,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
     </div>
   </div>
 
-  <div class="venue-toast" id="bsideToast"><div class="vt-k">New B-Side unlocked</div><div class="vt-n" id="bsideToastN"></div><div class="vt-s">Tap \u266B B-Sides on the map to read it</div></div>
+  <div class="venue-toast" id="bsideToast"><div class="vt-k">New Liner Note unlocked</div><div class="vt-n" id="bsideToastN"></div><div class="vt-s">Tap \u266B Liner Notes on the map to read it</div></div>
 
 <script>
 "use strict";
@@ -3248,7 +3261,7 @@ const UNLOCK_INFO = {
   rockstar: { name:'X-Ray Star', icon:'★', how:'Match 5 to earn one. Fire it to clear EVERY tile of one instrument.' },
   bassdrop: { name:'Bass Drop',  icon:'✛', how:'Match 6 (or a big block) to earn one. Fire it to clear its whole row AND column at once.' },
 };
-// ===== B-SIDES — collectible lore vignettes, revealed as you climb the Journey =====
+// ===== LINER NOTES — collectible lore vignettes, revealed as you climb the Journey =====
 const BSIDES = [
   { i:'\uD83D\uDC3E', t:'Josh\u2019s Diary \u2014 Entry One',
     x:'Day 847. The loud ones have returned to my basement. I say mine because I was here first and because I have never once been asked to leave. They bring noise and, occasionally, pizza crusts. The small angry one plays the long instrument with four ropes. Her rhythm is acceptable. I have not told her this and I will not.' },
@@ -3270,6 +3283,8 @@ const BSIDES = [
     x:'To whom it concerns, and I have decided it concerns everyone.\n\nMy name is Steve. I am the dog at the Dive Bar. I am not employed there in any formal sense, but I have been present for every show since the pallets went down and I consider the arrangement settled.\n\nI wish to place several things on the record. The tall one who smells of batteries is my favourite, though I want it understood that I hold no rankings and that everyone is my favourite. The mailman and I have an understanding that I would characterise as warm. I met a chair once. I think about it.\n\nOn the matter of the cat. There is a cat in my bed. The bed has my name stitched into it. I am aware of this. He is aware of this. Neither of us has raised it and I have elected not to be the one who does.\n\nI have offered him, over four days: a rope, two tennis balls, and a shoe belonging to the tall one. He accepted none of them, which is his right. I would like the record to show that I did not stop offering.\n\nLast night it was cold and he slept on me. I held completely still for four hours. I did not sleep. I have never been happier in my life and I am not going to pretend otherwise for the sake of appearing dignified.\n\nOne further item, and then I am done. Somebody at the Crooked Knee said, within my hearing, that the band would not amount to anything. I heard it. I remember his coat. That is all I have to say about that.\n\nI howled on the bridge and they gave me a writing credit. I am told this is unusual. I would do it again.\n\nRespectfully, and with enormous feeling,\nSTEVE (good dog)' },
   { i:'\uD83D\uDCE2', t:'Steve \u2014 A Formal Complaint',
     x:'This is a separate document from my Statement and I would ask that it not be filed alongside it.\n\nOn Thursday I was dancing. I want to establish that first, because what happened afterwards depends on it. There was a bridge, the bridge has a part where the bass goes up, and I was dancing to it. Freely. In my own bed. In a bar where I am, and I cannot stress this enough, a fixture.\n\nA man laughed at me.\n\nNot with. AT. I know the difference. I have known the difference since I was nine months old.\n\nHe then asked \u2014 and I would like this preserved exactly \u2014 where I had learned to dance. Which is a question with only one purpose. Nobody has ever asked that sincerely in the history of the world. He then did an impression of me, for his friends, and I want the record to note that the impression was not accurate. There was a thing with the thumbs. I do not do a thing with the thumbs. My kicks are controlled and they go where I send them.\n\nDid I say something? No. I did not. And people will say that is the same as agreeing with him and those people were not there.\n\nWhat I did do was sit down beside him for ninety minutes. Not touching him. Just present. Looking slightly past him at the middle distance, the way you do. He left at half ten and he did not finish his drink and I want that in the record too.\n\nI have since been informed that the tall one, who was watching all of this, turned to Kat and said \u201cthat dog is holding a grudge.\u201d\n\nIt is not a grudge. A grudge is something you carry. This is something I am simply choosing not to put down.\n\nI would like an apology. I am not going to ask for one. That would defeat the entire point.\n\nSTEVE (good dog, wronged)' },
+  { i:'\uD83D\uDCCE', t:'Josh \u2014 Rebuttal, Filed In Response',
+    x:'Reference: the Formal Complaint of Thursday.\n\nI have read it. All of it. Twice, which I am not proud of.\n\nAs the only other party present, I am in a position to confirm or contest the record. I will confirm one item.\n\nHe does do a thing with the thumbs.\n\nThat is the entirety of my rebuttal. The remainder of the document I decline to contest \u2014 not because it is accurate, because it is not, the man did finish his drink \u2014 but because contesting it would require that I had been present, and I was not.\n\nAddendum: I was.\n\nAddendum two: I would like it entered into the record that I sat down on the other side of him first. Steve joined me. This reverses the entire narrative of the document above and I will not be expanding on it.\n\nAddendum three: the coat was terrible.\n\n\u2014 Josh, unaffiliated' },
   { i:'\uD83E\uDD41', t:'The Plasma Cathedral Drummer Situation',
     x:'Before Dave there were four drummers, and the band does not like to talk about it. Nigel left to \u201Cpursue ceramics.\u201D Baz was last seen entering a portable toilet at a festival in Reading and has not been seen since; his kit was still warm. The third one\u2019s name nobody can agree on \u2014 Maya says Terry, Jake swears it was a woman named Terry, and Kat maintains there was never a third drummer and that they are both thinking of a coat rack. The fourth lasted nine minutes. Dave has now been in the band longer than all of them combined and has been told none of this.' },
   { i:'\uD83E\uDD87', t:'Jake and the Thing on Stage',
@@ -3288,7 +3303,7 @@ const BSIDES = [
 // Fifteen scraps across thirty sets — one every other set, so there is always another
 // one close enough to be worth reaching. The story turned out to be half the reason
 // people play, so it pays out twice as often as it used to.
-const BSIDE_AT = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 27, 28, 29, 30];
+const BSIDE_AT = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 25, 26, 27, 28, 29, 30];
 const AMP_PYRO_PER_CELL = 200;
 const ROCKSTAR_PER_TILE = 250;
 
@@ -4481,7 +4496,22 @@ function showOverlay(won) {
     mkBtn('★ Band', false, () => { hideOverlay(); showBand(); }, 'band-cta');
     mkBtn('↻ Replay', false, () => { hideOverlay(); Game.newGame(); });
   } else {
-    mkBtn('↻ Try Again', true, () => { hideOverlay(); Game.newGame(); });
+    /* From the third attempt, help is OFFERED rather than applied. Some people want to
+       grind it out, and quietly making their game easier takes that away from them.
+       The choice sits on the retry button, where the decision already is. */
+    const fails = Game.failsByLevel[lv.n] || 0;
+    if (fails >= 2) {
+      const fl = document.getElementById('ovFlavor');
+      if (fl) fl.innerHTML += '<div class="trevor-line">Trevor has been watching from the desk. '
+        + 'He has seen this before. He says he can set the stage for you, if you want it.</div>';
+      /* The help is Trevor. He already exists — the sound guy at the Crooked Knee who has
+         heard everything since 1987, whose entire character is fetching you the gear you
+         did not ask for. "Try again, with help" is menu language; this is the game's own. */
+      mkBtn('↻ Let Trevor set up ★', true, () => { Game.wantHelp = true; hideOverlay(); Game.newGame(); });
+      mkBtn('↻ Go again, on your own', false, () => { Game.wantHelp = false; hideOverlay(); Game.newGame(); });
+    } else {
+      mkBtn('↻ Try Again', true, () => { hideOverlay(); Game.newGame(); });
+    }
     mkBtn('☰ Menu', false, () => { hideOverlay(); showMap(); });
   }
   if (finale) {
@@ -4649,7 +4679,9 @@ Game.newGame = function() {
   // COMEBACK ASSIST — each failed attempt at this level adds moves and seeds more specials.
   // Attempt 2 is a gentle leg-up (squeak by); by attempt 4 it's a barrage so you always get over the hump.
   Game.failsByLevel = Game.failsByLevel || {};
-  const assist = Math.min(Game.failsByLevel[lv.n] || 0, 4);
+  // help only arrives if they asked for it on the retry button
+  const assist = Game.wantHelp ? Math.min(Game.failsByLevel[lv.n] || 0, 4) : 0;
+  Game.wantHelp = false;
   Game.moves = lv.m + assist * 3; Game.target = lv.t; Game.score = 0; Game.combo = 0;
   Game.startMoves = Game.moves; Game.movesAtWin = 0; Game.lowWarned = false; Game.resultShown = false;
   Game.selected = null; Game.busy = false; Game.ended = false;
@@ -4666,15 +4698,12 @@ Game.newGame = function() {
   const obj = levelObj(lv);
   if (obj.k === 'crates') seedCrates(obj.need);
   applyVenue(lv.n);
-  if (Game.catnipArmed) {
+  /* The catnip set. This flag is consumed here, but the MESSAGE is set further down \u2014
+     everything set here is overwritten by the setMsg near the end of this function. */
+  const catnipSet = Game.catnipArmed;
+  if (catnipSet) {
     Game.catnipArmed = false;
-    setMsg('Josh has gotten into something \u2605');
     try { Sfx.levelUpSting && Sfx.levelUpSting(); } catch (_) {}
-  } else
-  // tell them help arrived, or it just feels like the game got randomly easier
-  if (assist >= 2) {
-    setMsg(assist >= 4 ? 'The crowd is behind you \u2014 the stage is loaded \u2605'
-                       : 'Another go, with a little help \u2605');
   }
   // a new room? announce it loudly — backdrop already swapped, now the sound + a toast
   const vi = venueIndex(lv.n);
@@ -4692,7 +4721,13 @@ Game.newGame = function() {
   levelIntroVenue(lv.n, v.name);
   setFeaturedLink(lv.n);
   updateCoinDisplays();
-  setMsg(assist > 0 ? (assist >= 3 ? 'The band brought the WHOLE arsenal — go get \u2019em! \uD83C\uDF86' : 'The band brought backup. Break a leg! \uD83C\uDFB8') : '');   // goal is shown up top; keep the bottom clear
+  // Trevor's line from set 5, paid back every time somebody takes him up on it.
+  // NOTE: this is the setMsg that survives — anything set earlier in startLevel is
+  // overwritten right here. Do not add a second one above it.
+  setMsg(catnipSet    ? 'Josh has gotten into something \u2605'
+       : assist >= 4  ? 'Trevor brought the whole rig \u2605'
+       : assist > 0   ? 'Trevor got the second mic \u2605'
+       : '');                                    // goal is shown up top; keep the bottom clear
   if (typeof window !== 'undefined' && window.scrollTo) { try { window.scrollTo(0, 0); } catch (_) {} }
 };
 
@@ -5092,6 +5127,156 @@ const GEAR = {
   drums:  ['Snare & Three Sticks', 'Secondhand 4-Piece', 'Pro Maple Kit', 'Custom Monster Kit'],
   bass:   ['Two-String Hand-Me-Down', 'Precision Bass', 'Boutique 5-String', 'Custom Thunderbird'],
 };
+
+/* =====================================================================
+   THE GEAR WALL
+   Sixteen instruments, one per tier. Musicians look at gear \u2014 that is the whole hobby \u2014
+   and until now the band's upgrades were four words on a card. Each is drawn as a
+   recognisable silhouette rather than a photo: the shape of a slab-body Tele, the reverse
+   body of a Thunderbird, a ribbon mic's rectangle. Enough that a player who owns one
+   recognises it instantly, and a player who does not still sees the thing get better.
+   ===================================================================== */
+const GEAR_ART = {
+  guitar: [
+    /* Pawn-Shop Six-String \u2014 nothing on it matches */
+    `<g><path d="M62 96 q-24 0-24-22 q0-20 22-22 q-12-14 4-22 q16-8 30 4 l44-30 6 9 -44 30 q10 16-2 28 q-14 14-36 25Z" fill="#6b5a3e"/>
+      <rect x="112" y="24" width="58" height="7" rx="3" transform="rotate(-34 112 24)" fill="#3e3225"/>
+      <rect x="150" y="4" width="16" height="13" rx="2" transform="rotate(-34 150 4)" fill="#2a2119"/>
+      <rect x="70" y="52" width="16" height="9" fill="#4a4a52"/><circle cx="56" cy="80" r="4" fill="#3a2f22"/>
+      <circle cx="72" cy="86" r="3.4" fill="#8a7a4a"/><path d="M46 66 q10 4 8 12" stroke="#c9b98a" stroke-width="1.6" fill="none"/>
+      <rect x="88" y="70" width="15" height="11" rx="2" fill="#a94b3a" opacity=".8"/></g>`,
+    /* Used Les Paul \u2014 single cut, gold top */
+    `<g><path d="M64 100 q-28 0-28-26 q0-24 26-26 q-4-18 14-22 q20-4 30 10 l46-32 6 9 -46 32 q8 20-6 30 q-16 12-42 25Z" fill="#c9a14a"/>
+      <path d="M64 100 q-28 0-28-26 q0-24 26-26" fill="none" stroke="#8a6a2a" stroke-width="3"/>
+      <rect x="118" y="26" width="52" height="8" rx="3" transform="rotate(-34 118 26)" fill="#3a281a"/>
+      <rect x="154" y="4" width="17" height="14" rx="2" transform="rotate(-34 154 4)" fill="#241a12"/>
+      <rect x="66" y="50" width="20" height="11" rx="2" fill="#d8d2c0"/><rect x="66" y="70" width="20" height="11" rx="2" fill="#d8d2c0"/>
+      <circle cx="52" cy="86" r="4" fill="#e8dfc4"/><circle cx="66" cy="92" r="4" fill="#e8dfc4"/>
+      <rect x="92" y="60" width="26" height="7" rx="2" fill="#3a281a"/></g>`,
+    /* Custom Telecaster \u2014 slab body, one cutaway */
+    `<g><path d="M56 98 q-22 0-22-24 q0-22 22-24 h20 q-6-16 10-18 q18-2 24 12 l48-32 6 9 -48 32 v45 q-30 0-60 0Z" fill="#d9a94a"/>
+      <path d="M56 50 h64 v48 h-64Z" fill="#d9a94a"/>
+      <path d="M64 54 q28-4 48 2 v40 q-24 6-48 2Z" fill="#1a1a1e"/>
+      <rect x="122" y="26" width="50" height="8" rx="2" transform="rotate(-34 122 26)" fill="#c9a96a"/>
+      <rect x="156" y="6" width="16" height="13" rx="2" transform="rotate(-34 156 6)" fill="#b09048"/>
+      <rect x="70" y="62" width="9" height="24" fill="#c9ccd2"/><rect x="100" y="58" width="20" height="9" rx="2" fill="#c9ccd2"/>
+      <circle cx="112" cy="88" r="4" fill="#e8e2d0"/></g>`,
+    /* One-Off Signature Axe \u2014 pointed, flamed, entirely unreasonable */
+    `<g><path d="M30 104 l26-40 -18-14 34-6 -6-20 30 16 8-14 12 22 44-30 6 9 -46 32 4 24 -30-8 -12 26 -20-18 -32 25Z" fill="#a8322e"/>
+      <path d="M52 68 l30-18 14 24 -30 18Z" fill="#e0603a" opacity=".7"/>
+      <rect x="122" y="26" width="52" height="7" rx="2" transform="rotate(-34 122 26)" fill="#1c1a20"/>
+      <rect x="158" y="5" width="16" height="13" rx="2" transform="rotate(-34 158 5)" fill="#12101a"/>
+      <rect x="64" y="60" width="18" height="10" rx="2" fill="#e8c46a"/><rect x="58" y="78" width="18" height="10" rx="2" fill="#e8c46a"/>
+      <circle cx="46" cy="92" r="3.4" fill="#e8c46a"/></g>`,
+  ],
+  mic: [
+    /* Borrowed Karaoke Mic \u2014 came free with something */
+    `<g><ellipse cx="100" cy="34" rx="20" ry="19" fill="#b9bcc2"/>
+      <g stroke="#8a8d94" stroke-width="1.6"><path d="M84 28 H116 M84 34 H116 M84 40 H116"/></g>
+      <rect x="92" y="50" width="16" height="46" rx="6" fill="#2e2e34"/>
+      <rect x="92" y="58" width="16" height="5" fill="#c9302c"/>
+      <path d="M100 96 q0 22-20 26 q-22 4-22-14" fill="none" stroke="#3a3a42" stroke-width="4"/>
+      <path d="M58 108 q-8 0-8 8 q0 8 8 8" fill="none" stroke="#3a3a42" stroke-width="4"/></g>`,
+    /* Dynamic Stage Mic \u2014 the one every stage has */
+    `<g><ellipse cx="100" cy="32" rx="21" ry="20" fill="#4a4d55"/>
+      <g stroke="#2c2f36" stroke-width="1.8"><path d="M83 24 H117 M83 32 H117 M83 40 H117 M92 15 V49 M108 15 V49"/></g>
+      <rect x="90" y="50" width="20" height="52" rx="5" fill="#22242a"/>
+      <rect x="90" y="60" width="20" height="4" fill="#5a5d66"/>
+      <rect x="88" y="100" width="24" height="8" rx="3" fill="#33363d"/>
+      <path d="M100 108 q2 20-16 26" fill="none" stroke="#2c2f36" stroke-width="4"/></g>`,
+    /* Studio Condenser \u2014 with the shockmount, obviously */
+    `<g><ellipse cx="100" cy="42" rx="24" ry="30" fill="#d0d3d8"/>
+      <ellipse cx="100" cy="42" rx="17" ry="23" fill="#7d8189"/>
+      <g stroke="#5a5e66" stroke-width="1.4"><path d="M84 30 H116 M84 42 H116 M84 54 H116"/></g>
+      <rect x="90" y="70" width="20" height="20" rx="3" fill="#33363d"/>
+      <path d="M62 20 q-14 34 0 74 M138 20 q14 34 0 74" fill="none" stroke="#9aa0a8" stroke-width="4"/>
+      <g stroke="#c9ccd2" stroke-width="2.4"><path d="M62 34 L88 40 M62 60 L88 56 M138 34 L112 40 M138 60 L112 56"/></g>
+      <rect x="86" y="94" width="28" height="9" rx="3" fill="#44474f"/></g>`,
+    /* Vintage Ribbon Mic \u2014 art deco, heavier than it looks */
+    `<g><rect x="76" y="12" width="48" height="70" rx="10" fill="#b08f4a"/>
+      <rect x="83" y="20" width="34" height="54" rx="7" fill="#2a2620"/>
+      <g stroke="#8a7238" stroke-width="1.8"><path d="M83 30 H117 M83 40 H117 M83 50 H117 M83 60 H117"/></g>
+      <rect x="88" y="82" width="24" height="14" rx="3" fill="#8a7238"/>
+      <path d="M100 96 v14" stroke="#5c4c24" stroke-width="5"/>
+      <ellipse cx="100" cy="114" rx="22" ry="6" fill="#6b5a2c"/>
+      <circle cx="100" cy="28" r="4" fill="#e8c46a"/></g>`,
+  ],
+  drums: [
+    /* Snare & Three Sticks \u2014 this is the whole kit */
+    `<g><ellipse cx="88" cy="52" rx="40" ry="11" fill="#c9ccd2"/>
+      <path d="M48 52 v22 q40 12 80 0 v-22" fill="#8a8d94"/>
+      <ellipse cx="88" cy="52" rx="34" ry="8" fill="#e8e6e0"/>
+      <g stroke="#5a5d66" stroke-width="2"><path d="M52 56 v18 M70 60 v18 M106 60 v18 M124 56 v18"/></g>
+      <g stroke="#6b6f78" stroke-width="4"><path d="M60 76 L40 116 M116 76 L136 116 M88 78 v38"/></g>
+      <g stroke="#b08f4a" stroke-width="3.4" stroke-linecap="round"><path d="M140 30 L168 92 M150 28 L176 90 M160 26 L184 88"/></g></g>`,
+    /* Secondhand 4-Piece \u2014 nothing matches, everything works */
+    `<g><circle cx="72" cy="86" r="34" fill="#5b3b2a"/><circle cx="72" cy="86" r="26" fill="#e8e2d4"/>
+      <circle cx="72" cy="86" r="7" fill="#3a2a1e"/>
+      <ellipse cx="126" cy="60" rx="22" ry="7" fill="#7a4d33"/><path d="M104 60 v18 q22 8 44 0 v-18" fill="#5b3b2a"/>
+      <ellipse cx="126" cy="60" rx="18" ry="5" fill="#ded8ca"/>
+      <ellipse cx="42" cy="46" rx="18" ry="6" fill="#6b4a35"/><path d="M24 46 v14 q18 6 36 0 v-14" fill="#4d3324"/>
+      <ellipse cx="42" cy="46" rx="14" ry="4" fill="#ded8ca"/>
+      <g stroke="#8a8d94" stroke-width="3"><path d="M158 34 v52 M20 24 v34"/></g>
+      <ellipse cx="158" cy="32" rx="24" ry="5" fill="#c9a14a"/>
+      <ellipse cx="20" cy="22" rx="19" ry="4" fill="#c9a14a"/></g>`,
+    /* Pro Maple Kit \u2014 matched shells, and it shows */
+    `<g><circle cx="70" cy="88" r="36" fill="#8a3f2a"/><circle cx="70" cy="88" r="28" fill="#efe9dc"/>
+      <circle cx="70" cy="88" r="7" fill="#2e1d14"/>
+      <g fill="#a04a30"><ellipse cx="118" cy="52" rx="20" ry="6"/><ellipse cx="152" cy="66" rx="17" ry="5"/></g>
+      <path d="M98 52 v16 q20 7 40 0 v-16" fill="#8a3f2a"/><path d="M135 66 v14 q17 6 34 0 v-14" fill="#8a3f2a"/>
+      <ellipse cx="118" cy="52" rx="16" ry="4" fill="#efe9dc"/><ellipse cx="152" cy="66" rx="13" ry="3.4" fill="#efe9dc"/>
+      <ellipse cx="34" cy="60" rx="19" ry="6" fill="#a04a30"/><path d="M15 60 v16 q19 6 38 0 v-16" fill="#8a3f2a"/>
+      <ellipse cx="34" cy="60" rx="15" ry="4" fill="#efe9dc"/>
+      <g stroke="#8a8d94" stroke-width="3"><path d="M176 26 v58 M14 22 v34 M96 20 v40"/></g>
+      <ellipse cx="176" cy="24" rx="24" ry="5" fill="#d8b45c"/><ellipse cx="14" cy="20" rx="20" ry="4" fill="#d8b45c"/>
+      <ellipse cx="96" cy="18" rx="22" ry="5" fill="#d8b45c"/></g>`,
+    /* Custom Monster Kit \u2014 two kicks and a moral question */
+    `<g><circle cx="52" cy="90" r="30" fill="#241a30"/><circle cx="52" cy="90" r="23" fill="#efe9dc"/>
+      <circle cx="118" cy="90" r="30" fill="#241a30"/><circle cx="118" cy="90" r="23" fill="#efe9dc"/>
+      <circle cx="52" cy="90" r="6" fill="#150f1e"/><circle cx="118" cy="90" r="6" fill="#150f1e"/>
+      <g fill="#33254a"><ellipse cx="30" cy="52" rx="17" ry="5"/><ellipse cx="85" cy="44" rx="18" ry="5"/><ellipse cx="140" cy="52" rx="17" ry="5"/><ellipse cx="172" cy="62" rx="15" ry="4.4"/></g>
+      <path d="M13 52 v14 q17 5 34 0 v-14" fill="#241a30"/><path d="M67 44 v15 q18 5 36 0 v-15" fill="#241a30"/>
+      <path d="M123 52 v14 q17 5 34 0 v-14" fill="#241a30"/><path d="M157 62 v12 q15 4 30 0 v-12" fill="#241a30"/>
+      <g fill="#efe9dc"><ellipse cx="30" cy="52" rx="13" ry="3.4"/><ellipse cx="85" cy="44" rx="14" ry="3.6"/><ellipse cx="140" cy="52" rx="13" ry="3.4"/><ellipse cx="172" cy="62" rx="11" ry="3"/></g>
+      <g stroke="#8a8d94" stroke-width="2.6"><path d="M8 26 v30 M60 16 v26 M112 14 v26 M190 30 v34"/></g>
+      <g fill="#e8c46a"><ellipse cx="8" cy="24" rx="17" ry="4"/><ellipse cx="60" cy="14" rx="20" ry="4.4"/><ellipse cx="112" cy="12" rx="22" ry="4.6"/><ellipse cx="190" cy="28" rx="16" ry="3.8"/></g></g>`,
+  ],
+  bass: [
+    /* Two-String Hand-Me-Down \u2014 two strings is enough for most songs */
+    `<g><path d="M60 100 q-26 0-26-25 q0-22 24-24 q-8-16 8-21 q18-6 28 8 l46-31 6 9 -46 31 q8 18-6 28 q-16 12-34 25Z" fill="#5a4a3a"/>
+      <rect x="118" y="24" width="56" height="8" rx="3" transform="rotate(-34 118 24)" fill="#3a2f24"/>
+      <rect x="156" y="2" width="17" height="14" rx="2" transform="rotate(-34 156 2)" fill="#2a2119"/>
+      <g stroke="#c9b98a" stroke-width="1.6"><path d="M50 74 L152 12 M56 82 L158 20"/></g>
+      <rect x="66" y="58" width="18" height="10" rx="2" fill="#4a4a52"/>
+      <rect x="52" y="86" width="20" height="12" rx="2" fill="#8a8a92" opacity=".7"/>
+      <path d="M78 88 h22 v6 h-22Z" fill="#a9a06a" opacity=".8"/></g>`,
+    /* Precision Bass \u2014 the one on most records ever made */
+    `<g><path d="M58 102 q-28 0-28-26 q0-23 26-25 q-6-18 12-22 q20-4 28 10 l48-32 6 9 -48 32 q8 20-6 30 q-16 12-38 24Z" fill="#c9503a"/>
+      <path d="M64 56 q30-6 46 4 v34 q-26 8-46 2Z" fill="#e8e2d0"/>
+      <rect x="122" y="24" width="54" height="9" rx="3" transform="rotate(-34 122 24)" fill="#c9a96a"/>
+      <rect x="160" y="2" width="18" height="15" rx="2" transform="rotate(-34 160 2)" fill="#c9503a"/>
+      <rect x="72" y="62" width="24" height="10" rx="2" fill="#2a2a30"/><rect x="86" y="76" width="24" height="10" rx="2" fill="#2a2a30"/>
+      <circle cx="52" cy="90" r="4" fill="#d8d2c0"/><circle cx="66" cy="96" r="4" fill="#d8d2c0"/></g>`,
+    /* Boutique 5-String \u2014 natural wood, five tuners, quietly expensive */
+    `<g><path d="M58 102 q-28 0-28-26 q0-23 26-25 q-6-18 12-22 q20-4 28 10 l48-32 6 9 -48 32 q8 20-6 30 q-16 12-38 24Z" fill="#a87c48"/>
+      <path d="M58 102 q-28 0-28-26 q0-23 26-25" fill="none" stroke="#7a5630" stroke-width="3"/>
+      <path d="M40 70 q30-14 60-30" fill="none" stroke="#c9a870" stroke-width="6" opacity=".5"/>
+      <rect x="122" y="24" width="54" height="9" rx="3" transform="rotate(-34 122 24)" fill="#3a2a1a"/>
+      <rect x="160" y="2" width="18" height="15" rx="2" transform="rotate(-34 160 2)" fill="#5a4028"/>
+      <g fill="#c9ccd2"><circle cx="168" cy="6" r="3"/><circle cx="174" cy="12" r="3"/><circle cx="163" cy="14" r="3"/><circle cx="169" cy="20" r="3"/><circle cx="158" cy="22" r="3"/></g>
+      <rect x="74" y="62" width="26" height="9" rx="2" fill="#1e1e24"/><rect x="86" y="76" width="26" height="9" rx="2" fill="#1e1e24"/>
+      <g fill="#e8c46a"><circle cx="52" cy="90" r="3.4"/><circle cx="64" cy="96" r="3.4"/><circle cx="76" cy="99" r="3.4"/></g></g>`,
+    /* Custom Thunderbird \u2014 reverse body, all angles */
+    `<g><path d="M34 104 l18-34 -10-14 30-4 4-18 26 12 46-32 6 9 -46 32 6 22 -26 4 -8 20 -24-12Z" fill="#3a2418"/>
+      <path d="M52 70 l30-16 12 20 -30 16Z" fill="#5c3a22" opacity=".8"/>
+      <rect x="122" y="24" width="54" height="8" rx="3" transform="rotate(-34 122 24)" fill="#2a1a10"/>
+      <rect x="160" y="2" width="18" height="14" rx="2" transform="rotate(-34 160 2)" fill="#1a100a"/>
+      <rect x="70" y="58" width="26" height="10" rx="2" fill="#c9ccd2"/><rect x="60" y="76" width="26" height="10" rx="2" fill="#c9ccd2"/>
+      <g fill="#c9a14a"><circle cx="46" cy="92" r="3.4"/><circle cx="58" cy="98" r="3.4"/></g>
+      <path d="M96 46 l14-8 6 10 -14 8Z" fill="#e8c46a" opacity=".8"/></g>`,
+  ],
+};
+
 const UPGRADE_COST = [200, 450, 900];                                // cost to reach tier 1, 2, 3
 // "The Good Life" — pure status/flavor purchases that show the band's rise. Tier 0 is where everyone starts (free).
 const LIFESTYLE = [
@@ -6269,6 +6454,29 @@ function buildTrophies() {
     return h + '</div>';
   };
 
+  /* THE GEAR WALL. Musicians look at gear; that is the hobby. Four members, four tiers
+     each, drawn rather than named. Locked ones stay visible as ghosts because seeing the
+     Thunderbird you have not bought yet is the entire reason to keep going. */
+  html += '<div class="tro-sec"><div class="tro-h">The Gear</div>'
+    + '<div class="tro-sub">What they play \u00b7 swipe across each shelf</div>';
+  BAND.forEach(mb => {
+    const tier = Save.memberTier(mb.key);
+    const names = GEAR[mb.key], art = GEAR_ART[mb.key] || [];
+    html += '<div class="tro-shelf"><div class="tro-who">' + mb.name + ' \u00b7 ' + mb.role + '</div>'
+      + '<div class="tro-rides">';
+    names.forEach((nm, i) => {
+      const owned = i <= tier;
+      html += '<div class="tro-ride tro-gear ' + (owned ? 'owned' : 'locked') + '">'
+        + '<svg viewBox="0 0 200 130" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+        + (art[i] || '') + '</svg>'
+        + '<div class="rn">' + nm + '</div>'
+        + '<div class="rs">' + (i < tier ? 'Retired' : i === tier ? 'Playing now' : 'Locked') + '</div>'
+        + '</div>';
+    });
+    html += '</div></div>';
+  });
+  html += '</div>';
+
   html += rows('The Basement', 'They never left the room they started in',
     [1, 2, 3].map(i => ({ has: Save.lifestyleTier('crib') >= i, name: crib[i].name, flavor: crib[i].flavor })));
   html += rows('The Look', 'What they wear on stage',
@@ -6276,12 +6484,39 @@ function buildTrophies() {
   html += rows('Things For Josh', 'He will not thank you',
     JOSH_GEAR.map(g => ({ has: Save.joshOwns(g.key), name: g.name, flavor: g.flavor })));
 
+  /* THE CAPE. It is technically inside the tier-3 threads purchase, but in the fiction
+     nobody bought it and nobody has ever explained it. So it gets its own plinth. */
+  if (Save.lifestyleTier('threads') >= 3) {
+    html += '<div class="tro-sec"><div class="tro-h">The Cape</div>'
+      + '<div class="tro-sub">Nobody bought this</div>'
+      + '<div class="tro-cape">'
+      + '<svg viewBox="0 0 220 190" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+      +   '<ellipse cx="110" cy="176" rx="86" ry="10" fill="#000" opacity=".35"/>'
+      +   '<path d="M110 18 q-16 0-18 12 l-64 132 q82 26 164 0 l-64-132 q-2-12-18-12Z" fill="#5b2a94"/>'
+      +   '<path d="M110 18 q-16 0-18 12 l-64 132 q82 26 164 0 l-64-132 q-2-12-18-12Z" fill="none" stroke="#ffe08a" stroke-width="4"/>'
+      +   '<path d="M92 30 q18 10 36 0" fill="none" stroke="#ffe08a" stroke-width="5"/>'
+      +   '<path d="M60 116 q50 20 100 0" fill="none" stroke="#8a54c9" stroke-width="3" opacity=".8"/>'
+      +   '<path d="M44 148 q66 24 132 0" fill="none" stroke="#8a54c9" stroke-width="3" opacity=".8"/>'
+      +   '<g fill="#fff7d6">'
+      +     '<circle cx="72" cy="72" r="2.6"/><circle cx="104" cy="58" r="2.2"/><circle cx="140" cy="76" r="2.6"/>'
+      +     '<circle cx="60" cy="112" r="2.2"/><circle cx="96" cy="98" r="3"/><circle cx="132" cy="118" r="2.4"/>'
+      +     '<circle cx="52" cy="146" r="2.4"/><circle cx="86" cy="136" r="2.2"/><circle cx="118" cy="150" r="2.8"/>'
+      +     '<circle cx="158" cy="140" r="2.2"/><circle cx="76" cy="164" r="2.4"/><circle cx="146" cy="166" r="2.6"/>'
+      +   '</g>'
+      +   '<text x="110" y="104" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="34" fill="#ffe08a" opacity=".85">\u2605</text>'
+      + '</svg>'
+      + '<div class="tro-cape-note">It was not on the invoice. The tailor denies all knowledge of it. '
+      + 'Jake has never once been asked to explain it, because everybody understood, immediately, '
+      + 'that there would be no explanation.</div>'
+      + '</div></div>';
+  }
+
   html += '<div class="tro-sec"><div class="tro-h">The Numbers</div>'
     + '<div class="tro-sub">Where it all got to</div><div class="tro-stats">'
     + '<div><div class="k">Stars</div><div class="v">' + totalStars() + '</div></div>'
     + '<div><div class="k">Furthest</div><div class="v">Set ' + Save.maxCleared() + '</div></div>'
     + '<div><div class="k">Best set</div><div class="v">' + (t.best || 0).toLocaleString() + '</div></div>'
-    + '<div><div class="k">B-Sides</div><div class="v">' + Save.bsidesUnlocked() + '/' + BSIDES.length + '</div></div>'
+    + '<div><div class="k">Liner Notes</div><div class="v">' + Save.bsidesUnlocked() + '/' + BSIDES.length + '</div></div>'
     + '<div><div class="k">Sets played</div><div class="v">' + t.started + '</div></div>'
     + '<div><div class="k">Josh</div><div class="v">Still out</div></div>'
     + '</div></div>';
@@ -6531,7 +6766,7 @@ function useCatnip() {
   if (t) {
     document.getElementById('vtK').textContent = 'Something has happened';
     document.getElementById('vtN').textContent = 'Josh is in the catnip';
-    document.getElementById('vtS').textContent = 'Your next set has help you did not ask for. Check the B-Sides afterwards.';
+    document.getElementById('vtS').textContent = 'Your next set has help you did not ask for. Check the Liner Notes afterwards.';
     t.classList.remove('show'); void t.offsetWidth; t.classList.add('show');
   }
 }
@@ -6549,7 +6784,7 @@ function buildLifestyle() {
   if (!grid) return;
   const fb = document.getElementById('fameBadge'); if (fb) fb.textContent = Save.fameLabel();
   const ex = document.getElementById('bandExtras');
-  if (ex) ex.innerHTML = '<button class="extra-btn" onclick="hideBand();showBsides()">♫ B-Sides</button>'
+  if (ex) ex.innerHTML = '<button class="extra-btn" onclick="hideBand();showBsides()">♫ Liner Notes</button>'
     + (Save.data.relicUnlocked ? '<button class="extra-btn relic" onclick="showRelic()">♦ Plasma Cathedral relics</button>' : '');
   grid.innerHTML = LIFESTYLE.map(cat => {
     const tier = Save.lifestyleTier(cat.key);
