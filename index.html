@@ -96,19 +96,19 @@ body.v-arena .stage-bg{background:
   border-radius:99px; text-decoration:none; background:rgba(13,10,20,.72); border:1px solid var(--gold-deep);
   color:var(--cream); font-size:.72rem; line-height:1; white-space:nowrap; overflow:hidden;}
 .np-chip.show{display:inline-flex;}
-.np-chip .np-eq{display:inline-flex; align-items:flex-end; gap:2px; height:11px; flex:0 0 auto;}
-.np-chip .np-eq i{display:block; width:2.5px; height:100%; border-radius:1px; background:var(--gold-hi); transform-origin:50% 100%;
+.sl-state .np-eq, .np-chip .np-eq{display:inline-flex; align-items:flex-end; gap:2px; height:11px; flex:0 0 auto;}
+.sl-state .np-eq i, .np-chip .np-eq i{display:block; width:2.5px; height:100%; border-radius:1px; background:var(--gold-hi); transform-origin:50% 100%;
   animation:np-bar 1.3s ease-in-out infinite alternate;}
-.np-chip .np-eq i:nth-child(2){animation-duration:1.7s; animation-delay:-.5s;}
-.np-chip .np-eq i:nth-child(3){animation-duration:1.1s; animation-delay:-.9s;}
+.sl-state .np-eq i:nth-child(2), .np-chip .np-eq i:nth-child(2){animation-duration:1.7s; animation-delay:-.5s;}
+.sl-state .np-eq i:nth-child(3), .np-chip .np-eq i:nth-child(3){animation-duration:1.1s; animation-delay:-.9s;}
 @keyframes np-bar{from{transform:scaleY(.3);}to{transform:scaleY(1);}}
 .np-chip .np-title{font-family:var(--serif); font-weight:700; font-size:.8rem; color:var(--gold-hi); overflow:hidden; text-overflow:ellipsis;}
 .np-chip .np-by{color:var(--cream-mute); flex:0 0 auto;}
 .np-chip .np-go{font-family:var(--mono); font-size:.56rem; letter-spacing:.1em; text-transform:uppercase; color:var(--gold-warm);
   border-left:1px solid var(--line); padding-left:7px; flex:0 0 auto;}
 @media (hover:hover){ .np-chip:hover{border-color:var(--gold-hi);} }
-.lowgfx .np-chip .np-eq i{animation:none; transform:scaleY(.7);}
-@media (prefers-reduced-motion:reduce){ .np-chip .np-eq i{animation:none; transform:scaleY(.7);} }
+.lowgfx .sl-state .np-eq i, .lowgfx .np-chip .np-eq i{animation:none; transform:scaleY(.7);}
+@media (prefers-reduced-motion:reduce){ .sl-state .np-eq i, .np-chip .np-eq i{animation:none; transform:scaleY(.7);} }
 .venue-toast .vt-k{font-family:var(--mono); font-size:.56rem; letter-spacing:.18em; text-transform:uppercase; color:var(--gold-warm);}
 .venue-toast .vt-n{font-family:var(--serif); font-weight:700; font-size:1.25rem; color:var(--cream); margin-top:2px;}
 .venue-toast .vt-s{font-size:.74rem; color:var(--cream-mute); margin-top:3px; font-style:italic;}
@@ -478,6 +478,32 @@ button.primary{background:linear-gradient(160deg,var(--gold),var(--gold-deep)); 
 .title-tag{font-family:var(--serif); font-style:italic; font-size:.95rem; color:var(--gold); margin:14px 0 24px;}
 .title-tag em{color:var(--gold-hi); font-style:italic;}
 .play-btn{font-size:1.05rem; padding:14px 44px;}
+/* ===== THE TITLE POSTER =====
+   The first thing every new player sees used to be text over a dimmed board. Now it is a
+   gig poster: the band on stage under the lights, Josh asleep on an amp — no, awake, in
+   the boa, unimpressed — and tonight's room on the marquee. The lineup wears whatever
+   the player has bought them, so the poster grows up with the save.
+   SAFETY: the beams sway, slowly (9-11s), and only rotate. No brightness change, no flash.
+   Off on lite machines and under reduced motion. */
+.titlescreen{overflow-y:auto; align-items:flex-start;
+  background:radial-gradient(ellipse 90% 55% at 50% 22%, rgba(74,46,92,.55), transparent 70%),
+             radial-gradient(ellipse at center, rgba(26,18,38,.95), rgba(10,8,16,.99));}
+.title-card{margin:auto 0;}
+.bigmark{font-size:2.5rem;}
+.bigmark .mark-sub{margin-top:6px;}
+.poster{position:relative; width:calc(100% + 16px); margin:10px -8px 0; aspect-ratio:440/250;
+  border-radius:16px; overflow:hidden; border:1px solid rgba(255,224,138,.22);
+  box-shadow:0 18px 40px -18px rgba(0,0,0,.9), inset 0 0 0 1px rgba(0,0,0,.4);}
+.poster svg{display:block; width:100%; height:100%;}
+.poster .beam{transform-box:view-box;}
+.poster .beam-a{transform-origin:118px 20px; animation:beam-sway 9.5s ease-in-out infinite alternate;}
+.poster .beam-b{transform-origin:220px 20px; animation:beam-sway 11s ease-in-out infinite alternate-reverse;}
+.poster .beam-c{transform-origin:322px 20px; animation:beam-sway 10s ease-in-out infinite alternate;}
+@keyframes beam-sway{from{transform:rotate(-4deg);}to{transform:rotate(4deg);}}
+.lowgfx .poster .beam{animation:none;}
+@media (prefers-reduced-motion:reduce){ .poster .beam{animation:none;} }
+.title-tag{margin:12px 0 18px;}
+.play-btn{font-size:1.25rem; padding:16px 56px; box-shadow:0 0 0 1px rgba(255,224,138,.35), 0 10px 28px -8px rgba(232,180,80,.55);}
 .links{display:flex; gap:9px; justify-content:center; flex-wrap:wrap; margin-top:24px;}
 .link{display:inline-flex; align-items:center; gap:6px; font-size:.76rem; font-weight:600; color:var(--cream-mute); text-decoration:none;
   border:1px solid var(--line); border-radius:99px; padding:7px 13px; background:var(--surface);
@@ -622,6 +648,31 @@ button.primary{background:linear-gradient(160deg,var(--gold),var(--gold-deep)); 
 .bside-t{font-family:var(--serif); font-weight:700; font-size:1.02rem; color:var(--cream); margin-bottom:5px;}
 .bside-x{font-size:.86rem; line-height:1.5; color:var(--cream-low);}
 .bside-card.locked .bside-x{font-family:var(--mono); font-size:.66rem; letter-spacing:.08em; text-transform:uppercase;}
+#setlistBtn.has-new{position:relative; border-color:var(--gold-warm);}
+#setlistBtn.has-new::after{content:''; position:absolute; top:-3px; right:-3px; width:9px; height:9px; border-radius:50%;
+  background:var(--gold-hi); box-shadow:0 0 0 2px var(--bg, #120e1a);}
+/* ===== THE SETLIST ===== */
+.sl-list{display:flex; flex-direction:column; gap:8px; margin-top:16px; text-align:left;}
+.sl-row{display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:14px; cursor:pointer;
+  background:linear-gradient(160deg,var(--surface-hi),var(--surface-low)); border:1px solid var(--line);
+  transition:border-color .2s ease, transform .15s ease;}
+.sl-row:hover{border-color:rgba(255,224,138,.4);}
+.sl-row:active{transform:scale(.99);}
+.sl-row.playing{border-color:var(--gold-hi); box-shadow:0 0 0 1px rgba(255,224,138,.25), 0 10px 26px -14px rgba(232,180,80,.6);}
+.sl-row.locked{cursor:default; opacity:.5;}
+.sl-num{flex:0 0 auto; width:30px; font-family:var(--mono); font-size:.8rem; color:var(--gold-warm); text-align:center;}
+.sl-bd{flex:1 1 auto; min-width:0;}
+.sl-title{font-family:var(--serif); font-weight:700; font-size:1.05rem; color:var(--cream); line-height:1.2;}
+.sl-where{font-family:var(--mono); font-size:.56rem; letter-spacing:.13em; text-transform:uppercase; color:var(--cream-low); margin-top:3px;}
+.sl-state{flex:0 0 auto; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--line); color:var(--gold-hi); font-size:.85rem;}
+.sl-row.playing .sl-state{background:var(--gold-hi); color:#10131c; border-color:var(--gold-hi);}
+.sl-state .np-eq{height:13px;} .sl-state .np-eq i{background:#10131c; width:3px;}
+.sl-sp{flex:0 0 auto; font-family:var(--mono); font-size:.56rem; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--gold-warm); text-decoration:none; padding:6px 9px; border:1px solid var(--gold-deep); border-radius:99px;}
+.sl-row.locked .sl-sp{display:none;}
+.sl-foot{margin-top:16px; font-size:.82rem; line-height:1.5; color:var(--cream-low);}
+.sl-foot a{color:var(--gold-hi);}
 #bsideBtn.has-new{position:relative; border-color:var(--gold-warm);}
 #bsideBtn.has-new::after{content:''; position:absolute; top:-3px; right:-3px; width:9px; height:9px; border-radius:50%;
   background:var(--gold-hi); box-shadow:0 0 8px var(--gold-hi); animation:newDot 2.4s ease-in-out infinite;}
@@ -1399,6 +1450,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
   <div class="titlescreen" id="titleScreen">
     <div class="title-card">
       <div class="bigmark">X-RAY <span class="star">★</span> STAR<span class="mark-sub">Match to Stardom</span></div>
+      <div class="poster" id="titlePoster" aria-label="The band on stage, and Josh"></div>
       <div class="title-tag">From basement dreamers to <em>superstars</em></div>
       <button class="primary play-btn" onclick="this.closest('.titlescreen').style.display='none';Game.start()">▶ Play</button>
       <button class="title-newgame" onclick="newJourney(this)">⟲ New Game</button>
@@ -1411,7 +1463,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
       </div>
       <div class="links-note sound-on">♪ Now with the band’s real recordings — turn your sound on.</div>
       <div class="links-note">A little gift from the band. Have fun — then go give them a listen.</div>
-      <div class="build-stamp">Build B33 · monster</div>
+      <div class="build-stamp">Build B35 · the setlist</div>
       <div class="advisory" role="note" aria-label="Content advisory">
         <div class="adv-top">Advisory</div>
         <div class="adv-rule"></div>
@@ -1510,6 +1562,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
         <button class="primary band-cta" onclick="showBand()">★ The Band</button>
         <button onclick="showBsides()" id="bsideBtn">♫ Liner Notes</button>
         <button onclick="showTrophies()">🏆 Trophy Room</button>
+        <button onclick="showSetlist()" id="setlistBtn">🎵 Setlist</button>
         <button onclick="toggleMusic()" id="musicBtn">♪ Music: On</button>
         <button onclick="showBackup()">⇅ Backup</button>
         <button onclick="newJourney(this)">⟲ New Game</button>
@@ -1517,7 +1570,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
       </div>
       <div class="j-path" id="mapPath"></div>
       <div class="gauge">
-        <div class="build-stamp">Build B33 · monster</div>
+        <div class="build-stamp">Build B35 · the setlist</div>
         <div class="gauge-stats" id="gaugeStats"></div>
         <button class="like-btn" id="likeBtn" onclick="Game.like()">♥ Like this game</button>
       </div>
@@ -1565,6 +1618,22 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
   </div>
 
   <!-- LINER NOTES — collectible lore vignettes -->
+  <div class="bandscreen" id="setlistScreen">
+    <div class="band-inner">
+      <div class="band-topbar">
+        <button class="band-back-btn" onclick="hideSetlist()">← Back to the Game</button>
+        <div class="j-coins" id="setlistCount">0 / 8</div>
+      </div>
+      <div class="j-head"><div class="j-title">The Setlist</div></div>
+      <div class="j-sub">The real X-Ray Star songs in the game. Each new room unlocks one. Tap one to play it.</div>
+      <div class="sl-list" id="setlistList"></div>
+      <div class="sl-foot">All of these, and the rest of the catalogue, are free on
+        <a href="https://open.spotify.com/artist/7kuG094aXgRmkgIOH9Tpdi" target="_blank" rel="noopener" onclick="nowPlayingTapped()">Spotify</a> and
+        <a href="https://youtube.com/playlist?list=PLd1uZNELj91lcc_vY2wqcmCd9OqVxs0-d" target="_blank" rel="noopener" onclick="nowPlayingTapped()">YouTube</a>.</div>
+      <div class="j-foot"><button class="primary" onclick="hideSetlist()">← Back to the Journey</button></div>
+    </div>
+  </div>
+
   <div class="bandscreen" id="bsideScreen">
     <div class="band-inner">
       <div class="band-topbar">
@@ -4744,7 +4813,7 @@ const Session = {
   // only true when the player is actually at the board, not on a menu or behind a card
   atBoard() {
     if (Game.atTitle || Game.ended) return false;
-    return !['mapScreen', 'bandScreen', 'bsideScreen', 'overlay', 'setIntro', 'tutorial']
+    return !['mapScreen', 'bandScreen', 'bsideScreen', 'setlistScreen', 'trophyScreen', 'overlay', 'setIntro', 'tutorial']
       .some(id => { const el = document.getElementById(id); return el && el.classList.contains('show'); });
   },
   save() {
@@ -4838,7 +4907,7 @@ Game.newGame = function() {
     showVenueToast(v);
     if (Sfx.levelUpSting) setTimeout(() => Sfx.levelUpSting(), 120);
   }
-  try { Music.encore = false; Sfx.retune(); } catch (_) {}   // this set's song
+  try { Music.pick = null; Music.encore = false; Sfx.retune(); } catch (_) {}   // this set's song
   Peek.cancel();
   setVenueLabel(lv.n);
   hideOverlay();
@@ -5910,37 +5979,43 @@ function restoreBackup() {
    Star. `gain` evens out loudness between recordings (measured, 1 = quietest track).
    ===================================================================== */
 const SPOTIFY_URL = 'https://open.spotify.com/artist/7kuG094aXgRmkgIOH9Tpdi';
-/* THE SETLIST. Five long recordings carry the sets; the short one is the victory song.
-   - Each room introduces ONE new song, on its first set, and then rotates through every
-     song the band has "learned" so far. So the Basement is one song, the Coffee Shop
-     alternates two, and by the Arena the band is playing the whole catalogue.
+/* THE SETLIST. Seven long recordings carry the sets; the short one is the victory song.
+   - Each room has its OWN song. It opens the room and comes back every other set; the sets
+     in between step back through the songs from earlier rooms. So a room always sounds like
+     itself, and no single recording carries a third of the game.
+   - The LAST line is held back for the final set of the game and nowhere else.
    - Winning a set brings in the VICTORY song, which plays through the result card and the
      Journey map until the next set starts. It is a 30-second clip, which is exactly how
      long people spend there; looped for a whole set it would wear thin.
-   TO REORDER: move lines within SETLIST (top = the Basement's song, bottom = the Theater's
-   and the finale's). To rename: fill in `title`. Nothing else needs to change. */
+   TO REORDER: move lines within SETLIST (top = the Basement's song, second from bottom =
+   the Arena's, bottom = the finale). `gain` evens out how loud each recording is. */
 const SETLIST = [
   { file: 'track-archipelago.mp3', title: 'House on Fire', gain: 0.93 },   // The Basement
-  { file: 'track-spires.mp3',      title: 'Ordinary', gain: 0.90 },   // + The Coffee Shop
-  { file: 'track-citadel.mp3',     title: 'Crutch', gain: 0.92 },   // + The Dive Bar
-  { file: 'track-hailstone.mp3',   title: 'Meteor', gain: 1.00 },   // + The Club
-  { file: 'track-highlands.mp3',   title: 'In Response', gain: 0.69 },   // + The Theater (and the last set of all)
+  { file: 'track-spires.mp3',      title: 'Ordinary',      gain: 0.90 },   // + The Coffee Shop
+  { file: 'track-citadel.mp3',     title: 'Crutch',        gain: 0.92 },   // + The Dive Bar
+  { file: 'track-hailstone.mp3',   title: 'Meteor',        gain: 1.00 },   // + The Club
+  { file: 'track-highlands.mp3',   title: 'In Response',   gain: 0.69 },   // + The Theater
+  { file: 'track-throne.mp3',      title: 'Been Waiting',  gain: 0.91 },   // + The Arena
+  { file: 'track-squall.mp3',      title: 'Full Circle',   gain: 0.88 },   // the final set only
 ];
 const VICTORY_SONG = { file: 'Montser.mp3', title: 'My Own Private Monster', gain: 0.72 };
 function songForSet(n) {
-  const v = Math.max(0, venueIndex(n)), k = n - VENUES[v].from, top = SETLIST.length - 1;
-  if (v > top) return SETLIST[Math.min(top, Math.max(0, k)) % SETLIST.length];   // the Arena plays them all, in order
-  if (k <= 0) return SETLIST[v];                                                // a new room opens with its new song
-  return SETLIST[(((v - k) % (v + 1)) + (v + 1)) % (v + 1)];                    // then back through the older ones
+  const last = SETLIST.length - 1;
+  if (n >= LEVELS.length) return SETLIST[last];                                 // the finale has its own song
+  const v = Math.min(Math.max(0, venueIndex(n)), last - 1), k = n - VENUES[v].from;
+  if (v === 0 || k <= 0 || k % 2 === 0) return SETLIST[v];                      // the room's own song, every other set
+  return SETLIST[(((v - 1 - (k - 1) / 2) % v) + v) % v];                        // in between: back through earlier rooms
 }
 const Music = {
   el: null, gainNode: null, cur: null, on: false, dead: {}, fade: 0, duck: 1,
   encore: false,                   // true from a win until the next set starts
+  pick: null,                      // a song chosen on the Setlist screen; wins over everything while it is open
   off: Prefs.get('musicOff', false),
   BASE: 0.55,                      // music sits under the sound effects
   _ft: null, _dt: null, _seam: false,
   trackFor(level) {
     try {
+      if (this.pick && !level) return this.pick;
       if (this.encore && !level) return VICTORY_SONG;
       return songForSet(level || Game.level || 1) || null;
     } catch (_) { return null; }
@@ -6544,7 +6619,7 @@ const Peek = {
   clearSteps() { this.steps.forEach(t => clearTimeout(t)); this.steps = []; },
   // never open on top of another screen or a win/lose panel
   blocked() {
-    return ['overlay', 'mapScreen', 'bandScreen', 'bsideScreen', 'trophyScreen', 'tutorial'].some(id => {
+    return ['overlay', 'mapScreen', 'bandScreen', 'bsideScreen', 'trophyScreen', 'setlistScreen', 'tutorial'].some(id => {
       const el = document.getElementById(id);
       return el && el.classList.contains('show');
     }) || Game.atTitle === true;
@@ -6639,7 +6714,68 @@ function hideTitle() {
   if (t) { t.classList.add('hide'); t.style.display = 'none'; t.style.pointerEvents = 'none'; }
   Game.atTitle = false;
 }
+/* The gig poster on the title screen. Built from the same portraits as the Band screen, so
+   the lineup is always dressed in whatever the player has bought them. */
+function buildPoster() {
+  const host = document.getElementById('titlePoster');
+  if (!host) return;
+  let tonight = VENUES[0], setN = 1;
+  try { setN = Math.min(LEVELS.length, Save.data.unlocked || 1); tonight = venueFor(setN); } catch (_) {}
+  const fig = (key, x, y, w) => {
+    let svg = ''; try { svg = memberPortrait(key, Save.memberTier(key)); } catch (_) { return ''; }
+    return svg.replace('<svg viewBox="0 0 100 100"', '<svg x="' + x + '" y="' + y + '" width="' + w + '" height="' + w + '" viewBox="0 0 100 100"');
+  };
+  const beam = (cls, x, c) => '<g class="beam ' + cls + '"><path d="M' + (x - 9) + ' 22 L' + (x + 9) + ' 22 L' + (x + 78) + ' 214 L' + (x - 78) + ' 214Z" fill="url(#pb' + c + ')"/></g>';
+  host.innerHTML = '<svg viewBox="0 0 440 250" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>'
+    + '<linearGradient id="pbBg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c1430"/><stop offset=".7" stop-color="#2a1a34"/><stop offset="1" stop-color="#120c1a"/></linearGradient>'
+    + '<linearGradient id="pbG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd98a" stop-opacity=".42"/><stop offset="1" stop-color="#ffd98a" stop-opacity="0"/></linearGradient>'
+    + '<linearGradient id="pbM" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff7ab6" stop-opacity=".36"/><stop offset="1" stop-color="#ff7ab6" stop-opacity="0"/></linearGradient>'
+    + '<linearGradient id="pbT" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6ff0d6" stop-opacity=".34"/><stop offset="1" stop-color="#6ff0d6" stop-opacity="0"/></linearGradient>'
+    + '<radialGradient id="pbHaze" cx="50%" cy="60%" r="55%"><stop offset="0" stop-color="#ffcf8a" stop-opacity=".22"/><stop offset="1" stop-color="#ffcf8a" stop-opacity="0"/></radialGradient>'
+    + '<linearGradient id="pbLip" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2c44"/><stop offset="1" stop-color="#140e1c"/></linearGradient>'
+    + '<linearGradient id="pbAmp" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1b1724"/><stop offset=".5" stop-color="#2a2434"/><stop offset="1" stop-color="#16121e"/></linearGradient>'
+    + '</defs>'
+    + '<rect width="440" height="250" fill="url(#pbBg)"/>'
+    + '<path d="M220 40 L233 78 L273 78 L241 101 L253 140 L220 117 L187 140 L199 101 L167 78 L207 78Z" fill="#ffe08a" opacity=".07"/>'
+    + '<ellipse cx="220" cy="160" rx="230" ry="110" fill="url(#pbHaze)"/>'
+    + '<rect x="0" y="10" width="440" height="7" fill="#2c2440"/><rect x="0" y="20" width="440" height="3" fill="#221c32"/>'
+    + beam('beam-a', 118, 'M') + beam('beam-b', 220, 'G') + beam('beam-c', 322, 'T')
+    + '<g fill="#221c32"><rect x="106" y="14" width="24" height="12" rx="3"/><rect x="208" y="14" width="24" height="12" rx="3"/><rect x="310" y="14" width="24" height="12" rx="3"/></g>'
+    + '<g fill="#fff3d6"><ellipse cx="118" cy="26" rx="8" ry="2.6"/><ellipse cx="220" cy="26" rx="8" ry="2.6"/><ellipse cx="322" cy="26" rx="8" ry="2.6"/></g>'
+    // the drum riser, behind everyone
+    + '<rect x="200" y="176" width="120" height="22" rx="3" fill="#2a2236"/><rect x="200" y="176" width="120" height="4" fill="#3a3048"/>'
+    // amp stacks
+    + '<g><rect x="8" y="118" width="46" height="34" rx="3" fill="url(#pbAmp)" stroke="#0c0a12" stroke-width="2"/><rect x="8" y="154" width="46" height="46" rx="3" fill="url(#pbAmp)" stroke="#0c0a12" stroke-width="2"/>'
+    +   '<rect x="6" y="108" width="50" height="10" rx="2" fill="#2e2838"/><g fill="#c9a14a"><circle cx="16" cy="113" r="1.6"/><circle cx="23" cy="113" r="1.6"/><circle cx="30" cy="113" r="1.6"/></g></g>'
+    + '<g><rect x="386" y="134" width="46" height="66" rx="3" fill="url(#pbAmp)" stroke="#0c0a12" stroke-width="2"/>'
+    +   '<rect x="384" y="124" width="50" height="10" rx="2" fill="#2e2838"/><g fill="#c9a14a"><circle cx="394" cy="129" r="1.6"/><circle cx="401" cy="129" r="1.6"/><circle cx="408" cy="129" r="1.6"/></g></g>'
+    // the band: Dave on the riser at the back, then Kat, Jake, and Maya out front
+    + fig('drums', 214, 78, 104) + fig('bass', 300, 96, 104) + fig('guitar', 42, 96, 104) + fig('mic', 122, 84, 118)
+    // Josh, on the amp, in the boa, entirely unmoved by any of it
+    + '<g transform="translate(409 124)">'
+    +   '<path d="M14 -2 q20 -4 18 -22" fill="none" stroke="#141119" stroke-width="5" stroke-linecap="round"/>'
+    +   '<ellipse cx="0" cy="-10" rx="17" ry="12" fill="#141119"/>'
+    +   '<circle cx="0" cy="-28" r="12" fill="#191521"/>'
+    +   '<path d="M-11 -34 l-2 -11 10 5Z M11 -34 l2 -11 -10 5Z" fill="#191521"/>'
+    +   '<path d="M-10 -35 l-1 -6 5 3Z M10 -35 l1 -6 -5 3Z" fill="#a9707c" opacity=".8"/>'
+    +   '<ellipse cx="-4.5" cy="-29" rx="2.8" ry="3.2" fill="#c3e04f"/><ellipse cx="4.5" cy="-29" rx="2.8" ry="3.2" fill="#c3e04f"/>'
+    +   '<ellipse cx="-4.5" cy="-28.6" rx="1" ry="2.6" fill="#141119"/><ellipse cx="4.5" cy="-28.6" rx="1" ry="2.6" fill="#141119"/>'
+    +   '<g fill="#d4548f"><circle cx="-12" cy="-17" r="4.6"/><circle cx="-5" cy="-14" r="5"/><circle cx="3" cy="-14" r="5"/><circle cx="10" cy="-17" r="4.6"/></g>'
+    +   '<g fill="#ff9ccb"><circle cx="-9" cy="-18" r="2.4"/><circle cx="0" cy="-16" r="2.6"/><circle cx="8" cy="-18" r="2.4"/></g>'
+    + '</g>'
+    // the stage lip and the marquee
+    + '<rect x="0" y="198" width="440" height="52" fill="url(#pbLip)"/><rect x="0" y="198" width="440" height="3" fill="#5a4668"/>'
+    + '<g fill="#ffdc94" opacity=".85">' + [30, 90, 150, 290, 350, 410].map(x => '<ellipse cx="' + x + '" cy="205" rx="7" ry="2.2"/>').join('') + '</g>'
+    + (() => {
+        const txt = 'TONIGHT \u00b7 ' + String(tonight.name).replace(/^The /, '').toUpperCase() + ' \u00b7 SET ' + setN;
+        const w = Math.min(236, txt.length * 8.4);   // the text is squeezed to fit, whatever font the phone has
+        return '<rect x="' + (220 - w / 2 - 14) + '" y="214" width="' + (w + 28) + '" height="26" rx="4" fill="#0e0a14" stroke="#c9a14a" stroke-width="1.4"/>'
+          + '<text x="220" y="231" text-anchor="middle" textLength="' + w + '" lengthAdjust="spacingAndGlyphs" font-family="\'JetBrains Mono\',monospace" font-size="10" fill="#ffe08a">' + txt + '</text>';
+      })()
+    + '</svg>';
+}
 function showTitle() {
+  try { buildPoster(); } catch (_) {}
   const t = document.getElementById('titleScreen');
   if (t) { t.classList.remove('hide'); t.style.display = ''; t.style.pointerEvents = ''; }
   Game.atTitle = true;
@@ -6764,6 +6900,10 @@ function showMap() {
   Peek.cancel();
   paintGauge();
   syncMusicBtn();
+  try { syncSetlistBtn(); } catch (_) {}
+  const sl = document.getElementById('setlistScreen');
+  if (sl) sl.classList.remove('show');
+  if (Music.pick) { Music.pick = null; try { Sfx.retune(); } catch (_) {} }
   hideOverlay();
   document.getElementById('bandScreen').classList.remove('show');
   document.getElementById('bsideScreen').classList.remove('show');
@@ -6895,7 +7035,7 @@ function buildTrophies() {
     + '</div></div>';
   box.innerHTML = html;
 }
-function backToTitle() { hideMap(); document.getElementById('bandScreen').classList.remove('show'); document.getElementById('trophyScreen').classList.remove('show'); showTitle(); }
+function backToTitle() { hideMap(); document.getElementById('bandScreen').classList.remove('show'); document.getElementById('trophyScreen').classList.remove('show'); document.getElementById('setlistScreen').classList.remove('show'); showTitle(); }
 
 // In-game Replay: instant if the set hasn't really started or is already over,
 // otherwise ask first — a mid-set mis-tap used to wipe the whole set with no warning.
@@ -7209,6 +7349,69 @@ function buildBsides() {
     return `<div class="bside-card locked"><div class="bside-ic">🔒</div><div class="bside-bd"><div class="bside-t">? ? ?</div><div class="bside-x">Clear level ${BSIDE_AT[i]} to dig this one up</div></div></div>`;
   }).join('');
 }
+/* THE SETLIST. Every real song in the game, unlocked as the band reaches the room it
+   belongs to. Tapping one plays it (and turns the sound back on if it was off \u2014 tapping a
+   song is as clear a "I want to hear this" as there is). Leaving puts the normal music back. */
+function setlistEntries() {
+  const out = SETLIST.map((tr, i) => {
+    const last = i === SETLIST.length - 1;
+    const v = last ? null : VENUES[Math.min(i, VENUES.length - 1)];
+    const at = last ? LEVELS.length : v.from;
+    return { tr, where: last ? 'The final set' : v.name, lockText: last ? 'Reach the final set' : 'Reach ' + v.name, open: (Save.data.unlocked || 1) >= at };
+  });
+  out.push({ tr: VICTORY_SONG, where: 'Plays after every win', lockText: 'Win a set', open: Save.maxCleared() >= 1 });
+  return out;
+}
+function songsUnlocked() { try { return setlistEntries().filter(e => e.open).length; } catch (_) { return 0; } }
+function syncSetlistBtn() {
+  const b = document.getElementById('setlistBtn'); if (!b) return;
+  b.classList.toggle('has-new', songsUnlocked() > (Prefs.get('songsSeen', 1) || 0));
+}
+function buildSetlist() {
+  const box = document.getElementById('setlistList'); if (!box) return;
+  const list = setlistEntries();
+  const playing = Music.on && Music.cur && Sfx.bgmOn && !Sfx.muted && !Music.off ? Music.cur.file : null;
+  const cnt = document.getElementById('setlistCount');
+  if (cnt) cnt.textContent = list.filter(e => e.open).length + ' / ' + list.length;
+  box.innerHTML = list.map((e, i) => {
+    const on = e.open && playing === e.tr.file;
+    return '<div class="sl-row' + (e.open ? '' : ' locked') + (on ? ' playing' : '') + '" onclick="setlistPlay(' + i + ')">'
+      + '<div class="sl-num">' + String(i + 1).padStart(2, '0') + '</div>'
+      + '<div class="sl-bd"><div class="sl-title">' + e.tr.title + '</div>'
+      + '<div class="sl-where">' + (e.open ? e.where : '\uD83D\uDD12 ' + e.lockText) + '</div></div>'
+      + '<a class="sl-sp" href="https://open.spotify.com/artist/7kuG094aXgRmkgIOH9Tpdi" target="_blank" rel="noopener" onclick="event.stopPropagation();nowPlayingTapped()">Spotify \u2197</a>'
+      + '<div class="sl-state">' + (!e.open ? '' : on ? '<span class="np-eq"><i></i><i></i><i></i></span>' : '\u25B6') + '</div>'
+      + '</div>';
+  }).join('');
+}
+function setlistPlay(i) {
+  const e = setlistEntries()[i];
+  if (!e || !e.open) return;
+  try {
+    Sfx.enable();
+    if (Sfx.muted) { Sfx.setMuted(false); syncMuteBtn(); }
+    if (Music.off) { Music.off = false; Prefs.set('musicOff', false); syncMusicBtn(); }
+    Music.pick = e.tr;
+    if (!Sfx.bgmOn) Sfx.startBGM(); else Sfx.retune();
+    Metrics.event('setlist-play');
+  } catch (_) {}
+  buildSetlist();
+  setTimeout(() => { try { buildSetlist(); } catch (_) {} }, 900);   // repaint once it is really playing
+}
+function showSetlist() {
+  hideOverlay(); hideTitle();
+  document.getElementById('mapScreen').classList.remove('show');
+  try { Prefs.set('songsSeen', songsUnlocked()); } catch (_) {}
+  syncSetlistBtn();
+  buildSetlist();
+  document.getElementById('setlistScreen').classList.add('show');
+  Metrics.event('setlist');
+}
+function hideSetlist() {
+  document.getElementById('setlistScreen').classList.remove('show');
+  showMap();
+}
+
 function showBsides() {
   hideOverlay();
   hideTitle();
@@ -7329,6 +7532,7 @@ function previewSet() {
 
 Metrics.boot();
 Metrics.event('play');
+try { buildPoster(); } catch (_) {}
 
 Game.newGame();   // Level 1 is set up behind the title screen
 // A ?set= preview wins; otherwise, if they were part-way through a set when the page went
