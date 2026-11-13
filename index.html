@@ -142,6 +142,7 @@ body.v-arena .stage-bg{background:
   width:76px; z-index:2; display:none; line-height:0;
   transform:rotate(-4deg); filter:drop-shadow(0 6px 14px rgba(0,0,0,.6));
 }
+.pc-corner.no-room, .gig-corner.no-room, .sticker-corner.no-room, .merch-corner.no-room{visibility:hidden;}
 .gig-corner{transform:rotate(3deg);}
 .sticker-corner{transform:rotate(-7deg); width:70px;}
 .merch-corner{transform:rotate(2deg); width:76px;}
@@ -1463,7 +1464,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
       </div>
       <div class="links-note sound-on">♪ Now with the band’s real recordings — turn your sound on.</div>
       <div class="links-note">A little gift from the band. Have fun — then go give them a listen.</div>
-      <div class="build-stamp">Build B35 · the setlist</div>
+      <div class="build-stamp">Build B36 · corner room</div>
       <div class="advisory" role="note" aria-label="Content advisory">
         <div class="adv-top">Advisory</div>
         <div class="adv-rule"></div>
@@ -1570,7 +1571,7 @@ body{padding-top:8px; height:100vh; overflow:hidden;}   /* phones: fixed viewpor
       </div>
       <div class="j-path" id="mapPath"></div>
       <div class="gauge">
-        <div class="build-stamp">Build B35 · the setlist</div>
+        <div class="build-stamp">Build B36 · corner room</div>
         <div class="gauge-stats" id="gaugeStats"></div>
         <button class="like-btn" id="likeBtn" onclick="Game.like()">♥ Like this game</button>
       </div>
@@ -7411,6 +7412,42 @@ function hideSetlist() {
   document.getElementById('setlistScreen').classList.remove('show');
   showMap();
 }
+
+/* The corner posters are pinned to the screen's bottom-right corner. On a phone with the
+   browser's address bar showing, the board (and the now-playing bar under it) can reach
+   right down into that corner \u2014 and a poster sitting on a tile is not decoration, it is
+   a bug. So: whenever the layout or the scroll changes, check. If the poster would land on
+   anything you need to see or tap, it steps out until there is room again. */
+const CORNER_SEL = '.pc-corner, .gig-corner, .sticker-corner, .merch-corner';
+const CORNER_AVOID = ['#board', '#npChip', '.controls', '#msg', '.hud', '.goal'];
+function fitCorners() {
+  try {
+    const hits = [];
+    CORNER_AVOID.forEach(q => document.querySelectorAll(q).forEach(el => {
+      const r = el.getBoundingClientRect();
+      if (r.width && r.height) hits.push(r);
+    }));
+    document.querySelectorAll(CORNER_SEL).forEach(c => {
+      c.classList.remove('no-room');
+      const r = c.getBoundingClientRect();
+      if (!r.width) return;
+      const pad = 4;
+      const clash = hits.some(h => r.left < h.right + pad && r.right > h.left - pad && r.top < h.bottom + pad && r.bottom > h.top - pad);
+      c.classList.toggle('no-room', clash);
+    });
+  } catch (_) {}
+}
+(function () {
+  let q = 0;
+  const later = () => { if (!q) q = requestAnimationFrame(() => { q = 0; fitCorners(); }); };
+  addEventListener('resize', later, { passive: true });
+  addEventListener('scroll', later, { passive: true });
+  try { if (window.visualViewport) visualViewport.addEventListener('resize', later); } catch (_) {}
+  try { new ResizeObserver(later).observe(document.body); } catch (_) {}
+  try { new MutationObserver(later).observe(document.body, { attributes: true, attributeFilter: ['class'] }); } catch (_) {}
+  try { const np = document.getElementById('npChip'); if (np) new MutationObserver(later).observe(np, { attributes: true, attributeFilter: ['class', 'style'] }); } catch (_) {}
+  setTimeout(later, 300); setTimeout(later, 1500);
+})();
 
 function showBsides() {
   hideOverlay();
